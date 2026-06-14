@@ -24,12 +24,7 @@ const autoLomitoDate = lastLomitoRes.rows.length > 0 ? lastLomitoRes.rows[0].dat
 const settingsRes = await db.execute("SELECT value FROM settings WHERE key = 'last_lomito_date'");
 const manualLomitoDate = settingsRes.rows.length > 0 ? settingsRes.rows[0].value as string : null;
 
-let lastLomitoDate = autoLomitoDate;
-if (manualLomitoDate) {
-	if (!lastLomitoDate || manualLomitoDate > lastLomitoDate) {
-		lastLomitoDate = manualLomitoDate;
-	}
-}
+let lastLomitoDate = manualLomitoDate ? manualLomitoDate : autoLomitoDate;
 
 let daysSinceLomito: number | null = null;
 let lomitoTooltip = "Nunca hubo un lomito aún 😢";
