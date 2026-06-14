@@ -1,0 +1,83 @@
+---
+import "../styles/global.css";
+import db from "../db/index.js";
+
+const { user } = Astro.locals;
+
+// Calculate days without lomito
+const today = new Date();
+today.setHours(today.getHours() - 3);
+const todayStr = today.toISOString().split('T')[0];
+
+const lastLomitoRes = await db.execute(`
+	SELECT r1.date
+	FROM roll r1
+	JOIN roll r2 ON r1.date = r2.date AND r1.id != r2.id
+		AND r1.die1 = r2.die1 AND r1.die2 = r2.die2
+		AND r1.die3 = r2.die3 AND r1.die4 = r2.die4
+	ORDER BY r1.date DESC
+	LIMIT 1
+`);
+
+const lastLomitoDate = lastLomitoRes.rows.length > 0 ? lastLomitoRes.rows[0].date as string : null;
+let daysSinceLomito: number | null = null;
+let lomitoTooltip = "Nunca hubo un lomito aún 😢";
+
+if (lastLomitoDate) {
+	const last = new Date(lastLomitoDate + "T12:00:00");
+	const now = new Date(todayStr + "T12:00:00");
+	daysSinceLomito = Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+	lomitoTooltip = `Último lomito: ${lastLomitoDate}`;
+}
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>POSALANA - POne SAca LAva NAda</title>
+		<!-- Google Fonts -->
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	</head>
+	<body class="bg-gray-100 text-gray-900 font-sans min-h-screen flex flex-col">
+		<header class="bg-white shadow">
+			<div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+				<div class="flex items-center gap-4">
+					<h1 class="text-xl font-bold"><a href="/"><span class="text-red-500">PO</span><span class="text-orange-500">SA</span><span class="text-yellow-600">LA</span><span class="text-green-600">NA</span></a></h1>
+					<div class="relative group">
+						<span class="text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded-full cursor-default">
+							🥩 {daysSinceLomito !== null ? daysSinceLomito : "∞"} días
+						</span>
+						<div class="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-gray-900 text-white text-xs px-3 py-2 rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+							{lomitoTooltip}
+						</div>
+					</div>
+				</div>
+				<nav class="space-x-4">
+					<a href="/" class="hover:text-blue-600">Inicio</a>
+					<a href="/history" class="hover:text-blue-600">Historial</a>
+					<a href="/rules" class="hover:text-blue-600">Reglas</a>
+					{user ? (
+						<span class="ml-4 font-semibold text-blue-800">{user.username}</span>
+						<form method="post" action="/api/logout" class="inline">
+							<button class="text-red-500 ml-2 hover:underline">Salir</button>
+						</form>
+					) : (
+						<a href="/login" class="text-blue-600 ml-4 hover:underline">Login</a>
+					)}
+				</nav>
+			</div>
+		</header>
+		<main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
+			<slot />
+		</main>
+		<footer class="bg-white border-t py-4 text-center text-sm text-gray-500">
+			&copy; 2026 POSALANA
+		</footer>
+	</body>
+</html>

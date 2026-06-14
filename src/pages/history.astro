@@ -1,0 +1,72 @@
+---
+import Layout from '../layouts/Layout.astro';
+import db from '../db/index.js';
+
+if (!Astro.locals.user) {
+	return Astro.redirect('/login');
+}
+
+// Get all rolls ordered by date descending, then by die scores ascending
+const allRollsRes = await db.execute(`
+    SELECT r.*, u.username, u.avatar_url 
+    FROM roll r
+    JOIN user u ON r.user_id = u.id
+    ORDER BY r.date DESC, r.die1 ASC, r.die2 ASC, r.die3 ASC, r.die4 ASC
+`);
+
+// Group by date
+const groupedRolls: Record<string, typeof allRollsRes.rows> = {};
+for (const row of allRollsRes.rows) {
+    const date = row.date as string;
+    if (!groupedRolls[date]) {
+        groupedRolls[date] = [];
+    }
+    groupedRolls[date].push(row);
+}
+
+const dates = Object.keys(groupedRolls).sort((a, b) => b.localeCompare(a));
+const chores = [
+    { label: "LAva", code: "LA" },
+    { label: "SAca", code: "SA" },
+    { label: "POne", code: "PO" }
+];
+const safeChore = { label: "NAda", code: "NA" };
+---
+
+<Layout>
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-2xl font-bold mb-6">Historial POSALANA</h2>
+        
+        {dates.length === 0 ? (
+            <p class="text-gray-500 text-center">No hay historial disponible.</p>
+        ) : (
+            <div class="space-y-8">
+                {dates.map(date => (
+                    <div>
+                        <h3 class="text-lg font-bold mb-3 border-b pb-1 text-blue-800">{date}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {groupedRolls[date].map((roll, index) => {
+                                const chore = index < 3 ? chores[index] : safeChore;
+                                const isSafe = index >= 3;
+                                return (
+                                    <div class={`flex items-center justify-between p-3 rounded border ${isSafe ? 'bg-green-50' : 'bg-red-50'}`}>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 rounded-full bg-gray-200 overflow-hidden">
+                                                {roll.avatar_url && <img src={roll.avatar_url as string} alt={roll.username as string} />}
+                                            </div>
+                                            <span class="font-semibold text-sm">{roll.username}</span>
+                                        </div>
+                                        <div class="text-sm">
+                                            <span class="font-mono text-gray-500 mr-2">{roll.die1}-{roll.die2}-{roll.die3}-{roll.die4}</span>
+                                            <span class={`font-bold px-2 py-0.5 rounded text-xs text-white ${isSafe ? 'bg-green-600' : 'bg-red-600'}`}>{chore.code}</span>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )}
+    </div>
+</Layout>

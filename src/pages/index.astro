@@ -1,0 +1,130 @@
+---
+import Layout from '../layouts/Layout.astro';
+import db from '../db/index.js';
+
+if (!Astro.locals.user) {
+	return Astro.redirect('/login');
+}
+
+const user = Astro.locals.user;
+
+// Get today's date in GMT-3
+const today = new Date();
+today.setHours(today.getHours() - 3);
+const dateStr = today.toISOString().split('T')[0];
+
+// Check if user rolled
+const userRollRes = await db.execute({
+    sql: "SELECT * FROM roll WHERE user_id = ? AND date = ?",
+    args: [user.id, dateStr]
+});
+const hasRolled = userRollRes.rows.length > 0;
+const myRoll = hasRolled ? userRollRes.rows[0] : null;
+
+// Get all rolls for today, ordered by rules
+const allRollsRes = await db.execute({
+    sql: `
+        SELECT r.*, u.username, u.avatar_url 
+        FROM roll r
+        JOIN user u ON r.user_id = u.id
+        WHERE r.date = ?
+        ORDER BY r.die1 ASC, r.die2 ASC, r.die3 ASC, r.die4 ASC
+    `,
+    args: [dateStr]
+});
+const allRolls = allRollsRes.rows;
+
+const chores = [
+    { label: "LAva los platos", code: "LA", emoji: "🍽️" },
+    { label: "SAca la mesa", code: "SA", emoji: "🧹" },
+    { label: "POne la mesa", code: "PO", emoji: "🍴" }
+];
+const safeChore = { label: "NAda", code: "NA", emoji: "🎉" };
+
+// Detect Cláusula Lomito: two rolls with exactly the same dice
+let lomitoActivated = false;
+let lomitoPlayers: string[] = [];
+for (let i = 0; i < allRolls.length; i++) {
+    for (let j = i + 1; j < allRolls.length; j++) {
+        const a = allRolls[i];
+        const b = allRolls[j];
+        if (a.die1 === b.die1 && a.die2 === b.die2 && a.die3 === b.die3 && a.die4 === b.die4) {
+            lomitoActivated = true;
+            if (!lomitoPlayers.includes(a.username as string)) lomitoPlayers.push(a.username as string);
+            if (!lomitoPlayers.includes(b.username as string)) lomitoPlayers.push(b.username as string);
+        }
+    }
+}
+---
+<Layout>
+    <div class="space-y-8">
+        <section class="bg-white p-6 rounded-lg shadow text-center">
+            <h2 class="text-2xl font-bold mb-2">Tirada del Día</h2>
+            <p class="text-gray-600 mb-6">{dateStr}</p>
+
+            {hasRolled && myRoll ? (
+                <div class="inline-block bg-blue-50 border border-blue-100 p-4 rounded-xl">
+                    <p class="text-sm text-blue-800 font-semibold mb-2">Tu tirada:</p>
+                    <div class="flex gap-2 justify-center text-3xl">
+                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die1 as number)-1]} text-blue-600`}></i>
+                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die2 as number)-1]} text-gray-400 text-2xl mt-1`}></i>
+                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die3 as number)-1]} text-gray-400 text-2xl mt-1`}></i>
+                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die4 as number)-1]} text-gray-400 text-2xl mt-1`}></i>
+                    </div>
+                </div>
+            ) : (
+                <form method="post" action="/api/roll">
+                    <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-bold hover:bg-blue-700 hover:scale-105 transition-transform shadow-lg cursor-pointer">
+                        <i class="fa-solid fa-dice mr-2"></i> Tirar los Dados
+                    </button>
+                </form>
+            )}
+        </section>
+
+        {lomitoActivated && (
+            <section class="bg-orange-100 border-2 border-orange-400 p-6 rounded-lg shadow text-center">
+                <p class="text-3xl mb-2">🥩🎉🥩</p>
+                <h3 class="text-xl font-bold text-orange-800">¡CLÁUSULA LOMITO ACTIVADA!</h3>
+                <p class="text-orange-700 mt-2 font-semibold">{lomitoPlayers.join(" y ")} sacaron exactamente la misma tirada.</p>
+                <p class="text-orange-600 mt-1">¡Se comen lomitos con papas!</p>
+            </section>
+        )}
+
+        <section class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-4 border-b pb-2">Ranking POSALANA del Día</h3>
+            
+            {allRolls.length === 0 ? (
+                <p class="text-gray-500 text-center py-4">Nadie ha tirado los dados todavía hoy.</p>
+            ) : (
+                <div class="space-y-3">
+                    {allRolls.map((roll, index) => {
+                        const chore = index < 3 ? chores[index] : safeChore;
+                        const isSafe = index >= 3;
+                        return (
+                            <div class={`flex items-center justify-between p-3 rounded-lg border ${isSafe ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+                                        {roll.avatar_url && <img src={roll.avatar_url as string} alt={roll.username as string} />}
+                                    </div>
+                                    <span class="font-semibold">{roll.username}</span>
+                                    <span class={`text-xs px-2 py-1 rounded-full ml-2 font-bold ${isSafe ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>{chore.code}</span>
+                                </div>
+                                <div class="flex items-center gap-6">
+                                    <div class="flex gap-1 text-xl">
+                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die1 as number)-1]}`}></i>
+                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die2 as number)-1]} text-sm mt-1 opacity-50`}></i>
+                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die3 as number)-1]} text-sm mt-1 opacity-50`}></i>
+                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die4 as number)-1]} text-sm mt-1 opacity-50`}></i>
+                                    </div>
+                                    <div class={`font-bold w-40 text-right ${isSafe ? 'text-green-600' : 'text-red-600'}`}>
+                                        {chore.emoji} {chore.label}
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            )}
+        </section>
+    </div>
+</Layout>
