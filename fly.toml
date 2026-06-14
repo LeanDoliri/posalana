@@ -18,3 +18,10 @@ primary_region = 'gru'
   memory = '2gb'
   cpus = 1
   memory_mb = 2048
+
+[mounts]
+  source = "data"
+  destination = "/data"
+
+[env]
+  DATABASE_URL = "file:/data/sqlite.db"
