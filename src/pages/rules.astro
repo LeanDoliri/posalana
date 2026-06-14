@@ -3,20 +3,20 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
-    <div class="bg-white p-8 rounded-lg shadow max-w-none">
+    <div class="bg-background border border-foreground/10 p-8 rounded-lg shadow max-w-none">
         <div class="flex justify-between items-start mb-6">
             <h2 class="text-2xl font-bold">Reglas del POSALANA</h2>
-            <span class="text-sm text-gray-400 italic">Editado el 16 de Junio de 2026</span>
+            <span class="text-sm text-foreground/40 italic">Editado el 16 de Junio de 2026</span>
         </div>
 
         <p class="mb-4">Todos los días, cada participante debe tirar los dados una vez para definir quién <strong>PO</strong>ne, quién <strong>SA</strong>ca, quién <strong>LA</strong>va y quién no hace <strong>NA</strong>da.</p>
 
         <h3 class="text-xl font-semibold mt-6 mb-2 border-b pb-1">¿Qué significa POSALANA?</h3>
         <ul class="list-none pl-0 mb-4 space-y-2">
-            <li><span class="inline-block bg-red-600 text-white text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">LA</span> <strong>LA</strong>va los platos — el peor tiro 🍽️</li>
-            <li><span class="inline-block bg-red-500 text-white text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">SA</span> <strong>SA</strong>ca la mesa — el segundo peor 🧹</li>
-            <li><span class="inline-block bg-red-400 text-white text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">PO</span> <strong>PO</strong>ne la mesa — el tercer peor 🍴</li>
-            <li><span class="inline-block bg-green-600 text-white text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">NA</span> <strong>NA</strong>da — ¡zafaste! 🎉</li>
+            <li><span class="inline-block bg-primary text-background text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">LA</span> <strong>LA</strong>va los platos — el peor tiro 🍽️</li>
+            <li><span class="inline-block bg-primary/90 text-background text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">SA</span> <strong>SA</strong>ca la mesa — el segundo peor 🧹</li>
+            <li><span class="inline-block bg-primary/80 text-background text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">PO</span> <strong>PO</strong>ne la mesa — el tercer peor 🍴</li>
+            <li><span class="inline-block bg-secondary text-background text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">NA</span> <strong>NA</strong>da — ¡zafaste! 🎉</li>
         </ul>
 
         <!-- Tirada -->
@@ -24,7 +24,7 @@ import Layout from '../layouts/Layout.astro';
         <ol class="list-decimal pl-6 mb-4 space-y-2">
             <li>Se tiran <strong>4 dados</strong> utilizando el botón de "Tirar los Dados" en la página principal.</li>
             <li>El tiro es válido y se registra automáticamente una sola vez por día.</li>
-            <li>El participante que saca el número <strong>más bajo</strong> en el primer dado <strong class="text-red-600">LAVA</strong>, el segundo más bajo <strong class="text-orange-600">SACA</strong>, y el tercero <strong class="text-yellow-600">PONE</strong>.</li>
+            <li>El participante que saca el número <strong>más bajo</strong> en el primer dado <strong class="text-primary">LAVA</strong>, el segundo más bajo <strong class="text-primary/90">SACA</strong>, y el tercero <strong class="text-primary/80">PONE</strong>.</li>
             <li>En caso de empate en cualquiera de los casos del punto anterior, desempata el siguiente dado y así sucesivamente.</li>
         </ol>
 
@@ -46,29 +46,29 @@ import Layout from '../layouts/Layout.astro';
         <!-- Horarios -->
         <h3 class="text-xl font-semibold mt-8 mb-2 border-b pb-1">Horarios</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
-                <p class="font-bold text-blue-800 mb-1">🎲 Tiempo de Tiración</p>
-                <p class="text-2xl font-bold text-blue-900">10:30 a 12:00</p>
-                <p class="text-sm text-blue-700 mt-1">Fuera de este horario no se puede tirar y se penaliza como llegada tarde.</p>
+            <div class="bg-secondary/10 border border-secondary/20 rounded-lg p-4">
+                <p class="font-bold text-secondary mb-1">🎲 Tiempo de Tiración</p>
+                <p class="text-2xl font-bold text-secondary">10:30 a 12:00</p>
+                <p class="text-sm text-secondary/80 mt-1">Fuera de este horario no se puede tirar y se penaliza como llegada tarde.</p>
             </div>
-            <div class="bg-amber-50 border border-amber-100 rounded-lg p-4">
-                <p class="font-bold text-amber-800 mb-1">🍽️ Tiempo de Llevación de Platos</p>
-                <p class="text-2xl font-bold text-amber-900">12:00 a 13:00</p>
+            <div class="bg-primary/10 border border-primary/20 rounded-lg p-4">
+                <p class="font-bold text-primary mb-1">🍽️ Tiempo de Llevación de Platos</p>
+                <p class="text-2xl font-bold text-primary">12:00 a 13:00</p>
             </div>
         </div>
-        <p class="text-sm text-gray-600 mb-4">Quienes por alguna razón no sepan si van a llegar antes de las 13:00 no participan del POSALANA.</p>
+        <p class="text-sm text-foreground/70 mb-4">Quienes por alguna razón no sepan si van a llegar antes de las 13:00 no participan del POSALANA.</p>
 
         <!-- Cláusula Lomito -->
         <h3 class="text-xl font-semibold mt-8 mb-2 border-b pb-1">🥩 Cláusula Lomito</h3>
-        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 rounded">
-            <p class="text-orange-900">Si la tirada de dos personas es <strong>exactamente igual</strong> (en orden y valores), el contador de días sin lomitos se reinicia a 0, porque las coincidencias existen y, cuando la magia ocurre, hay que celebrarlo.</p>
-            <p class="text-orange-900 mt-2">Cuando los dados de dos personas coincidan de forma exacta, <strong>LUTVIA</strong> garantiza que se almorzarán <strong>lomitos con papas</strong>. 🥩🍟</p>
+        <div class="bg-accent/10 border-l-4 border-accent p-4 rounded">
+            <p class="text-accent">Si la tirada de dos personas es <strong>exactamente igual</strong> (en orden y valores), el contador de días sin lomitos se reinicia a 0, porque las coincidencias existen y, cuando la magia ocurre, hay que celebrarlo.</p>
+            <p class="text-accent mt-2">Cuando los dados de dos personas coincidan de forma exacta, <strong>LUTVIA</strong> garantiza que se almorzarán <strong>lomitos con papas</strong>. 🥩🍟</p>
         </div>
 
         <!-- Nota del sistema -->
-        <div class="bg-gray-50 border-l-4 border-gray-400 p-4 mt-8 rounded">
-            <h4 class="font-bold text-gray-700">Sobre esta aplicación</h4>
-            <p class="text-sm text-gray-600 mt-1">Este sistema digitaliza el POSALANA. Las tiradas se generan de forma aleatoria, se guardan automáticamente y los resultados se actualizan en tiempo real a medida que cada participante va tirando.</p>
+        <div class="bg-foreground/5 border-l-4 border-foreground/30 p-4 mt-8 rounded">
+            <h4 class="font-bold text-foreground/80">Sobre esta aplicación</h4>
+            <p class="text-sm text-foreground/70 mt-1">Este sistema digitaliza el POSALANA. Las tiradas se generan de forma aleatoria, se guardan automáticamente y los resultados se actualizan en tiempo real a medida que cada participante va tirando.</p>
         </div>
     </div>
 </Layout>

@@ -7,7 +7,7 @@ if (Astro.locals.user) {
 ---
 
 <Layout>
-	<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow mt-10">
+	<div class="max-w-md mx-auto bg-background border border-foreground/10 p-8 rounded-lg shadow mt-10">
 		<h2 class="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
 		<form method="post" action="/api/login" enctype="application/x-www-form-urlencoded" class="space-y-4">
 			<div>
@@ -18,13 +18,13 @@ if (Astro.locals.user) {
 				<label class="block text-sm font-medium mb-1">Contraseña</label>
 				<input type="password" name="password" class="w-full border rounded p-2" required />
 			</div>
-			<button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-semibold transition">Entrar</button>
+			<button type="submit" class="w-full bg-secondary text-background p-2 rounded hover:opacity-90 font-semibold transition">Entrar</button>
 		</form>
-		<p class="mt-4 text-center text-sm text-gray-600">
+		<p class="mt-4 text-center text-sm text-foreground/70">
 			Si el usuario no existe, se creará automáticamente.
 		</p>
 		<p class="mt-2 text-center text-sm">
-			<a href="/reset" class="text-orange-600 hover:underline">¿Olvidaste tu contraseña?</a>
+			<a href="/reset" class="text-accent hover:underline">¿Olvidaste tu contraseña?</a>
 		</p>
 	</div>
 </Layout>

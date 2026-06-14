@@ -58,23 +58,23 @@ for (let i = 0; i < allRolls.length; i++) {
 ---
 <Layout>
     <div class="space-y-8">
-        <section class="bg-white p-6 rounded-lg shadow text-center">
+        <section class="bg-background border border-foreground/10 p-6 rounded-lg shadow text-center">
             <h2 class="text-2xl font-bold mb-2">Tirada del Día</h2>
-            <p class="text-gray-600 mb-6">{dateStr}</p>
+            <p class="text-foreground/60 mb-6">{dateStr}</p>
 
             {hasRolled && myRoll ? (
-                <div class="inline-block bg-blue-50 border border-blue-100 p-4 rounded-xl">
-                    <p class="text-sm text-blue-800 font-semibold mb-2">Tu tirada:</p>
+                <div class="inline-block bg-secondary/10 border border-secondary/20 p-4 rounded-xl">
+                    <p class="text-sm text-secondary font-semibold mb-2">Tu tirada:</p>
                     <div class="flex gap-2 justify-center text-3xl">
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die1 as number)-1]} text-blue-600`}></i>
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die2 as number)-1]} text-gray-400 text-2xl mt-1`}></i>
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die3 as number)-1]} text-gray-400 text-2xl mt-1`}></i>
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die4 as number)-1]} text-gray-400 text-2xl mt-1`}></i>
+                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die1 as number)-1]} text-secondary`}></i>
+                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die2 as number)-1]} text-foreground/40 text-2xl mt-1`}></i>
+                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die3 as number)-1]} text-foreground/40 text-2xl mt-1`}></i>
+                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die4 as number)-1]} text-foreground/40 text-2xl mt-1`}></i>
                     </div>
                 </div>
             ) : (
                 <form method="post" action="/api/roll">
-                    <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-full text-lg font-bold hover:bg-blue-700 hover:scale-105 transition-transform shadow-lg cursor-pointer">
+                    <button type="submit" class="bg-secondary text-background px-8 py-3 rounded-full text-lg font-bold hover:opacity-90 hover:scale-105 transition-transform shadow-lg cursor-pointer">
                         <i class="fa-solid fa-dice mr-2"></i> Tirar los Dados
                     </button>
                 </form>
@@ -82,32 +82,32 @@ for (let i = 0; i < allRolls.length; i++) {
         </section>
 
         {lomitoActivated && (
-            <section class="bg-orange-100 border-2 border-orange-400 p-6 rounded-lg shadow text-center">
+            <section class="bg-accent/10 border-2 border-accent p-6 rounded-lg shadow text-center">
                 <p class="text-3xl mb-2">🥩🎉🥩</p>
-                <h3 class="text-xl font-bold text-orange-800">¡CLÁUSULA LOMITO ACTIVADA!</h3>
-                <p class="text-orange-700 mt-2 font-semibold">{lomitoPlayers.join(" y ")} sacaron exactamente la misma tirada.</p>
-                <p class="text-orange-600 mt-1">¡Se comen lomitos con papas!</p>
+                <h3 class="text-xl font-bold text-accent">¡CLÁUSULA LOMITO ACTIVADA!</h3>
+                <p class="text-accent/90 mt-2 font-semibold">{lomitoPlayers.join(" y ")} sacaron exactamente la misma tirada.</p>
+                <p class="text-accent/80 mt-1">¡Se comen lomitos con papas!</p>
             </section>
         )}
 
-        <section class="bg-white p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-4 border-b pb-2">Ranking POSALANA del Día</h3>
+        <section class="bg-background border border-foreground/10 p-6 rounded-lg shadow">
+            <h3 class="text-xl font-bold mb-4 border-b border-foreground/10 pb-2">Ranking POSALANA del Día</h3>
             
             {allRolls.length === 0 ? (
-                <p class="text-gray-500 text-center py-4">Nadie ha tirado los dados todavía hoy.</p>
+                <p class="text-foreground/50 text-center py-4">Nadie ha tirado los dados todavía hoy.</p>
             ) : (
                 <div class="space-y-3">
                     {allRolls.map((roll, index) => {
                         const chore = index < 3 ? chores[index] : safeChore;
                         const isSafe = index >= 3;
                         return (
-                            <div class={`flex items-center justify-between p-3 rounded-lg border ${isSafe ? 'bg-green-50 border-green-100' : 'bg-red-50 border-red-100'}`}>
+                            <div class={`flex items-center justify-between p-3 rounded-lg border ${isSafe ? 'bg-secondary/10 border-secondary/20' : 'bg-primary/10 border-primary/20'}`}>
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+                                    <div class="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden">
                                         {roll.avatar_url && <img src={roll.avatar_url as string} alt={roll.username as string} />}
                                     </div>
                                     <span class="font-semibold">{roll.username}</span>
-                                    <span class={`text-xs px-2 py-1 rounded-full ml-2 font-bold ${isSafe ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>{chore.code}</span>
+                                    <span class={`text-xs px-2 py-1 rounded-full ml-2 font-bold ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background'}`}>{chore.code}</span>
                                 </div>
                                 <div class="flex items-center gap-6">
                                     <div class="flex gap-1 text-xl">
@@ -116,7 +116,7 @@ for (let i = 0; i < allRolls.length; i++) {
                                         <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die3 as number)-1]} text-sm mt-1 opacity-50`}></i>
                                         <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die4 as number)-1]} text-sm mt-1 opacity-50`}></i>
                                     </div>
-                                    <div class={`font-bold w-40 text-right ${isSafe ? 'text-green-600' : 'text-red-600'}`}>
+                                    <div class={`font-bold w-40 text-right ${isSafe ? 'text-secondary' : 'text-primary'}`}>
                                         {chore.emoji} {chore.label}
                                     </div>
                                 </div>

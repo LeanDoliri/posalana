@@ -26,30 +26,30 @@ const recentRolls = rollsRes.rows;
 <Layout>
 	<div class="space-y-8">
 		<header class="text-center">
-			<h2 class="text-3xl font-bold text-gray-800">Panel de Administración</h2>
-			<p class="text-gray-600 mt-2">Gestión de Usuarios y Tiradas</p>
+			<h2 class="text-3xl font-bold text-foreground">Panel de Administración</h2>
+			<p class="text-foreground/70 mt-2">Gestión de Usuarios y Tiradas</p>
 		</header>
 
-		<section class="bg-white p-6 rounded-lg shadow overflow-x-auto">
-			<h3 class="text-xl font-bold mb-4 border-b pb-2">Usuarios Registrados</h3>
+		<section class="bg-background border border-foreground/10 p-6 rounded-lg shadow overflow-x-auto">
+			<h3 class="text-xl font-bold mb-4 border-b border-foreground/10 pb-2">Usuarios Registrados</h3>
 			<table class="w-full text-left border-collapse">
 				<thead>
-					<tr class="bg-gray-100 text-gray-700">
-						<th class="p-3 border-b">Avatar</th>
-						<th class="p-3 border-b">Usuario</th>
-						<th class="p-3 border-b">Rol</th>
-						<th class="p-3 border-b text-right">Acciones</th>
+					<tr class="bg-foreground/5 text-foreground/80">
+						<th class="p-3 border-b border-foreground/10">Avatar</th>
+						<th class="p-3 border-b border-foreground/10">Usuario</th>
+						<th class="p-3 border-b border-foreground/10">Rol</th>
+						<th class="p-3 border-b border-foreground/10 text-right">Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
 					{allUsers.map((u) => (
-						<tr class="border-b hover:bg-gray-50">
+						<tr class="border-b border-foreground/5 hover:bg-foreground/5">
 							<td class="p-3">
-								<img src={u.avatar_url as string} alt={u.username as string} class="w-10 h-10 rounded-full bg-gray-200" />
+								<img src={u.avatar_url as string} alt={u.username as string} class="w-10 h-10 rounded-full bg-foreground/10" />
 							</td>
-							<td class="p-3 font-semibold text-gray-800">{u.username}</td>
+							<td class="p-3 font-semibold text-foreground">{u.username}</td>
 							<td class="p-3">
-								<span class={`px-2 py-1 text-xs rounded-full font-bold ${u.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}`}>
+								<span class={`px-2 py-1 text-xs rounded-full font-bold ${u.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary'}`}>
 									{u.role}
 								</span>
 							</td>
@@ -59,20 +59,20 @@ const recentRolls = rollsRes.rows;
 										<form method="post" action="/api/admin/toggle-role" class="inline">
 											<input type="hidden" name="userId" value={u.id} />
 											<input type="hidden" name="role" value={u.role === 'admin' ? 'user' : 'admin'} />
-											<button class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm transition font-medium">
+											<button class="px-3 py-1 bg-foreground/10 hover:bg-foreground/20 text-foreground rounded text-sm transition font-medium">
 												{u.role === 'admin' ? 'Quitar Admin' : 'Hacer Admin'}
 											</button>
 										</form>
 										<form method="post" action="/api/admin/delete-user" class="inline" onsubmit={`return confirm('¿Seguro que querés eliminar a ${u.username}? Se borrará todo su historial.')`}>
 											<input type="hidden" name="userId" value={u.id} />
-											<button class="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-sm transition font-medium">
+											<button class="px-3 py-1 bg-primary/20 hover:bg-primary/30 text-primary rounded text-sm transition font-medium">
 												Eliminar
 											</button>
 										</form>
 									</>
 								)}
 								{u.id === user.id && (
-									<span class="text-gray-400 text-sm italic">Vos</span>
+									<span class="text-foreground/50 text-sm italic">Vos</span>
 								)}
 							</td>
 						</tr>
@@ -81,26 +81,26 @@ const recentRolls = rollsRes.rows;
 			</table>
 		</section>
 
-		<section class="bg-white p-6 rounded-lg shadow overflow-x-auto">
-			<h3 class="text-xl font-bold mb-4 border-b pb-2">Últimas Tiradas (Máx 50)</h3>
+		<section class="bg-background border border-foreground/10 p-6 rounded-lg shadow overflow-x-auto">
+			<h3 class="text-xl font-bold mb-4 border-b border-foreground/10 pb-2">Últimas Tiradas (Máx 50)</h3>
 			<table class="w-full text-left border-collapse">
 				<thead>
-					<tr class="bg-gray-100 text-gray-700">
-						<th class="p-3 border-b">Fecha</th>
-						<th class="p-3 border-b">Usuario</th>
-						<th class="p-3 border-b">Dados</th>
-						<th class="p-3 border-b text-right">Acciones</th>
+					<tr class="bg-foreground/5 text-foreground/80">
+						<th class="p-3 border-b border-foreground/10">Fecha</th>
+						<th class="p-3 border-b border-foreground/10">Usuario</th>
+						<th class="p-3 border-b border-foreground/10">Dados</th>
+						<th class="p-3 border-b border-foreground/10 text-right">Acciones</th>
 					</tr>
 				</thead>
 				<tbody>
 					{recentRolls.length === 0 && (
-						<tr><td colspan="4" class="p-3 text-center text-gray-500">No hay tiradas aún.</td></tr>
+						<tr><td colspan="4" class="p-3 text-center text-foreground/50">No hay tiradas aún.</td></tr>
 					)}
 					{recentRolls.map((r) => (
-						<tr class="border-b hover:bg-gray-50">
-							<td class="p-3 text-sm text-gray-600">{r.date}</td>
-							<td class="p-3 font-semibold text-gray-800 flex items-center gap-2">
-								<img src={r.avatar_url as string} alt={r.username as string} class="w-6 h-6 rounded-full bg-gray-200" />
+						<tr class="border-b border-foreground/5 hover:bg-foreground/5">
+							<td class="p-3 text-sm text-foreground/70">{r.date}</td>
+							<td class="p-3 font-semibold text-foreground flex items-center gap-2">
+								<img src={r.avatar_url as string} alt={r.username as string} class="w-6 h-6 rounded-full bg-foreground/10" />
 								{r.username}
 							</td>
 							<td class="p-3 text-xl tracking-widest">
@@ -109,7 +109,7 @@ const recentRolls = rollsRes.rows;
 							<td class="p-3 text-right">
 								<form method="post" action="/api/admin/delete-roll" class="inline" onsubmit={`return confirm('¿Seguro que querés anular esta tirada de ${r.username}?')`}>
 									<input type="hidden" name="rollId" value={r.id} />
-									<button class="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-sm transition font-medium">
+									<button class="px-3 py-1 bg-primary/20 hover:bg-primary/30 text-primary rounded text-sm transition font-medium">
 										Anular
 									</button>
 								</form>

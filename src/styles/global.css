@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Montserrat', sans-serif;
+
+  /* Paleta de Colores de la Marca */
+  --color-primary: #EA2A58;
+  --color-secondary: #00CCCC;
+  --color-accent: #CC66FF;
+  
+  /* Colores Base */
+  --color-background: #EDEDED;
+  --color-foreground: #3C3C3B;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}

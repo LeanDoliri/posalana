@@ -40,40 +40,42 @@ if (lastLomitoDate) {
 		<meta name="generator" content={Astro.generator} />
 		<title>POSALANA - POne SAca LAva NAda</title>
 		<!-- Google Fonts -->
-		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 		<!-- Font Awesome -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	</head>
-	<body class="bg-gray-100 text-gray-900 font-sans min-h-screen flex flex-col">
-		<header class="bg-white shadow">
+	<body class="bg-background text-foreground font-sans min-h-screen flex flex-col">
+		<header class="bg-background shadow border-b border-foreground/10">
 			<div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
 				<div class="flex items-center gap-4">
-					<h1 class="text-xl font-bold"><a href="/"><span class="text-red-500">PO</span><span class="text-orange-500">SA</span><span class="text-yellow-600">LA</span><span class="text-green-600">NA</span></a></h1>
+					<h1 class="text-xl font-bold"><a href="/"><span class="text-primary">PO</span><span class="text-secondary">SA</span><span class="text-accent">LA</span><span class="text-foreground">NA</span></a></h1>
 					<div class="relative group">
-						<span class="text-sm bg-orange-100 text-orange-800 px-2 py-1 rounded-full cursor-default">
+						<span class="text-sm bg-accent/20 text-accent px-2 py-1 rounded-full cursor-default">
 							🥩 {daysSinceLomito !== null ? daysSinceLomito : "∞"} días
 						</span>
-						<div class="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-gray-900 text-white text-xs px-3 py-2 rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+						<div class="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-foreground text-background text-xs px-3 py-2 rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
 							{lomitoTooltip}
 						</div>
 					</div>
 				</div>
 				<nav class="space-x-4">
-					<a href="/" class="hover:text-blue-600">Inicio</a>
-					<a href="/history" class="hover:text-blue-600">Historial</a>
-					<a href="/rules" class="hover:text-blue-600">Reglas</a>
+					<a href="/" class="hover:text-secondary">Inicio</a>
+					<a href="/history" class="hover:text-secondary">Historial</a>
+					<a href="/rules" class="hover:text-secondary">Reglas</a>
 					{user ? (
-						<span class="ml-4 font-semibold text-blue-800 flex items-center gap-2 inline-flex">
+						<span class="ml-4 font-semibold text-secondary flex items-center gap-2 inline-flex">
 							{user.username}
 							{user.role === 'admin' && (
-								<a href="/admin" class="bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 ml-2">Admin</a>
+								<a href="/admin" class="bg-primary text-background text-xs px-2 py-1 rounded hover:opacity-80 ml-2">Admin</a>
 							)}
 						</span>
 						<form method="post" action="/api/logout" class="inline">
-							<button class="text-red-500 ml-2 hover:underline">Salir</button>
+							<button class="text-primary ml-2 hover:underline">Salir</button>
 						</form>
 					) : (
-						<a href="/login" class="text-blue-600 ml-4 hover:underline">Login</a>
+						<a href="/login" class="text-secondary ml-4 hover:underline">Login</a>
 					)}
 				</nav>
 			</div>
@@ -81,7 +83,7 @@ if (lastLomitoDate) {
 		<main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
 			<slot />
 		</main>
-		<footer class="bg-white border-t py-4 text-center text-sm text-gray-500">
+		<footer class="bg-background border-t border-foreground/10 py-4 text-center text-sm text-foreground/60">
 			&copy; 2026 POSALANA
 		</footer>
 	</body>

@@ -34,31 +34,31 @@ const safeChore = { label: "NAda", code: "NA" };
 ---
 
 <Layout>
-    <div class="bg-white p-6 rounded-lg shadow">
+    <div class="bg-background border border-foreground/10 p-6 rounded-lg shadow">
         <h2 class="text-2xl font-bold mb-6">Historial POSALANA</h2>
         
         {dates.length === 0 ? (
-            <p class="text-gray-500 text-center">No hay historial disponible.</p>
+            <p class="text-foreground/60 text-center">No hay historial disponible.</p>
         ) : (
             <div class="space-y-8">
                 {dates.map(date => (
                     <div>
-                        <h3 class="text-lg font-bold mb-3 border-b pb-1 text-blue-800">{date}</h3>
+                        <h3 class="text-lg font-bold mb-3 border-b border-foreground/10 pb-1 text-secondary">{date}</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {groupedRolls[date].map((roll, index) => {
                                 const chore = index < 3 ? chores[index] : safeChore;
                                 const isSafe = index >= 3;
                                 return (
-                                    <div class={`flex items-center justify-between p-3 rounded border ${isSafe ? 'bg-green-50' : 'bg-red-50'}`}>
+                                    <div class={`flex items-center justify-between p-3 rounded border ${isSafe ? 'bg-secondary/10 border-secondary/20' : 'bg-primary/10 border-primary/20'}`}>
                                         <div class="flex items-center gap-2">
-                                            <div class="w-6 h-6 rounded-full bg-gray-200 overflow-hidden">
+                                            <div class="w-6 h-6 rounded-full bg-foreground/10 overflow-hidden">
                                                 {roll.avatar_url && <img src={roll.avatar_url as string} alt={roll.username as string} />}
                                             </div>
                                             <span class="font-semibold text-sm">{roll.username}</span>
                                         </div>
                                         <div class="text-sm">
-                                            <span class="font-mono text-gray-500 mr-2">{roll.die1}-{roll.die2}-{roll.die3}-{roll.die4}</span>
-                                            <span class={`font-bold px-2 py-0.5 rounded text-xs text-white ${isSafe ? 'bg-green-600' : 'bg-red-600'}`}>{chore.code}</span>
+                                            <span class="font-mono text-foreground/50 mr-2">{roll.die1}-{roll.die2}-{roll.die3}-{roll.die4}</span>
+                                            <span class={`font-bold px-2 py-0.5 rounded text-xs text-background ${isSafe ? 'bg-secondary' : 'bg-primary'}`}>{chore.code}</span>
                                         </div>
                                     </div>
                                 )
