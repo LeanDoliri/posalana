@@ -14,7 +14,7 @@ La forma definitiva, justa y basada puramente en el azar para dividir las tareas
 *   **Autenticación Integrada:** Registro e inicio de sesión seguro usando [Lucia Auth](https://lucia-auth.com/).
 *   **Tirada Diaria Única:** Cada usuario solo puede tirar los dados una vez por día. El sistema bloquea intentos múltiples.
 *   **Ranking Automático:** Calcula matemáticamente quién saca el número más bajo y asigna automáticamente la peor tarea (Lava), la intermedia (Saca) y la más leve (Pone).
-*   **🥩 Cláusula Lomito:** Si dos personas sacan **exactamente los mismos dados** en el mismo día, se activa el cartel festivo de *Lomito* y el contador de "Días sin Lomito" se reinicia a cero.
+*   **🥪 Cláusula Lomito:** Si dos personas sacan **exactamente los mismos dados** en el mismo día, se activa el cartel festivo de *Lomito* y el contador de "Días sin Lomito" se reinicia a cero.
 *   **Panel de Administración (Admin Dashboard):** Un usuario maestro puede acceder a una ruta privada para anular tiradas accidentales, promover nuevos administradores o eliminar cuentas maliciosas.
 
 ## 🛠️ Tecnologías Utilizadas
