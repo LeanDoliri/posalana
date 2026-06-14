@@ -1,0 +1,68 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+if (Astro.locals.user) {
+	return Astro.redirect('/');
+}
+---
+
+<Layout>
+	<div class="min-h-[70vh] flex items-center justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+		<div class="w-full max-w-md relative group">
+			<div class="absolute -inset-1 bg-gradient-to-r from-secondary to-accent rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+			
+			<div class="relative bg-background border border-foreground/10 p-10 rounded-3xl shadow-2xl">
+				<div class="text-center mb-8">
+					<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary/10 text-secondary mb-4">
+						<i class="fa-solid fa-user-plus text-2xl"></i>
+					</div>
+					<h2 class="text-3xl font-black text-foreground tracking-tight">Registro</h2>
+					<p class="text-foreground/50 mt-2 font-medium">Unite a la historia de Posalana.</p>
+				</div>
+
+				<form method="post" action="/api/register" enctype="application/x-www-form-urlencoded" class="space-y-5">
+					<div class="space-y-1">
+						<label class="block text-xs font-bold uppercase tracking-wider text-foreground/70 ml-1">Tu Nombre</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+								<i class="fa-solid fa-address-card text-foreground/30"></i>
+							</div>
+							<input type="text" name="display_name" class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all" placeholder="Ej: Juan, Mati" required />
+						</div>
+                        <p class="text-[10px] text-foreground/40 ml-1 mt-1">Este nombre se mostrará a todos.</p>
+					</div>
+
+					<div class="space-y-1">
+						<label class="block text-xs font-bold uppercase tracking-wider text-foreground/70 ml-1">Nombre de Usuario (Para entrar)</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+								<i class="fa-solid fa-user text-foreground/30"></i>
+							</div>
+							<input type="text" name="username" class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all" placeholder="usuario_unico" required />
+						</div>
+					</div>
+
+					<div class="space-y-1">
+						<label class="block text-xs font-bold uppercase tracking-wider text-foreground/70 ml-1">Contraseña</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+								<i class="fa-solid fa-key text-foreground/30"></i>
+							</div>
+							<input type="password" name="password" class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all" placeholder="••••••••" required minlength="4" />
+						</div>
+					</div>
+
+					<button type="submit" class="w-full bg-secondary text-background py-3.5 rounded-xl font-bold shadow-lg shadow-secondary/20 hover:shadow-secondary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all mt-6 flex items-center justify-center gap-2">
+						Crear Cuenta <i class="fa-solid fa-arrow-right"></i>
+					</button>
+				</form>
+
+				<div class="mt-8 pt-6 border-t border-foreground/5 text-center space-y-3">
+					<p class="text-sm font-semibold text-foreground/70">
+						¿Ya tenés cuenta? <a href="/login" class="text-accent hover:text-accent/80 hover:underline transition-colors">Iniciá sesión acá</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</Layout>

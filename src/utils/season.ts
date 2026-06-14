@@ -1,3 +1,5 @@
+import { assignDailyChores } from './chores.js';
+
 export function getSeasonId(dateStr: string): string {
     const d = new Date(dateStr);
     const month = d.getMonth() + 1; // 1-12
@@ -34,7 +36,7 @@ export async function calculateSeasonPoints(db: any, seasonId: string) {
     // 1. Get all rolls that belong to the season
     // Since we don't store season_id in roll, we must fetch rolls and filter them, or just fetch all and filter by getSeasonId.
     // For simplicity, we fetch all rolls (or rolls in a date range, but fetching all is fine for small DBs).
-    const rollsRes = await db.execute("SELECT r.*, u.username, u.avatar_url FROM roll r JOIN user u ON r.user_id = u.id");
+    const rollsRes = await db.execute("SELECT r.*, u.username, u.display_name, u.avatar_url FROM roll r JOIN user u ON r.user_id = u.id");
     const allRolls = rollsRes.rows.filter((r: any) => getSeasonId(r.date as string) === seasonId);
 
     // 2. Get exemptions and manual points for this season
@@ -58,42 +60,29 @@ export async function calculateSeasonPoints(db: any, seasonId: string) {
     }
 
     // 4. Calculate points
-    // Map: user_id -> { username, avatar_url, scores: { LA: 0, SA: 0, PO: 0 } }
+    // Map: user_id -> { username, display_name, avatar_url, scores: { LA: 0, SA: 0, PO: 0 } }
     const userStats = new Map<string, any>();
     
     // Initialize users that have manual points or exemptions even if they didn't roll
-    const initUser = (userId: string, username: string = "Desconocido", avatar_url: string = "") => {
+    const initUser = (userId: string, username: string = "Desconocido", display_name: string = "Desconocido", avatar_url: string = "") => {
         if (!userStats.has(userId)) {
-            userStats.set(userId, { id: userId, username, avatar_url, scores: { LA: 0, SA: 0, PO: 0 } });
+            userStats.set(userId, { id: userId, username, display_name, avatar_url, scores: { LA: 0, SA: 0, PO: 0 } });
         }
     };
 
     const chores = ["LA", "SA", "PO"];
     
     for (const [date, dailyRolls] of rollsByDate.entries()) {
-        const sortedRolls = [...dailyRolls].sort((a, b) => {
-            if (a.die1 !== b.die1) return (a.die1 as number) - (b.die1 as number);
-            if (a.die2 !== b.die2) return (a.die2 as number) - (b.die2 as number);
-            if (a.die3 !== b.die3) return (a.die3 as number) - (b.die3 as number);
-            return (a.die4 as number) - (b.die4 as number);
-        });
-
-        const assignedChores = new Map();
-        for (const roll of sortedRolls) {
-            assignedChores.set(roll.id, "NA");
-            initUser(roll.user_id, roll.username, roll.avatar_url);
+        for (const roll of dailyRolls) {
+            initUser(roll.user_id as string, roll.username as string, roll.display_name as string, roll.avatar_url as string);
         }
 
-        for (const chore of chores) {
-            for (const roll of sortedRolls) {
-                if (assignedChores.get(roll.id) !== "NA") continue;
-
-                const isExempt = exemptions.some((e: any) => e.user_id === roll.user_id && e.chore_code === chore);
-                if (!isExempt) {
-                    assignedChores.set(roll.id, chore);
-                    userStats.get(roll.user_id).scores[chore]++;
-                    break;
-                }
+        const { rollChoreMap, lomitoActivated } = assignDailyChores(dailyRolls, exemptions);
+        
+        for (const [rollId, chore] of rollChoreMap.entries()) {
+            if (chore.code !== "NA") {
+                const roll = dailyRolls.find((r: any) => r.id === rollId);
+                if (roll) userStats.get(roll.user_id).scores[chore.code]++;
             }
         }
     }
@@ -102,9 +91,9 @@ export async function calculateSeasonPoints(db: any, seasonId: string) {
     for (const mp of manualPoints) {
         if (!userStats.has(mp.user_id as string)) {
             // Find user details from DB
-            const uRes = await db.execute({ sql: "SELECT username, avatar_url FROM user WHERE id = ?", args: [mp.user_id] });
+            const uRes = await db.execute({ sql: "SELECT username, display_name, avatar_url FROM user WHERE id = ?", args: [mp.user_id] });
             const u = uRes.rows[0];
-            initUser(mp.user_id as string, u?.username as string, u?.avatar_url as string);
+            initUser(mp.user_id as string, u?.username as string, u?.display_name as string, u?.avatar_url as string);
         }
         userStats.get(mp.user_id as string).scores[mp.chore_code as string] = mp.points;
     }

@@ -8,7 +8,7 @@ if (!Astro.locals.user) {
 
 // Get all rolls ordered by date descending, then by die scores ascending
 const allRollsRes = await db.execute(`
-    SELECT r.*, u.username, u.avatar_url 
+    SELECT r.*, u.username, u.display_name, u.avatar_url 
     FROM roll r
     JOIN user u ON r.user_id = u.id
     ORDER BY r.date DESC, r.die1 ASC, r.die2 ASC, r.die3 ASC, r.die4 ASC
@@ -24,13 +24,29 @@ for (const row of allRollsRes.rows) {
     groupedRolls[date].push(row);
 }
 
+import { getSeasonId } from '../utils/season.js';
+import { assignDailyChores } from '../utils/chores.js';
+
 const dates = Object.keys(groupedRolls).sort((a, b) => b.localeCompare(a));
-const chores = [
-    { label: "Lava", code: "LA" },
-    { label: "Saca", code: "SA" },
-    { label: "Pone", code: "PO" }
-];
-const safeChore = { label: "Nada", code: "NA" };
+
+// Fetch all exemptions
+const allExemptionsRes = await db.execute("SELECT * FROM exemption");
+const allExemptions = allExemptionsRes.rows;
+
+const historyData = dates.map(date => {
+    const seasonId = getSeasonId(date);
+    const seasonExemptions = allExemptions.filter(e => e.season_id === seasonId);
+    
+    const { sortedRolls, rollChoreMap, lomitoActivated, lomitoPlayers } = assignDailyChores(groupedRolls[date], seasonExemptions);
+    
+    return {
+        date,
+        rolls: sortedRolls,
+        choreMap: rollChoreMap,
+        lomitoActivated,
+        lomitoPlayers
+    };
+});
 ---
 
 <Layout>
@@ -53,7 +69,7 @@ const safeChore = { label: "Nada", code: "NA" };
             </div>
         ) : (
             <div class="space-y-12">
-                {dates.map((date, dateIndex) => (
+                {historyData.map((data, dateIndex) => (
                     <section class="relative">
                         <!-- Timeline visual connector -->
                         {dateIndex !== dates.length - 1 && (
@@ -65,14 +81,23 @@ const safeChore = { label: "Nada", code: "NA" };
                             <div class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-secondary text-background flex items-center justify-center font-black shadow-lg">
                                 <i class="fa-solid fa-calendar-day"></i>
                             </div>
-                            <h3 class="text-xl md:text-2xl font-black text-foreground">{date}</h3>
+                            <h3 class="text-xl md:text-2xl font-black text-foreground">{data.date}</h3>
                         </div>
+
+                        <!-- Lomito Indicator -->
+                        {data.lomitoActivated && (
+                            <div class="pl-6 md:pl-10 mb-4 relative z-10">
+                                <div class="bg-accent/10 border border-accent/20 px-4 py-2 rounded-xl inline-block">
+                                    <span class="text-accent font-bold text-sm">🥪 Cláusula Lomito activada por {data.lomitoPlayers.join(" y ")}</span>
+                                </div>
+                            </div>
+                        )}
 
                         <!-- Rolls Grid -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 md:pl-10 relative z-10">
-                            {groupedRolls[date].map((roll, index) => {
-                                const chore = index < 3 ? chores[index] : safeChore;
-                                const isSafe = index >= 3;
+                            {data.rolls.map((roll, index) => {
+                                const chore = data.choreMap.get(roll.id);
+                                const isSafe = chore.code === "NA";
                                 return (
                                     <div class={`group flex flex-row items-center justify-between p-4 rounded-2xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${isSafe ? 'bg-background border-foreground/10 hover:border-secondary/30' : 'bg-primary/5 border-primary/10 hover:border-primary/30'}`}>
                                         
@@ -80,12 +105,12 @@ const safeChore = { label: "Nada", code: "NA" };
                                         <div class="flex items-center gap-3">
                                             <div class="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center font-bold overflow-hidden border border-foreground/10">
                                                 {roll.avatar_url ? (
-                                                    <img src={roll.avatar_url as string} alt={roll.username as string} class="w-full h-full object-cover" />
+                                                    <img src={roll.avatar_url as string} alt={roll.display_name as string} class="w-full h-full object-cover" />
                                                 ) : (
-                                                    (roll.username as string).charAt(0).toUpperCase()
+                                                    (roll.display_name as string).charAt(0).toUpperCase()
                                                 )}
                                             </div>
-                                            <span class="font-bold text-foreground">{roll.username}</span>
+                                            <span class="font-bold text-foreground">{roll.display_name}</span>
                                         </div>
 
                                         <!-- Stats -->

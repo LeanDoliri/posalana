@@ -50,21 +50,8 @@ export async function POST(context: APIContext): Promise<Response> {
 
 		return context.redirect("/");
 	} else {
-		// Crear usuario
-		const userId = generateId();
-		const passwordHash = await hash(password, 10);
-		// Avatar random
-		const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
-
-		await db.execute({
-			sql: "INSERT INTO user (id, username, password_hash, avatar_url) VALUES (?, ?, ?, ?)",
-			args: [userId, username, passwordHash, avatarUrl]
+		return new Response("Usuario no encontrado. Registrate primero.", {
+			status: 404
 		});
-
-		const session = await lucia.createSession(userId, {});
-		const sessionCookie = lucia.createSessionCookie(session.id);
-		context.cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-
-		return context.redirect("/");
 	}
 }

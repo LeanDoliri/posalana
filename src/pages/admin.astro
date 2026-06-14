@@ -9,12 +9,12 @@ if (!user || user.role !== "admin") {
 }
 
 // Fetch all users
-const usersRes = await db.execute("SELECT id, username, avatar_url, role FROM user ORDER BY username ASC");
+const usersRes = await db.execute("SELECT id, username, display_name, avatar_url, role FROM user ORDER BY username ASC");
 const allUsers = usersRes.rows;
 
 // Fetch all rolls
 const rollsRes = await db.execute(`
-	SELECT r.id, r.date, r.die1, r.die2, r.die3, r.die4, u.username, u.avatar_url 
+	SELECT r.id, r.date, r.die1, r.die2, r.die3, r.die4, u.username, u.display_name, u.avatar_url 
 	FROM roll r 
 	JOIN user u ON r.user_id = u.id 
 	ORDER BY r.date DESC, r.id DESC
@@ -83,11 +83,11 @@ settingsRes.rows.forEach((s: any) => settingsMap.set(s.key, s.value));
                                     <td class="p-4">
                                         <div class="flex items-center gap-3">
                                             <div class="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center font-bold text-foreground/70 overflow-hidden shadow-sm">
-                                                {u.avatar_url ? (
-                                                    <img src={u.avatar_url as string} alt={u.username as string} class="w-full h-full object-cover" />
-                                                ) : (
-                                                    (u.username as string).charAt(0).toUpperCase()
-                                                )}
+                                                {u.avatar_url && u.avatar_url !== 'null' ? (
+                                            <img src={u.avatar_url as string} alt={u.username as string} class="w-10 h-10 rounded-full object-cover border-2 border-foreground/10" referrerpolicy="no-referrer" />
+                                        ) : (
+                                            <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center font-bold text-secondary border-2 border-secondary/20">{(u.username as string).charAt(0).toUpperCase()}</div>
+                                        )}
                                             </div>
                                             <span class="font-bold text-foreground">{u.username}</span>
                                         </div>
@@ -153,12 +153,12 @@ settingsRes.rows.forEach((s: any) => settingsMap.set(s.key, s.value));
                                         <div class="flex items-center gap-2 font-bold text-foreground">
                                             <div class="w-6 h-6 rounded-full bg-foreground/10 overflow-hidden flex items-center justify-center text-[10px]">
                                                 {r.avatar_url ? (
-                                                    <img src={r.avatar_url as string} alt={r.username as string} class="w-full h-full object-cover" />
+                                                    <img src={r.avatar_url as string} alt={r.display_name as string} class="w-full h-full object-cover" />
                                                 ) : (
-                                                    (r.username as string).charAt(0).toUpperCase()
+                                                    (r.display_name as string).charAt(0).toUpperCase()
                                                 )}
                                             </div>
-                                            {r.username}
+                                            {r.display_name}
                                         </div>
                                     </td>
                                     <td class="p-4 text-lg font-mono tracking-widest text-foreground/80">

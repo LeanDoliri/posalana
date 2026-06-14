@@ -11,6 +11,7 @@ db.executeMultiple(`
   CREATE TABLE IF NOT EXISTS user (
       id TEXT NOT NULL PRIMARY KEY,
       username TEXT NOT NULL UNIQUE,
+      display_name TEXT NOT NULL,
       password_hash TEXT NOT NULL,
       avatar_url TEXT,
       role TEXT DEFAULT 'user'
@@ -60,13 +61,16 @@ db.executeMultiple(`
   );
 `).catch(console.error);
 
-// Migration: Add 'role' column if it doesn't exist, and make ldoliri admin
+// Migrations
 (async () => {
   try {
       await db.execute("ALTER TABLE user ADD COLUMN role TEXT DEFAULT 'user'");
-  } catch (e) {
-      // Column probably already exists, ignore
-  }
+  } catch (e) {}
+
+  try {
+      await db.execute("ALTER TABLE user ADD COLUMN display_name TEXT");
+      await db.execute("UPDATE user SET display_name = username WHERE display_name IS NULL");
+  } catch (e) {}
 
   try {
       await db.execute("ALTER TABLE roll ADD COLUMN time TEXT");
@@ -81,6 +85,21 @@ db.executeMultiple(`
       });
   } catch (e) {
       console.error("Failed to upgrade ldoliri to admin:", e);
+  }
+
+  try {
+      const testerRes = await db.execute("SELECT id FROM user WHERE username = 'lomitotester'");
+      if (testerRes.rows.length === 0) {
+          const { hash } = await import('bcryptjs');
+          const pass = await hash('lomitotester', 10);
+          await db.execute({
+              sql: "INSERT INTO user (id, username, password_hash, avatar_url, role) VALUES (?, ?, ?, ?, ?)",
+              args: ['tester-lomito-id', 'lomitotester', pass, 'https://api.dicebear.com/7.x/avataaars/svg?seed=lomitotester', 'tester']
+          });
+          console.log("Created lomitotester account");
+      }
+  } catch (e) {
+      console.error("Failed to create lomitotester:", e);
   }
 })();
 

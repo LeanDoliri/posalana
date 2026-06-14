@@ -30,14 +30,14 @@ import Layout from '../layouts/Layout.astro';
                         <span class="shrink-0 flex items-center justify-center w-12 h-12 bg-secondary/20 text-secondary font-black rounded-lg">SA</span> 
                         <div>
                             <p class="font-bold">Saca la mesa</p>
-                            <p class="text-xs text-foreground/50">El segundo peor tiro 🧹</p>
+                            <p class="text-xs text-foreground/50">El segundo peor tiro 🗑️</p>
                         </div>
                     </li>
                     <li class="flex items-center gap-4 p-3 rounded-xl hover:bg-foreground/5 transition-colors">
                         <span class="shrink-0 flex items-center justify-center w-12 h-12 bg-primary/20 text-primary font-black rounded-lg">PO</span> 
                         <div>
                             <p class="font-bold">Pone la mesa</p>
-                            <p class="text-xs text-foreground/50">El tercer peor tiro 🍴</p>
+                            <p class="text-xs text-foreground/50">El tercer peor tiro 🍽️</p>
                         </div>
                     </li>
                     <li class="flex items-center gap-4 p-3 rounded-xl hover:bg-foreground/5 transition-colors">
@@ -64,9 +64,9 @@ import Layout from '../layouts/Layout.astro';
                 <div class="bg-background border border-foreground/10 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <h3 class="text-xl font-bold mb-4 flex items-center gap-3"><i class="fa-solid fa-calendar-star text-secondary"></i> Temporadas</h3>
                     <ul class="space-y-3 text-foreground/80 list-disc pl-5">
-                        <li>Suman puntos quienes hagan tareas. Gana quien sume más al final de la estación.</li>
-                        <li>El perdedor de una tarea <strong>no la realiza</strong> en la próxima temporada.</li>
-                        <li>Si estás exento de una tarea y sacás el puntaje para hacerla, no hacés nada ni sumás puntos.</li>
+                        <li>Hacer las tareas de <strong class="text-primary">Lavar</strong>, <strong class="text-primary">Sacar</strong> o <strong class="text-primary">Poner</strong> suma <strong>1 punto</strong> en esa categoría específica.</li>
+                        <li>Al final de la temporada, se hace un recuento. Quien tenga <strong>más puntos acumulados en una tarea</strong>, se consagra ganador de esa categoría y queda <strong>exento</strong> de realizarla durante toda la siguiente temporada.</li>
+                        <li>Si estás exento de una tarea y los dados te designan para hacerla, ¡te salvás y pasás a no hacer nada! (No se suman puntos estando exento).</li>
                     </ul>
                 </div>
             </div>
