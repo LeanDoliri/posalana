@@ -36,4 +36,22 @@ db.executeMultiple(`
   );
 `).catch(console.error);
 
+// Migration: Add 'role' column if it doesn't exist, and make ldoliri admin
+(async () => {
+  try {
+      await db.execute("ALTER TABLE user ADD COLUMN role TEXT DEFAULT 'user'");
+  } catch (e) {
+      // Column probably already exists, ignore
+  }
+  
+  try {
+      await db.execute({
+          sql: "UPDATE user SET role = 'admin' WHERE username = ?",
+          args: ["ldoliri"]
+      });
+  } catch (e) {
+      console.error("Failed to upgrade ldoliri to admin:", e);
+  }
+})();
+
 export default db;
