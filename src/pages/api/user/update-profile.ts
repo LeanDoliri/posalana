@@ -33,10 +33,12 @@ export async function POST(context: APIContext): Promise<Response> {
     args.push(context.locals.user!.id);
 
 	try {
+		console.log("Updating profile:", updates, args);
 		await db.execute({
 			sql: `UPDATE user SET ${updates.join(', ')} WHERE id = ?`,
 			args: args
 		});
+		console.log("Profile updated successfully in DB");
 		return new Response("OK", { status: 200 });
 	} catch (e) {
 		console.error("Error al actualizar perfil:", e);

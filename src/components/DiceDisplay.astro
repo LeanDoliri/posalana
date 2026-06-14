@@ -1,0 +1,32 @@
+---
+export interface Props {
+    die1: number;
+    die2: number;
+    die3: number;
+    die4: number;
+    isSafe?: boolean;
+    size?: "sm" | "md" | "lg" | "xl";
+}
+
+const { die1, die2, die3, die4, isSafe, size = "md" } = Astro.props;
+
+const diceWords = ['one', 'two', 'three', 'four', 'five', 'six'];
+
+const getDieClass = (val: number) => `fa-solid fa-dice-${diceWords[val - 1]}`;
+
+const sizeClasses = {
+    sm: "text-sm gap-1",
+    md: "text-lg gap-2",
+    lg: "text-2xl gap-3",
+    xl: "text-6xl gap-6"
+};
+
+const safeClass = isSafe === undefined ? "text-secondary" : (isSafe ? "text-secondary" : "text-primary");
+---
+
+<div class={`flex items-center justify-center ${sizeClasses[size]}`}>
+    <i class={`${getDieClass(die1)} ${safeClass} drop-shadow-sm`}></i>
+    <i class={`${getDieClass(die2)} text-foreground/30`}></i>
+    <i class={`${getDieClass(die3)} text-foreground/30`}></i>
+    <i class={`${getDieClass(die4)} text-foreground/30`}></i>
+</div>

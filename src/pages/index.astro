@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import db from '../db/index.js';
 import { getSeasonId } from '../utils/season.js';
+import UserAvatar from '../components/UserAvatar.astro';
+import DiceDisplay from '../components/DiceDisplay.astro';
 
 if (!Astro.locals.user) {
 	return Astro.redirect('/login');
@@ -66,12 +68,7 @@ const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDail
                 </div>
                 <div class="flex items-center gap-3 bg-secondary/5 border border-secondary/20 px-4 py-2 rounded-xl shadow-inner">
                     <p class="text-xs text-secondary font-bold uppercase tracking-wider mr-2 hidden md:block">Tu Suerte:</p>
-                    <div class="flex gap-1.5 text-2xl drop-shadow-sm">
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die1 as number)-1]} text-secondary`}></i>
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die2 as number)-1]} text-foreground/30`}></i>
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die3 as number)-1]} text-foreground/30`}></i>
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die4 as number)-1]} text-foreground/30`}></i>
-                    </div>
+                    <DiceDisplay die1={myRoll.die1 as number} die2={myRoll.die2 as number} die3={myRoll.die3 as number} die4={myRoll.die4 as number} size="lg" />
                 </div>
             </section>
         ) : (
@@ -160,13 +157,7 @@ const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDail
                                 
                                 <!-- User Info & Time -->
                                 <div class="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
-                                    <div class={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl overflow-hidden border-2 shadow-sm shrink-0 ${isSafe ? 'border-secondary/20 bg-secondary/10 text-secondary' : 'border-primary/20 bg-primary/10 text-primary'}`}>
-                                        {roll.avatar_url && roll.avatar_url !== 'null' ? (
-                                            <img src={roll.avatar_url as string} alt={roll.username as string} class="w-full h-full object-cover" referrerpolicy="no-referrer" />
-                                        ) : (
-                                            (roll.username as string).charAt(0).toUpperCase()
-                                        )}
-                                    </div>
+                                    <UserAvatar user={roll as any} size="lg" border={true} />
                                     <div class="flex-grow">
                                         <div class="flex flex-wrap items-center gap-2">
                                             <p class="font-black text-foreground text-xl leading-tight">{roll.display_name}</p>
@@ -181,14 +172,8 @@ const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDail
                                     </div>
                                 </div>
 
-                                <!-- Dice Prominent -->
                                 <div class="flex items-center justify-center sm:justify-end bg-background/50 sm:bg-transparent p-4 sm:p-0 rounded-xl w-full sm:w-auto mt-2 sm:mt-0">
-                                    <div class="flex gap-2 text-4xl sm:text-5xl drop-shadow-sm">
-                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die1 as number)-1]} ${isSafe ? 'text-secondary' : 'text-primary'}`}></i>
-                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die2 as number)-1]} text-foreground/30`}></i>
-                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die3 as number)-1]} text-foreground/30`}></i>
-                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die4 as number)-1]} text-foreground/30`}></i>
-                                    </div>
+                                    <DiceDisplay die1={roll.die1 as number} die2={roll.die2 as number} die3={roll.die3 as number} die4={roll.die4 as number} size="xl" isSafe={isSafe} />
                                 </div>
                             </div>
                         )

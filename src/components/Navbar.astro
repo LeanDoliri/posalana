@@ -1,0 +1,165 @@
+---
+import db from "../db/index.js";
+import UserAvatar from "./UserAvatar.astro";
+
+const { user } = Astro.locals;
+
+// Calculate days without lomito
+const today = new Date();
+today.setHours(today.getHours() - 3);
+const todayStr = today.toISOString().split('T')[0];
+
+const lastLomitoRes = await db.execute(`
+	SELECT r1.date
+	FROM roll r1
+	JOIN roll r2 ON r1.date = r2.date AND r1.id != r2.id
+		AND r1.die1 = r2.die1 AND r1.die2 = r2.die2
+		AND r1.die3 = r2.die3 AND r1.die4 = r2.die4
+	ORDER BY r1.date DESC
+	LIMIT 1
+`);
+
+const autoLomitoDate = lastLomitoRes.rows.length > 0 ? lastLomitoRes.rows[0].date as string : null;
+
+const settingsRes = await db.execute("SELECT value FROM settings WHERE key = 'last_lomito_date'");
+const manualLomitoDate = settingsRes.rows.length > 0 ? settingsRes.rows[0].value as string : null;
+
+let lastLomitoDate = manualLomitoDate ? manualLomitoDate : autoLomitoDate;
+
+let daysSinceLomito: number | null = null;
+let lomitoTooltip = "Nunca hubo un lomito aún 😢";
+
+if (lastLomitoDate) {
+	const last = new Date(lastLomitoDate + "T12:00:00");
+	const now = new Date(todayStr + "T12:00:00");
+	daysSinceLomito = Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+	lomitoTooltip = `Último lomito: ${lastLomitoDate}`;
+}
+---
+
+<!-- Sticky Header -->
+<header class="sticky top-0 z-50 bg-background/80 backdrop-blur-md shadow-sm border-b border-foreground/5 transition-all duration-300">
+    <div class="max-w-5xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
+        <!-- Brand & Lomito -->
+        <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-black tracking-tighter hover:scale-105 transition-transform origin-left">
+                <a href="/" class="flex">
+                    <span class="text-primary">PO</span>
+                    <span class="text-secondary">SA</span>
+                    <span class="text-accent">LA</span>
+                    <span class="text-foreground">NA</span>
+                </a>
+            </h1>
+            
+            <div class="relative group hidden sm:block">
+                <span class="text-xs font-bold bg-accent/10 text-accent px-3 py-1 rounded-full cursor-default shadow-sm border border-accent/20">
+                    🥪 {daysSinceLomito !== null ? daysSinceLomito : "∞"} {daysSinceLomito === 1 ? 'día' : 'días'} sin lomito
+                </span>
+                <div class="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-foreground/90 backdrop-blur-sm text-background text-xs px-3 py-2 rounded-lg shadow-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 translate-y-1 group-hover:translate-y-0">
+                    {lomitoTooltip}
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Nav -->
+        <nav class="hidden md:flex items-center space-x-6 text-sm font-semibold">
+            <a href="/" class="text-foreground/80 hover:text-secondary transition-colors relative after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-secondary hover:after:w-full after:transition-all after:duration-300">Inicio</a>
+            <a href="/history" class="text-foreground/80 hover:text-secondary transition-colors relative after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-secondary hover:after:w-full after:transition-all after:duration-300">Historial</a>
+            <a href="/rules" class="text-foreground/80 hover:text-secondary transition-colors relative after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-secondary hover:after:w-full after:transition-all after:duration-300">Reglas</a>
+            
+            {user ? (
+                <div class="flex items-center gap-4 pl-4 border-l border-foreground/10">
+                    <div class="flex items-center gap-2">
+                        <a href="/profile" class="text-foreground font-bold flex items-center gap-2 hover:text-secondary transition-colors group">
+                            <i class="fa-solid fa-user-circle text-secondary group-hover:scale-110 transition-transform"></i> {user.display_name || user.username}
+                        </a>
+                        {user.role === 'admin' && (
+                            <a href="/admin" class="bg-primary/10 text-primary text-[10px] uppercase tracking-wider px-2 py-1 rounded-md hover:bg-primary/20 transition-colors">Admin</a>
+                        )}
+                    </div>
+                    <form method="post" action="/api/logout">
+                        <button class="text-primary/80 hover:text-primary font-bold hover:bg-primary/10 px-3 py-1.5 rounded-full transition-colors"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                    </form>
+                </div>
+            ) : (
+                <a href="/login" class="bg-secondary text-background px-5 py-2 rounded-full hover:shadow-lg hover:shadow-secondary/30 hover:-translate-y-0.5 transition-all">Iniciar Sesión</a>
+            )}
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="md:hidden text-foreground/80 hover:text-foreground text-2xl focus:outline-none transition-transform active:scale-95">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+    
+    <!-- Mobile Lomito Indicator -->
+    <div class="sm:hidden px-4 pb-3 border-t border-foreground/5 flex justify-center bg-background/50">
+        <span class="text-xs font-bold bg-accent/10 text-accent px-3 py-1 rounded-full cursor-default mt-2">
+            🥪 {daysSinceLomito !== null ? daysSinceLomito : "∞"} {daysSinceLomito === 1 ? 'día' : 'días'} sin lomito ({lomitoTooltip})
+        </span>
+    </div>
+</header>
+
+<!-- Mobile Navigation Drawer -->
+<div id="mobile-menu" class="fixed inset-0 z-40 bg-background flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out md:hidden pt-20">
+    <nav class="flex flex-col space-y-2 p-6 text-xl font-bold">
+        <a href="/" class="mobile-link p-4 rounded-xl text-foreground hover:bg-foreground/5 transition-colors border-b border-foreground/5"><i class="fa-solid fa-home w-8 text-secondary"></i> Inicio</a>
+        <a href="/history" class="mobile-link p-4 rounded-xl text-foreground hover:bg-foreground/5 transition-colors border-b border-foreground/5"><i class="fa-solid fa-clock-rotate-left w-8 text-secondary"></i> Historial</a>
+        <a href="/rules" class="mobile-link p-4 rounded-xl text-foreground hover:bg-foreground/5 transition-colors border-b border-foreground/5"><i class="fa-solid fa-book w-8 text-secondary"></i> Reglas</a>
+        
+        {user ? (
+            <div class="pt-6 mt-4 border-t border-foreground/10">
+                <div class="p-4 flex items-center gap-3">
+                    <UserAvatar user={user} class="w-10 h-10" />
+                    <div class="flex-grow">
+                        <p class="text-sm font-normal text-foreground/60">Conectado como</p>
+                        <p class="text-foreground font-bold">{user.display_name || user.username}</p>
+                    </div>
+                    {user.role === 'admin' && (
+                        <a href="/admin" class="mobile-link bg-primary/10 text-primary text-xs uppercase px-3 py-1 rounded-md">Admin</a>
+                    )}
+                </div>
+                <form method="post" action="/api/logout" class="mt-2">
+                    <button class="w-full text-left p-4 rounded-xl text-primary hover:bg-primary/5 transition-colors font-bold"><i class="fa-solid fa-arrow-right-from-bracket w-8"></i> Cerrar Sesión</button>
+                </form>
+            </div>
+        ) : (
+            <div class="pt-6 mt-4 border-t border-foreground/10">
+                <a href="/login" class="mobile-link flex items-center justify-center w-full bg-secondary text-background p-4 rounded-xl font-bold shadow-lg shadow-secondary/20"><i class="fa-solid fa-right-to-bracket mr-2"></i> Iniciar Sesión</a>
+            </div>
+        )}
+    </nav>
+</div>
+
+<!-- Mobile Menu Script -->
+<script>
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    const icon = btn?.querySelector('i');
+    const links = document.querySelectorAll('.mobile-link');
+
+    let isMenuOpen = false;
+
+    function toggleMenu() {
+        isMenuOpen = !isMenuOpen;
+        if (isMenuOpen) {
+            menu?.classList.remove('translate-x-full');
+            icon?.classList.remove('fa-bars');
+            icon?.classList.add('fa-xmark');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        } else {
+            menu?.classList.add('translate-x-full');
+            icon?.classList.remove('fa-xmark');
+            icon?.classList.add('fa-bars');
+            document.body.style.overflow = '';
+        }
+    }
+
+    btn?.addEventListener('click', toggleMenu);
+    
+    links.forEach(link => {
+        link.addEventListener('click', () => {
+            if(isMenuOpen) toggleMenu();
+        });
+    });
+</script>

@@ -1,6 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import db from '../db/index.js';
+import UserAvatar from '../components/UserAvatar.astro';
+import DiceDisplay from '../components/DiceDisplay.astro';
 
 if (!Astro.locals.user) {
 	return Astro.redirect('/login');
@@ -103,23 +105,14 @@ const historyData = dates.map(date => {
                                         
                                         <!-- User -->
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center font-bold overflow-hidden border border-foreground/10">
-                                                {roll.avatar_url ? (
-                                                    <img src={roll.avatar_url as string} alt={roll.display_name as string} class="w-full h-full object-cover" />
-                                                ) : (
-                                                    (roll.display_name as string).charAt(0).toUpperCase()
-                                                )}
-                                            </div>
+                                            <UserAvatar user={{ username: roll.username as string, display_name: roll.display_name as string, avatar_url: roll.avatar_url as string }} size="md" />
                                             <span class="font-bold text-foreground">{roll.display_name}</span>
                                         </div>
 
                                         <!-- Stats -->
                                         <div class="flex items-center gap-4">
-                                            <div class="hidden sm:flex items-center gap-1 opacity-50 font-mono text-sm group-hover:opacity-100 transition-opacity">
-                                                <span class="w-4 text-center">{roll.die1}</span>-
-                                                <span class="w-4 text-center">{roll.die2}</span>-
-                                                <span class="w-4 text-center">{roll.die3}</span>-
-                                                <span class="w-4 text-center">{roll.die4}</span>
+                                            <div class="hidden sm:flex items-center opacity-70 group-hover:opacity-100 transition-opacity">
+                                                <DiceDisplay die1={roll.die1 as number} die2={roll.die2 as number} die3={roll.die3 as number} die4={roll.die4 as number} size="sm" isSafe={isSafe} />
                                             </div>
                                             <div class={`px-3 py-1 rounded-lg text-xs font-black tracking-widest ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background shadow-[0_0_10px_rgba(234,42,88,0.3)]'}`}>
                                                 {chore.code}

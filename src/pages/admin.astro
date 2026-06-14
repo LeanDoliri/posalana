@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import db from "../db/index.js";
+import UserAvatar from "../components/UserAvatar.astro";
+import DiceDisplay from "../components/DiceDisplay.astro";
 
 const { user } = Astro.locals;
 
@@ -81,14 +83,7 @@ settingsRes.rows.forEach((s: any) => settingsMap.set(s.key, s.value));
                             {allUsers.map((u) => (
                                 <tr class="hover:bg-foreground/[0.02] transition-colors">
                                     <td class="p-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center font-bold text-foreground/70 overflow-hidden shadow-sm">
-                                                {u.avatar_url && u.avatar_url !== 'null' ? (
-                                            <img src={u.avatar_url as string} alt={u.username as string} class="w-10 h-10 rounded-full object-cover border-2 border-foreground/10" referrerpolicy="no-referrer" />
-                                        ) : (
-                                            <div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center font-bold text-secondary border-2 border-secondary/20">{(u.username as string).charAt(0).toUpperCase()}</div>
-                                        )}
-                                            </div>
+                                            <UserAvatar user={u as any} size="md" />
                                             <span class="font-bold text-foreground">{u.username}</span>
                                         </div>
                                     </td>
@@ -200,18 +195,12 @@ settingsRes.rows.forEach((s: any) => settingsMap.set(s.key, s.value));
                                     <td class="p-4 text-sm font-mono text-foreground/60">{r.date}</td>
                                     <td class="p-4">
                                         <div class="flex items-center gap-2 font-bold text-foreground">
-                                            <div class="w-6 h-6 rounded-full bg-foreground/10 overflow-hidden flex items-center justify-center text-[10px]">
-                                                {r.avatar_url ? (
-                                                    <img src={r.avatar_url as string} alt={r.display_name as string} class="w-full h-full object-cover" />
-                                                ) : (
-                                                    (r.display_name as string).charAt(0).toUpperCase()
-                                                )}
-                                            </div>
+                                            <UserAvatar user={{ username: r.username as string, display_name: r.display_name as string, avatar_url: r.avatar_url as string }} size="sm" />
                                             {r.display_name}
                                         </div>
                                     </td>
-                                    <td class="p-4 text-lg font-mono tracking-widest text-foreground/80">
-                                        {r.die1}-{r.die2}-{r.die3}-{r.die4}
+                                    <td class="p-4">
+                                        <DiceDisplay die1={r.die1 as number} die2={r.die2 as number} die3={r.die3 as number} die4={r.die4 as number} size="md" />
                                     </td>
                                     <td class="p-4 text-right">
                                         <form method="post" action="/api/admin/delete-roll" onsubmit={`return confirm('⚠️ ¿Alterar el destino y anular la tirada de ${r.username}?')`}>
