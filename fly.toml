@@ -1,0 +1,20 @@
+# fly.toml app configuration file generated for posalana on 2026-06-13T22:30:56-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'posalana'
+primary_region = 'gru'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '2gb'
+  cpus = 1
+  memory_mb = 2048

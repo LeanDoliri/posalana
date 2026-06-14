@@ -63,7 +63,12 @@ if (lastLomitoDate) {
 					<a href="/history" class="hover:text-blue-600">Historial</a>
 					<a href="/rules" class="hover:text-blue-600">Reglas</a>
 					{user ? (
-						<span class="ml-4 font-semibold text-blue-800">{user.username}</span>
+						<span class="ml-4 font-semibold text-blue-800 flex items-center gap-2 inline-flex">
+							{user.username}
+							{user.role === 'admin' && (
+								<a href="/admin" class="bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 ml-2">Admin</a>
+							)}
+						</span>
 						<form method="post" action="/api/logout" class="inline">
 							<button class="text-red-500 ml-2 hover:underline">Salir</button>
 						</form>

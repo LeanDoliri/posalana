@@ -12,7 +12,8 @@ db.executeMultiple(`
       id TEXT NOT NULL PRIMARY KEY,
       username TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
-      avatar_url TEXT
+      avatar_url TEXT,
+      role TEXT DEFAULT 'user'
   );
 
   CREATE TABLE IF NOT EXISTS session (
