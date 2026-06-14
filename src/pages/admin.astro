@@ -126,6 +126,55 @@ settingsRes.rows.forEach((s: any) => settingsMap.set(s.key, s.value));
             </div>
 		</section>
 
+		<!-- Manual Points Section -->
+		<section class="bg-background border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8">
+            <div class="p-6 md:p-8">
+			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-accent"></i> Carga Histórica de Puntos</h3>
+			    <div class="grid grid-cols-1 gap-8">
+                    <form method="post" action="/api/admin/manual-points" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold mb-1 text-foreground/80">Jugador</label>
+                                <select name="user_id" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
+                                    <option value="">Seleccionar...</option>
+                                    {allUsers.map(u => (
+                                        <option value={u.id}>{u.display_name || u.username}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1 text-foreground/80">Temporada</label>
+                                <select name="season_id" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="2024-verano">Verano 2024</option>
+                                    <option value="2024-otoño">Otoño 2024</option>
+                                    <option value="2024-invierno">Invierno 2024</option>
+                                    <option value="2024-primavera">Primavera 2024</option>
+                                    <option value="2025-verano">Verano 2025</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1 text-foreground/80">Tarea</label>
+                                <select name="chore_code" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
+                                    <option value="">Seleccionar...</option>
+                                    <option value="LA">Lavar (LA)</option>
+                                    <option value="SA">Sacar (SA)</option>
+                                    <option value="PO">Poner (PO)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1 text-foreground/80">Puntos Totales</label>
+                                <input type="number" name="points" min="0" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" placeholder="Ej: 5" required />
+                            </div>
+                        </div>
+                        <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity mt-2">
+                            Cargar Puntos
+                        </button>
+                    </form>
+                </div>
+            </div>
+		</section>
+
 		<!-- Rolls Section -->
 		<section class="bg-background border border-foreground/10 p-1 rounded-3xl shadow-lg">
             <div class="p-6 md:p-8">

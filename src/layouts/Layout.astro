@@ -87,7 +87,7 @@ if (lastLomitoDate) {
 						<div class="flex items-center gap-4 pl-4 border-l border-foreground/10">
 							<div class="flex items-center gap-2">
 								<a href="/profile" class="text-foreground font-bold flex items-center gap-2 hover:text-secondary transition-colors group">
-									<i class="fa-solid fa-user-circle text-secondary group-hover:scale-110 transition-transform"></i> {user.display_name}
+									<i class="fa-solid fa-user-circle text-secondary group-hover:scale-110 transition-transform"></i> {user.display_name || user.username}
 								</a>
 								{user.role === 'admin' && (
 									<a href="/admin" class="bg-primary/10 text-primary text-[10px] uppercase tracking-wider px-2 py-1 rounded-md hover:bg-primary/20 transition-colors">Admin</a>
@@ -135,7 +135,7 @@ if (lastLomitoDate) {
 							</div>
 							<div class="flex-grow">
 								<p class="text-sm font-normal text-foreground/60">Conectado como</p>
-								<p class="text-foreground font-bold">{user.display_name}</p>
+								<p class="text-foreground font-bold">{user.display_name || user.username}</p>
 							</div>
 							{user.role === 'admin' && (
 								<a href="/admin" class="mobile-link bg-primary/10 text-primary text-xs uppercase px-3 py-1 rounded-md">Admin</a>
