@@ -7,26 +7,61 @@ if (Astro.locals.user) {
 ---
 
 <Layout>
-	<div class="max-w-md mx-auto bg-background border border-foreground/10 p-8 rounded-lg shadow mt-10">
-		<h2 class="text-2xl font-bold mb-2 text-center">Restablecer Contraseña</h2>
-		<p class="text-sm text-foreground/60 text-center mb-6">Pedile la clave maestra al administrador del juego.</p>
-		<form method="post" action="/api/reset" enctype="application/x-www-form-urlencoded" class="space-y-4">
-			<div>
-				<label class="block text-sm font-medium mb-1">Usuario</label>
-				<input type="text" name="username" class="w-full border rounded p-2" required />
+	<div class="min-h-[70vh] flex items-center justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+		<div class="w-full max-w-md relative group">
+			<div class="absolute -inset-1 bg-gradient-to-r from-accent to-primary rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+			
+			<div class="relative bg-background border border-foreground/10 p-10 rounded-3xl shadow-2xl">
+				<div class="text-center mb-8">
+					<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 text-accent mb-4">
+						<i class="fa-solid fa-unlock-keyhole text-2xl"></i>
+					</div>
+					<h2 class="text-2xl font-black text-foreground tracking-tight">Restablecer Clave</h2>
+					<p class="text-foreground/50 mt-2 font-medium text-sm">Pedile la clave maestra al administrador.</p>
+				</div>
+
+				<form method="post" action="/api/reset" enctype="application/x-www-form-urlencoded" class="space-y-4">
+					<div class="space-y-1">
+						<label class="block text-xs font-bold uppercase tracking-wider text-foreground/70 ml-1">Usuario</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+								<i class="fa-solid fa-user text-foreground/30"></i>
+							</div>
+							<input type="text" name="username" class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all" required />
+						</div>
+					</div>
+
+					<div class="space-y-1">
+						<label class="block text-xs font-bold uppercase tracking-wider text-foreground/70 ml-1">Nueva Contraseña</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+								<i class="fa-solid fa-key text-foreground/30"></i>
+							</div>
+							<input type="password" name="new_password" class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all" required />
+						</div>
+					</div>
+
+					<div class="space-y-1">
+						<label class="block text-xs font-bold uppercase tracking-wider text-primary/70 ml-1">Clave Maestra</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+								<i class="fa-solid fa-lock text-primary/40"></i>
+							</div>
+							<input type="password" name="master_key" class="w-full bg-primary/5 border border-primary/20 text-foreground rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" required />
+						</div>
+					</div>
+
+					<button type="submit" class="w-full bg-accent text-background py-3.5 rounded-xl font-bold shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:-translate-y-0.5 active:translate-y-0 transition-all mt-6 cursor-pointer">
+						Restablecer
+					</button>
+				</form>
+
+				<div class="mt-8 pt-6 border-t border-foreground/5 text-center">
+					<p class="text-sm font-semibold">
+						<a href="/login" class="text-secondary hover:text-secondary/80 hover:underline transition-colors"><i class="fa-solid fa-arrow-left mr-1"></i> Volver al Login</a>
+					</p>
+				</div>
 			</div>
-			<div>
-				<label class="block text-sm font-medium mb-1">Nueva Contraseña</label>
-				<input type="password" name="new_password" class="w-full border rounded p-2" required />
-			</div>
-			<div>
-				<label class="block text-sm font-medium mb-1">Clave Maestra</label>
-				<input type="password" name="master_key" class="w-full border rounded p-2" required />
-			</div>
-			<button type="submit" class="w-full bg-accent text-background p-2 rounded hover:opacity-90 font-semibold transition cursor-pointer">Restablecer</button>
-		</form>
-		<p class="mt-4 text-center text-sm">
-			<a href="/login" class="text-secondary hover:underline">Volver al Login</a>
-		</p>
+		</div>
 	</div>
 </Layout>

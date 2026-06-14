@@ -17,6 +17,7 @@ export async function POST(context: APIContext): Promise<Response> {
     // adjust to GMT-3 for Argentina
     today.setHours(today.getHours() - 3);
     const dateStr = today.toISOString().split('T')[0];
+    const timeStr = today.toISOString().split('T')[1].substring(0, 5); // HH:mm
 
     const userId = context.locals.user!.id;
 
@@ -37,8 +38,8 @@ export async function POST(context: APIContext): Promise<Response> {
     const id = Math.random().toString(36).substring(2, 15);
 
     await db.execute({
-        sql: "INSERT INTO roll (id, user_id, date, die1, die2, die3, die4) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        args: [id, userId, dateStr, d1, d2, d3, d4]
+        sql: "INSERT INTO roll (id, user_id, date, time, die1, die2, die3, die4) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        args: [id, userId, dateStr, timeStr, d1, d2, d3, d4]
     });
 
 	return context.redirect("/");

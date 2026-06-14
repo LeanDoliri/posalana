@@ -53,12 +53,23 @@ db.executeMultiple(`
       FOREIGN KEY (user_id) REFERENCES user(id),
       UNIQUE(user_id, season_id, chore_code)
   );
+
+  CREATE TABLE IF NOT EXISTS settings (
+      key TEXT NOT NULL PRIMARY KEY,
+      value TEXT NOT NULL
+  );
 `).catch(console.error);
 
 // Migration: Add 'role' column if it doesn't exist, and make ldoliri admin
 (async () => {
   try {
       await db.execute("ALTER TABLE user ADD COLUMN role TEXT DEFAULT 'user'");
+  } catch (e) {
+      // Column probably already exists, ignore
+  }
+
+  try {
+      await db.execute("ALTER TABLE roll ADD COLUMN time TEXT");
   } catch (e) {
       // Column probably already exists, ignore
   }

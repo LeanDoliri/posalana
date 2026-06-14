@@ -1,13 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import db from '../db/index.js';
-import { getSeasonId, formatSeasonName, calculateSeasonPoints } from '../utils/season.js';
 
 if (!Astro.locals.user) {
 	return Astro.redirect('/login');
 }
 
-// Fetch all rolls
+// Get all rolls ordered by date descending, then by die scores ascending
 const allRollsRes = await db.execute(`
     SELECT r.*, u.username, u.avatar_url 
     FROM roll r
@@ -15,203 +14,99 @@ const allRollsRes = await db.execute(`
     ORDER BY r.date DESC, r.die1 ASC, r.die2 ASC, r.die3 ASC, r.die4 ASC
 `);
 
-// Determine unique seasons and calculate points
-const uniqueSeasons = new Set<string>();
-allRollsRes.rows.forEach(r => uniqueSeasons.add(getSeasonId(r.date as string)));
-
-// Sort seasons descending (e.g. 2026-primavera, 2026-invierno, etc.)
-// Simple sort by string is mostly fine because year is first, but seasons aren't alphabetical.
-// Let's just use an array and let them be sorted by order of appearance (which is newest first because rolls are DESC).
-const orderedSeasons = Array.from(uniqueSeasons);
-
-const seasonPointsMap = new Map();
-const yearlyPointsMap = new Map(); // year -> map of user_id -> scores
-
-for (const seasonId of orderedSeasons) {
-    const points = await calculateSeasonPoints(db, seasonId);
-    seasonPointsMap.set(seasonId, points);
-
-    const year = seasonId.split('-')[0];
-    if (!yearlyPointsMap.has(year)) yearlyPointsMap.set(year, new Map());
-    
-    const yearData = yearlyPointsMap.get(year);
-    for (const p of points) {
-        if (!yearData.has(p.id)) {
-            yearData.set(p.id, { username: p.username, avatar_url: p.avatar_url, scores: { LA: 0, SA: 0, PO: 0 } });
-        }
-        const yUser = yearData.get(p.id);
-        yUser.scores.LA += p.scores.LA;
-        yUser.scores.SA += p.scores.SA;
-        yUser.scores.PO += p.scores.PO;
-    }
-}
-
-// Convert yearly map to arrays for rendering
-const yearlyStats = Array.from(yearlyPointsMap.entries()).map(([year, map]) => {
-    return {
-        year,
-        users: Array.from(map.values())
-    };
-});
-
-// Group rolls by date and calculate chores properly (like index.astro)
-const exemptionsRes = await db.execute("SELECT user_id, season_id, chore_code FROM exemption");
-const allExemptions = exemptionsRes.rows;
-
-const groupedRolls: Record<string, any[]> = {};
+// Group by date
+const groupedRolls: Record<string, typeof allRollsRes.rows> = {};
 for (const row of allRollsRes.rows) {
     const date = row.date as string;
-    if (!groupedRolls[date]) groupedRolls[date] = [];
+    if (!groupedRolls[date]) {
+        groupedRolls[date] = [];
+    }
     groupedRolls[date].push(row);
 }
 
 const dates = Object.keys(groupedRolls).sort((a, b) => b.localeCompare(a));
 const chores = [
-    { label: "LAva", code: "LA" },
-    { label: "SAca", code: "SA" },
-    { label: "POne", code: "PO" }
+    { label: "Lava", code: "LA" },
+    { label: "Saca", code: "SA" },
+    { label: "Pone", code: "PO" }
 ];
-const safeChore = { label: "NAda", code: "NA" };
-
-// We will pre-calculate the assigned chores for the UI
-const assignedChoresMap = new Map();
-for (const date of dates) {
-    const dailyRolls = groupedRolls[date];
-    const seasonId = getSeasonId(date);
-    const dailyExemptions = allExemptions.filter(e => e.season_id === seasonId);
-
-    for (const roll of dailyRolls) {
-        assignedChoresMap.set(roll.id, safeChore);
-    }
-
-    for (const chore of chores) {
-        for (const roll of dailyRolls) {
-            if (assignedChoresMap.get(roll.id) !== safeChore) continue;
-
-            const isExempt = dailyExemptions.some(e => e.user_id === roll.user_id && e.chore_code === chore.code);
-            if (!isExempt) {
-                assignedChoresMap.set(roll.id, chore);
-                break;
-            }
-        }
-    }
-}
+const safeChore = { label: "Nada", code: "NA" };
 ---
 
 <Layout>
-    <div class="space-y-8">
+    <div class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
         
-        <section class="bg-background border border-foreground/10 p-6 rounded-lg shadow">
-            <h2 class="text-2xl font-bold mb-4">Puntajes por Temporada</h2>
-            {orderedSeasons.length === 0 && <p class="text-foreground/50">Aún no hay temporadas jugadas.</p>}
-            
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {orderedSeasons.map(seasonId => (
-                    <div class="bg-foreground/5 p-4 rounded-lg">
-                        <h3 class="font-bold text-lg text-secondary mb-3">{formatSeasonName(seasonId)}</h3>
-                        <table class="w-full text-left text-sm border-collapse">
-                            <thead>
-                                <tr class="border-b border-foreground/10 text-foreground/70">
-                                    <th class="pb-2">Usuario</th>
-                                    <th class="pb-2 text-center">LA</th>
-                                    <th class="pb-2 text-center">SA</th>
-                                    <th class="pb-2 text-center">PO</th>
-                                    <th class="pb-2 text-center font-bold text-primary">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {seasonPointsMap.get(seasonId).map((p: any) => (
-                                    <tr class="border-b border-foreground/5 hover:bg-foreground/10">
-                                        <td class="py-2 flex items-center gap-2">
-                                            <img src={p.avatar_url} class="w-6 h-6 rounded-full" />
-                                            {p.username}
-                                        </td>
-                                        <td class="py-2 text-center">{p.scores.LA}</td>
-                                        <td class="py-2 text-center">{p.scores.SA}</td>
-                                        <td class="py-2 text-center">{p.scores.PO}</td>
-                                        <td class="py-2 text-center font-bold text-primary">{p.scores.LA + p.scores.SA + p.scores.PO}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ))}
+        <header class="mb-10 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h2 class="text-3xl md:text-4xl font-black tracking-tight text-foreground">Archivos POSALANA</h2>
+                <p class="text-foreground/60 mt-2">El registro inmutable de la suerte pasada.</p>
             </div>
-        </section>
-
-        <section class="bg-background border border-foreground/10 p-6 rounded-lg shadow">
-            <h2 class="text-2xl font-bold mb-4">Totales Anuales</h2>
-            {yearlyStats.length === 0 && <p class="text-foreground/50">Aún no hay años jugados.</p>}
-
-            <div class="space-y-6">
-                {yearlyStats.map(yearStat => (
-                    <div>
-                        <h3 class="font-bold text-xl text-primary mb-3">Año {yearStat.year}</h3>
-                        <table class="w-full max-w-2xl text-left border-collapse">
-                            <thead>
-                                <tr class="bg-foreground/5 text-foreground/80">
-                                    <th class="p-3 border-b border-foreground/10">Usuario</th>
-                                    <th class="p-3 border-b border-foreground/10 text-center">LA</th>
-                                    <th class="p-3 border-b border-foreground/10 text-center">SA</th>
-                                    <th class="p-3 border-b border-foreground/10 text-center">PO</th>
-                                    <th class="p-3 border-b border-foreground/10 text-center font-bold">Total Puntos</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {yearStat.users.sort((a,b) => (b.scores.LA + b.scores.SA + b.scores.PO) - (a.scores.LA + a.scores.SA + a.scores.PO)).map((u: any) => (
-                                    <tr class="border-b border-foreground/5 hover:bg-foreground/5">
-                                        <td class="p-3 flex items-center gap-2 font-semibold">
-                                            <img src={u.avatar_url} class="w-8 h-8 rounded-full" />
-                                            {u.username}
-                                        </td>
-                                        <td class="p-3 text-center">{u.scores.LA}</td>
-                                        <td class="p-3 text-center">{u.scores.SA}</td>
-                                        <td class="p-3 text-center">{u.scores.PO}</td>
-                                        <td class="p-3 text-center font-bold text-lg text-primary">{u.scores.LA + u.scores.SA + u.scores.PO}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ))}
+            <div class="bg-foreground/5 px-4 py-2 rounded-full text-sm font-bold text-foreground/70">
+                <i class="fa-solid fa-database mr-2"></i> {dates.length} días registrados
             </div>
-        </section>
+        </header>
 
-        <section class="bg-background border border-foreground/10 p-6 rounded-lg shadow">
-            <h2 class="text-2xl font-bold mb-6">Historial de Tiradas</h2>
-            
-            {dates.length === 0 ? (
-                <p class="text-foreground/60 text-center">No hay historial disponible.</p>
-            ) : (
-                <div class="space-y-8">
-                    {dates.map(date => (
-                        <div>
-                            <h3 class="text-lg font-bold mb-3 border-b border-foreground/10 pb-1 text-secondary">{date} <span class="text-sm font-normal text-foreground/50 ml-2">({formatSeasonName(getSeasonId(date))})</span></h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {groupedRolls[date].map((roll) => {
-                                    const chore = assignedChoresMap.get(roll.id);
-                                    const isSafe = chore.code === 'NA';
-                                    return (
-                                        <div class={`flex items-center justify-between p-3 rounded border ${isSafe ? 'bg-secondary/10 border-secondary/20' : 'bg-primary/10 border-primary/20'}`}>
-                                            <div class="flex items-center gap-2">
-                                                <div class="w-6 h-6 rounded-full bg-foreground/10 overflow-hidden">
-                                                    {roll.avatar_url && <img src={roll.avatar_url as string} alt={roll.username as string} />}
-                                                </div>
-                                                <span class="font-semibold text-sm">{roll.username}</span>
+        {dates.length === 0 ? (
+            <div class="py-20 text-center border-2 border-dashed border-foreground/10 rounded-3xl">
+                <div class="text-5xl mb-4 text-foreground/20"><i class="fa-solid fa-folder-open"></i></div>
+                <p class="text-foreground/60 font-medium text-lg">Los archivos están vacíos.</p>
+            </div>
+        ) : (
+            <div class="space-y-12">
+                {dates.map((date, dateIndex) => (
+                    <section class="relative">
+                        <!-- Timeline visual connector -->
+                        {dateIndex !== dates.length - 1 && (
+                            <div class="absolute left-[1.3rem] md:left-[1.8rem] top-14 bottom-[-3rem] w-px bg-foreground/10 z-0"></div>
+                        )}
+                        
+                        <!-- Date Header -->
+                        <div class="flex items-center gap-4 mb-6 relative z-10">
+                            <div class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-secondary text-background flex items-center justify-center font-black shadow-lg">
+                                <i class="fa-solid fa-calendar-day"></i>
+                            </div>
+                            <h3 class="text-xl md:text-2xl font-black text-foreground">{date}</h3>
+                        </div>
+
+                        <!-- Rolls Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 md:pl-10 relative z-10">
+                            {groupedRolls[date].map((roll, index) => {
+                                const chore = index < 3 ? chores[index] : safeChore;
+                                const isSafe = index >= 3;
+                                return (
+                                    <div class={`group flex flex-row items-center justify-between p-4 rounded-2xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${isSafe ? 'bg-background border-foreground/10 hover:border-secondary/30' : 'bg-primary/5 border-primary/10 hover:border-primary/30'}`}>
+                                        
+                                        <!-- User -->
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center font-bold overflow-hidden border border-foreground/10">
+                                                {roll.avatar_url ? (
+                                                    <img src={roll.avatar_url as string} alt={roll.username as string} class="w-full h-full object-cover" />
+                                                ) : (
+                                                    (roll.username as string).charAt(0).toUpperCase()
+                                                )}
                                             </div>
-                                            <div class="text-sm">
-                                                <span class="font-mono text-foreground/50 mr-2">{roll.die1}-{roll.die2}-{roll.die3}-{roll.die4}</span>
-                                                <span class={`font-bold px-2 py-0.5 rounded text-xs text-background ${isSafe ? 'bg-secondary' : 'bg-primary'}`}>{chore.code}</span>
+                                            <span class="font-bold text-foreground">{roll.username}</span>
+                                        </div>
+
+                                        <!-- Stats -->
+                                        <div class="flex items-center gap-4">
+                                            <div class="hidden sm:flex items-center gap-1 opacity-50 font-mono text-sm group-hover:opacity-100 transition-opacity">
+                                                <span class="w-4 text-center">{roll.die1}</span>-
+                                                <span class="w-4 text-center">{roll.die2}</span>-
+                                                <span class="w-4 text-center">{roll.die3}</span>-
+                                                <span class="w-4 text-center">{roll.die4}</span>
+                                            </div>
+                                            <div class={`px-3 py-1 rounded-lg text-xs font-black tracking-widest ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background shadow-[0_0_10px_rgba(234,42,88,0.3)]'}`}>
+                                                {chore.code}
                                             </div>
                                         </div>
-                                    )
-                                })}
-                            </div>
+                                    </div>
+                                )
+                            })}
                         </div>
-                    ))}
-                </div>
-            )}
-        </section>
-
+                    </section>
+                ))}
+            </div>
+        )}
     </div>
 </Layout>

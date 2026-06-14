@@ -3,78 +3,113 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
-    <div class="bg-background border border-foreground/10 p-8 rounded-lg shadow max-w-none">
-        <div class="flex justify-between items-start mb-6">
-            <h2 class="text-2xl font-bold">Reglas del POSALANA</h2>
-            <span class="text-sm text-foreground/40 italic">Editado el 16 de Junio de 2026</span>
-        </div>
+    <div class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+        
+        <!-- Header Section -->
+        <section class="text-center pb-8 border-b border-foreground/5">
+            <h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tight text-foreground text-balance">Reglas del POSALANA</h2>
+            <p class="text-lg text-foreground/60 max-w-2xl mx-auto text-pretty">El reglamento oficial para definir quién pone, saca, lava, o se salva de hacer nada.</p>
+            <p class="text-xs text-foreground/40 mt-4 uppercase tracking-widest font-bold">Última actualización: 16 Jun 2026</p>
+        </section>
 
-        <p class="mb-4">Todos los días, cada participante debe tirar los dados una vez para definir quién <strong>PO</strong>ne, quién <strong>SA</strong>ca, quién <strong>LA</strong>va y quién no hace <strong>NA</strong>da.</p>
-
-        <h3 class="text-xl font-semibold mt-6 mb-2 border-b pb-1">¿Qué significa POSALANA?</h3>
-        <ul class="list-none pl-0 mb-4 space-y-2">
-            <li><span class="inline-block bg-primary text-background text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">LA</span> <strong>LA</strong>va los platos — el peor tiro 🍽️</li>
-            <li><span class="inline-block bg-primary/90 text-background text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">SA</span> <strong>SA</strong>ca la mesa — el segundo peor 🧹</li>
-            <li><span class="inline-block bg-primary/80 text-background text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">PO</span> <strong>PO</strong>ne la mesa — el tercer peor 🍴</li>
-            <li><span class="inline-block bg-secondary text-background text-xs font-bold px-2 py-1 rounded mr-2 w-8 text-center">NA</span> <strong>NA</strong>da — ¡zafaste! 🎉</li>
-        </ul>
-
-        <!-- Tirada -->
-        <h3 class="text-xl font-semibold mt-8 mb-2 border-b pb-1">Tirada</h3>
-        <ol class="list-decimal pl-6 mb-4 space-y-2">
-            <li>Se tiran <strong>4 dados</strong> utilizando el botón de "Tirar los Dados" en la página principal.</li>
-            <li>El tiro es válido y se registra automáticamente una sola vez por día.</li>
-            <li>El participante que saca el número <strong>más bajo</strong> en el primer dado <strong class="text-primary">LAVA</strong>, el segundo más bajo <strong class="text-primary/90">SACA</strong>, y el tercero <strong class="text-primary/80">PONE</strong>.</li>
-            <li>En caso de empate en cualquiera de los casos del punto anterior, desempata el siguiente dado y así sucesivamente.</li>
-            <li><strong>Transparencia:</strong> La generación de los números ocurre enteramente en el servidor de forma segura al momento de apretar el botón, garantizando que el resultado es 100% aleatorio e imposible de alterar o predecir desde el celular de los participantes.</li>
-        </ol>
-
-        <!-- Temporadas -->
-        <h3 class="text-xl font-semibold mt-8 mb-2 border-b pb-1">Temporadas</h3>
-        <ol class="list-decimal pl-6 mb-4 space-y-2">
-            <li>Quien más puntos sume en cada categoría en una temporada <strong>no realizará esa tarea en la temporada siguiente</strong>. Las temporadas se corresponden con las estaciones del año.</li>
-            <li>En caso de empate, las dos (o más) personas en el empate se someten a una nueva tirada de dados para definir quién no hace la tarea la próxima temporada.</li>
-            <li>En caso de sacar un puntaje de los tres más bajos y estar exento de realizar una tarea, <strong>no realizará ninguna tarea ni sumará el punto correspondiente</strong>.</li>
-        </ol>
-
-        <!-- Llegadas tarde -->
-        <h3 class="text-xl font-semibold mt-8 mb-2 border-b pb-1">Llegadas Tarde</h3>
-        <ol class="list-decimal pl-6 mb-4 space-y-2">
-            <li>Quien llegue después de las <strong>10:15</strong> sin autorización previa queda excluido de realizar el POSALANA y deberá <strong>lavar los platos</strong>.</li>
-            <li>En el caso de que sea más de una persona, se van ocupando las tareas según la tardanza. Los puntos no quedan vacantes: los dados se tiran y alguien ganará los puntos sin realizar la tarea.</li>
-        </ol>
-
-        <!-- Horarios -->
-        <h3 class="text-xl font-semibold mt-8 mb-2 border-b pb-1">Horarios</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div class="bg-secondary/10 border border-secondary/20 rounded-lg p-4">
-                <p class="font-bold text-secondary mb-1">🎲 Tiempo de Tiración</p>
-                <p class="text-2xl font-bold text-secondary">10:30 a 12:00</p>
-                <p class="text-sm text-secondary/80 mt-1">Fuera de este horario no se puede tirar y se penaliza como llegada tarde.</p>
+        <!-- The Meaning -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            <div class="bg-background border border-foreground/10 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <h3 class="text-2xl font-bold mb-6 flex items-center gap-3 text-balance"><i class="fa-solid fa-circle-question text-secondary"></i> ¿Qué es POSALANA?</h3>
+                <p class="text-foreground/80 leading-relaxed mb-6 text-pretty">Todos los días, cada participante debe tirar los dados una vez para definir su tarea en la mesa. Las tareas se asignan desde el tiro más bajo (peor suerte) hasta el más alto.</p>
+                
+                <ul class="space-y-4">
+                    <li class="flex items-center gap-4 p-3 rounded-xl hover:bg-foreground/5 transition-colors">
+                        <span class="shrink-0 flex items-center justify-center w-12 h-12 bg-primary/10 text-primary font-black rounded-lg">LA</span> 
+                        <div>
+                            <p class="font-bold">Lava los platos</p>
+                            <p class="text-xs text-foreground/50">El peor tiro absoluto 🍽️</p>
+                        </div>
+                    </li>
+                    <li class="flex items-center gap-4 p-3 rounded-xl hover:bg-foreground/5 transition-colors">
+                        <span class="shrink-0 flex items-center justify-center w-12 h-12 bg-primary/20 text-primary font-black rounded-lg">SA</span> 
+                        <div>
+                            <p class="font-bold">Saca la mesa</p>
+                            <p class="text-xs text-foreground/50">El segundo peor tiro 🧹</p>
+                        </div>
+                    </li>
+                    <li class="flex items-center gap-4 p-3 rounded-xl hover:bg-foreground/5 transition-colors">
+                        <span class="shrink-0 flex items-center justify-center w-12 h-12 bg-primary/30 text-primary font-black rounded-lg">PO</span> 
+                        <div>
+                            <p class="font-bold">Pone la mesa</p>
+                            <p class="text-xs text-foreground/50">El tercer peor tiro 🍴</p>
+                        </div>
+                    </li>
+                    <li class="flex items-center gap-4 p-3 rounded-xl hover:bg-foreground/5 transition-colors">
+                        <span class="shrink-0 flex items-center justify-center w-12 h-12 bg-secondary/20 text-secondary font-black rounded-lg">NA</span> 
+                        <div>
+                            <p class="font-bold">Nada</p>
+                            <p class="text-xs text-foreground/50">¡Zafaste, no hacés nada! 🎉</p>
+                        </div>
+                    </li>
+                </ul>
             </div>
-            <div class="bg-primary/10 border border-primary/20 rounded-lg p-4">
-                <p class="font-bold text-primary mb-1">🍽️ Tiempo de Llevación de Platos</p>
-                <p class="text-2xl font-bold text-primary">12:00 a 13:00</p>
-            </div>
-        </div>
-        <p class="text-sm text-foreground/70 mb-4">Quienes por alguna razón no sepan si van a llegar antes de las 13:00 no participan del POSALANA.</p>
 
-        <!-- Cláusula Lomito -->
-        <h3 class="text-xl font-semibold mt-8 mb-2 border-b pb-1">🥩 Cláusula Lomito</h3>
-        <div class="bg-accent/10 border-l-4 border-accent p-4 rounded">
-            <p class="text-accent">Si la tirada de dos personas es <strong>exactamente igual</strong> (en orden y valores), el contador de días sin lomitos se reinicia a 0, porque las coincidencias existen y, cuando la magia ocurre, hay que celebrarlo.</p>
-            <p class="text-accent mt-2">Cuando los dados de dos personas coincidan de forma exacta, <strong>LUTVIA</strong> garantiza que se almorzarán <strong>lomitos con papas</strong>. 🥩🍟</p>
-            <hr class="border-accent/20 my-3" />
-            <div class="text-sm text-accent/80">
-                <strong>La matemática detrás de la magia:</strong> Hay 1.296 combinaciones posibles al tirar 4 dados ($6^4$). Si juegan 10 personas, se forman 45 pares posibles por día. La probabilidad de que al menos un par coincida en un día cualquiera es del <strong>~3.4%</strong>. 
-                Pero si jugamos 3 veces por semana durante todo un año (156 días), la probabilidad acumulada de que ocurra la Cláusula Lomito al menos una vez asciende a un asombroso <strong>99.5%</strong>. ¡El lomito es estadísticamente inevitable!
-            </div>
-        </div>
+            <!-- Mecánica -->
+            <div class="space-y-8">
+                <div class="bg-background border border-foreground/10 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-3"><i class="fa-solid fa-dice text-secondary"></i> La Tirada</h3>
+                    <ul class="space-y-3 text-foreground/80 list-disc pl-5">
+                        <li>Se tiran <strong>4 dados</strong> una vez por día en la app.</li>
+                        <li>El tiro más bajo en el 1º dado <strong class="text-primary">LAVA</strong>, el 2º <strong class="text-primary">SACA</strong>, el 3º <strong class="text-primary">PONE</strong>.</li>
+                        <li>En caso de empate, desempata el 2º dado, y así sucesivamente.</li>
+                    </ul>
+                </div>
 
-        <!-- Nota del sistema -->
-        <div class="bg-foreground/5 border-l-4 border-foreground/30 p-4 mt-8 rounded">
-            <h4 class="font-bold text-foreground/80">Sobre esta aplicación</h4>
-            <p class="text-sm text-foreground/70 mt-1">Este sistema digitaliza el POSALANA. Las tiradas se generan de forma aleatoria, se guardan automáticamente y los resultados se actualizan en tiempo real a medida que cada participante va tirando.</p>
-        </div>
+                <div class="bg-background border border-foreground/10 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-3"><i class="fa-solid fa-calendar-star text-secondary"></i> Temporadas</h3>
+                    <ul class="space-y-3 text-foreground/80 list-disc pl-5">
+                        <li>Suman puntos quienes hagan tareas. Gana quien sume más al final de la estación.</li>
+                        <li>El perdedor de una tarea <strong>no la realiza</strong> en la próxima temporada.</li>
+                        <li>Si estás exento de una tarea y sacás el puntaje para hacerla, no hacés nada ni sumás puntos.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Horarios y Llegadas Tarde -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Tiempos -->
+            <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="relative overflow-hidden bg-secondary/5 border border-secondary/20 rounded-3xl p-6 group">
+                    <div class="absolute -right-4 -bottom-4 text-secondary/10 text-8xl group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-stopwatch"></i></div>
+                    <p class="font-bold text-secondary uppercase tracking-widest text-xs mb-2">🎲 Tiempo de Tiración</p>
+                    <p class="text-3xl font-black text-foreground mb-2">10:30 <span class="text-foreground/30 font-normal">a</span> 12:00</p>
+                    <p class="text-sm text-foreground/70 relative z-10">Tirar fuera de hora es llegada tarde.</p>
+                </div>
+                <div class="relative overflow-hidden bg-primary/5 border border-primary/20 rounded-3xl p-6 group">
+                    <div class="absolute -right-4 -bottom-4 text-primary/10 text-8xl group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-utensils"></i></div>
+                    <p class="font-bold text-primary uppercase tracking-widest text-xs mb-2">🍽️ Llevación de Platos</p>
+                    <p class="text-3xl font-black text-foreground mb-2">12:00 <span class="text-foreground/30 font-normal">a</span> 13:00</p>
+                    <p class="text-sm text-foreground/70 relative z-10">Si no llegás antes de las 13:00, no jugás.</p>
+                </div>
+            </div>
+
+            <!-- Castigos -->
+            <div class="bg-foreground/5 border border-foreground/10 rounded-3xl p-6 flex flex-col justify-center">
+                <h3 class="font-bold text-foreground mb-3 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-primary"></i> Llegadas Tarde</h3>
+                <p class="text-sm text-foreground/80 mb-3">Llegar después de las <strong>10:15</strong> sin aviso previo excluye de la tirada e implica <strong class="text-primary">lavar los platos directamente</strong>.</p>
+                <p class="text-sm text-foreground/80">Si llegan varios tarde, se reparten las tareas según el orden de llegada.</p>
+            </div>
+        </section>
+
+        <!-- Lomito -->
+        <section class="bg-accent/10 border border-accent/30 p-8 md:p-10 rounded-3xl shadow-lg relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent"></div>
+            <div class="relative z-10 text-center md:text-left flex flex-col md:flex-row items-center gap-8">
+                <div class="text-7xl group-hover:animate-bounce transition-all">🥪</div>
+                <div>
+                    <h3 class="text-2xl font-black text-accent mb-2 text-balance">La Cláusula Lomito</h3>
+                    <p class="text-foreground/80 leading-relaxed max-w-3xl text-pretty">Si la tirada de dos personas es <strong>exactamente igual</strong> en valores y orden, las coincidencias se celebran. El contador de la app se reinicia a cero y <strong>LUTVIA</strong> garantiza un almuerzo de <strong>lomitos con papas</strong> ese mismo día. 🥪🍟</p>
+                </div>
+            </div>
+        </section>
+
+        <p class="text-center text-sm text-foreground/40 pb-8"><i class="fa-solid fa-microchip"></i> Las tiradas en esta app son aleatorias, inmutables y en tiempo real.</p>
     </div>
 </Layout>

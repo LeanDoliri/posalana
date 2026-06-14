@@ -1,7 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import db from "../db/index.js";
-import { getSeasonId, formatSeasonName, calculateSeasonPoints } from "../utils/season.js";
 
 const { user } = Astro.locals;
 
@@ -23,196 +22,162 @@ const rollsRes = await db.execute(`
 `);
 const recentRolls = rollsRes.rows;
 
-const today = new Date();
-today.setHours(today.getHours() - 3);
-const currentSeasonId = getSeasonId(today.toISOString().split('T')[0]);
-const currentSeasonName = formatSeasonName(currentSeasonId);
-const seasonPoints = await calculateSeasonPoints(db, currentSeasonId);
-
-const exemptionsRes = await db.execute({
-	sql: "SELECT e.id, e.chore_code, u.username FROM exemption e JOIN user u ON e.user_id = u.id WHERE e.season_id = ?",
-	args: [currentSeasonId]
-});
-const currentExemptions = exemptionsRes.rows;
+// Fetch global settings
+const settingsRes = await db.execute("SELECT key, value FROM settings");
+const settingsMap = new Map();
+settingsRes.rows.forEach((s: any) => settingsMap.set(s.key, s.value));
 ---
 
 <Layout>
-	<div class="space-y-8">
-		<header class="text-center">
-			<h2 class="text-3xl font-bold text-foreground">Panel de Administración</h2>
-			<p class="text-foreground/70 mt-2">Gestión de Usuarios y Tiradas</p>
+	<div class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+		<header class="text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4 border-b border-foreground/5 pb-8">
+			<div>
+				<h2 class="text-3xl font-black text-foreground tracking-tight"><i class="fa-solid fa-screwdriver-wrench text-primary mr-2"></i> Centro de Control</h2>
+				<p class="text-foreground/60 mt-1">Gestión avanzada de jugadores y manipulación del destino.</p>
+			</div>
+            <div class="bg-primary/10 px-4 py-2 rounded-full text-sm font-bold text-primary">
+                Modo Administrador
+            </div>
 		</header>
 
-		<section class="bg-background border border-foreground/10 p-6 rounded-lg shadow">
-			<h3 class="text-xl font-bold mb-4 border-b border-foreground/10 pb-2">Temporada Actual: {currentSeasonName}</h3>
-			
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-				<div>
-					<h4 class="font-bold mb-3">Exenciones Activas</h4>
-					<ul class="space-y-2 mb-4">
-						{currentExemptions.length === 0 && <li class="text-foreground/50 text-sm">No hay exenciones esta temporada.</li>}
-						{currentExemptions.map(e => (
-							<li class="flex items-center justify-between bg-foreground/5 p-2 rounded">
-								<span><strong class="text-primary">{e.chore_code}</strong>: {e.username}</span>
-								<form method="post" action="/api/admin/remove-exemption">
-									<input type="hidden" name="id" value={e.id} />
-									<button class="text-primary hover:underline text-sm">Quitar</button>
-								</form>
-							</li>
-						))}
-					</ul>
-					
-					<form method="post" action="/api/admin/add-exemption" class="bg-foreground/5 p-3 rounded space-y-2">
-						<h5 class="text-sm font-bold">Agregar Exención</h5>
-						<input type="hidden" name="season_id" value={currentSeasonId} />
-						<div class="flex gap-2">
-							<select name="user_id" class="border rounded p-1 text-sm flex-1" required>
-								<option value="">Usuario...</option>
-								{allUsers.map(u => <option value={u.id}>{u.username}</option>)}
-							</select>
-							<select name="chore_code" class="border rounded p-1 text-sm w-20" required>
-								<option value="LA">LA</option>
-								<option value="SA">SA</option>
-								<option value="PO">PO</option>
-							</select>
-						</div>
-						<button class="w-full bg-secondary text-background py-1 rounded text-sm hover:opacity-90">Agregar</button>
-					</form>
-				</div>
-
-				<div>
-					<h4 class="font-bold mb-3">Puntajes de Temporada</h4>
-					<table class="w-full text-left border-collapse text-sm mb-4">
-						<thead>
-							<tr class="bg-foreground/5 text-foreground/80">
-								<th class="p-2 border-b border-foreground/10">Usuario</th>
-								<th class="p-2 border-b border-foreground/10">LA</th>
-								<th class="p-2 border-b border-foreground/10">SA</th>
-								<th class="p-2 border-b border-foreground/10">PO</th>
-							</tr>
-						</thead>
-						<tbody>
-							{seasonPoints.map((sp: any) => (
-								<tr class="border-b border-foreground/5">
-									<td class="p-2">{sp.username}</td>
-									<td class="p-2">{sp.scores.LA}</td>
-									<td class="p-2">{sp.scores.SA}</td>
-									<td class="p-2">{sp.scores.PO}</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-
-					<form method="post" action="/api/admin/set-manual-points" class="bg-foreground/5 p-3 rounded space-y-2">
-						<h5 class="text-sm font-bold">Sobreescribir Puntos Totales</h5>
-						<p class="text-xs text-foreground/60">Si cargás un valor acá, pisará el cálculo automático para ese usuario y categoría en esta temporada.</p>
-						<input type="hidden" name="season_id" value={currentSeasonId} />
-						<div class="flex gap-2">
-							<select name="user_id" class="border rounded p-1 text-sm flex-1" required>
-								<option value="">Usuario...</option>
-								{allUsers.map(u => <option value={u.id}>{u.username}</option>)}
-							</select>
-							<select name="chore_code" class="border rounded p-1 text-sm w-20" required>
-								<option value="LA">LA</option>
-								<option value="SA">SA</option>
-								<option value="PO">PO</option>
-							</select>
-							<input type="number" name="points" placeholder="Pts" class="border rounded p-1 text-sm w-16" required min="0" />
-						</div>
-						<button class="w-full bg-accent text-background py-1 rounded text-sm hover:opacity-90">Guardar Puntos</button>
-					</form>
-				</div>
-			</div>
+		<!-- Global Settings Section -->
+		<section class="bg-background border border-foreground/10 p-1 rounded-3xl shadow-lg">
+            <div class="p-6 md:p-8">
+			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-globe text-accent"></i> Configuración Global</h3>
+			    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <form method="post" action="/api/admin/save-settings" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold mb-1 text-foreground/80">Último Lomito Manual</label>
+                            <input type="date" name="last_lomito_date" value={settingsMap.get('last_lomito_date') || ''} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
+                            <p class="text-xs text-foreground/50 mt-1">Al configurarla, esta fecha se usa para el contador de días.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold mb-1 text-foreground/80">Clave Maestra (Recuperación)</label>
+                            <input type="text" name="master_key" value={settingsMap.get('master_key') || ''} placeholder="Ej: Lomito123" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
+                            <p class="text-xs text-foreground/50 mt-1">Usada en /recover para resetear contraseñas de cualquier usuario.</p>
+                        </div>
+                        <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity">
+                            Guardar Configuración
+                        </button>
+                    </form>
+                </div>
+            </div>
 		</section>
 
-		<section class="bg-background border border-foreground/10 p-6 rounded-lg shadow overflow-x-auto">
-			<h3 class="text-xl font-bold mb-4 border-b border-foreground/10 pb-2">Usuarios Registrados</h3>
-			<table class="w-full text-left border-collapse">
-				<thead>
-					<tr class="bg-foreground/5 text-foreground/80">
-						<th class="p-3 border-b border-foreground/10">Avatar</th>
-						<th class="p-3 border-b border-foreground/10">Usuario</th>
-						<th class="p-3 border-b border-foreground/10">Rol</th>
-						<th class="p-3 border-b border-foreground/10 text-right">Acciones</th>
-					</tr>
-				</thead>
-				<tbody>
-					{allUsers.map((u) => (
-						<tr class="border-b border-foreground/5 hover:bg-foreground/5">
-							<td class="p-3">
-								<img src={u.avatar_url as string} alt={u.username as string} class="w-10 h-10 rounded-full bg-foreground/10" />
-							</td>
-							<td class="p-3 font-semibold text-foreground">{u.username}</td>
-							<td class="p-3">
-								<span class={`px-2 py-1 text-xs rounded-full font-bold ${u.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-secondary/20 text-secondary'}`}>
-									{u.role}
-								</span>
-							</td>
-							<td class="p-3 text-right space-x-2">
-								{u.id !== user.id && (
-									<>
-										<form method="post" action="/api/admin/toggle-role" class="inline">
-											<input type="hidden" name="userId" value={u.id} />
-											<input type="hidden" name="role" value={u.role === 'admin' ? 'user' : 'admin'} />
-											<button class="px-3 py-1 bg-foreground/10 hover:bg-foreground/20 text-foreground rounded text-sm transition font-medium">
-												{u.role === 'admin' ? 'Quitar Admin' : 'Hacer Admin'}
-											</button>
-										</form>
-										<form method="post" action="/api/admin/delete-user" class="inline" onsubmit={`return confirm('¿Seguro que querés eliminar a ${u.username}? Se borrará todo su historial.')`}>
-											<input type="hidden" name="userId" value={u.id} />
-											<button class="px-3 py-1 bg-primary/20 hover:bg-primary/30 text-primary rounded text-sm transition font-medium">
-												Eliminar
-											</button>
-										</form>
-									</>
-								)}
-								{u.id === user.id && (
-									<span class="text-foreground/50 text-sm italic">Vos</span>
-								)}
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+		<!-- Users Section -->
+		<section class="bg-background border border-foreground/10 p-1 rounded-3xl shadow-lg">
+            <div class="p-6 md:p-8">
+			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-users text-secondary"></i> Padrón de Jugadores</h3>
+			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
+                                <th class="p-4 font-bold">Jugador</th>
+                                <th class="p-4 font-bold">Rol</th>
+                                <th class="p-4 font-bold text-right">Acciones Peligrosas</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-foreground/5">
+                            {allUsers.map((u) => (
+                                <tr class="hover:bg-foreground/[0.02] transition-colors">
+                                    <td class="p-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center font-bold text-foreground/70 overflow-hidden shadow-sm">
+                                                {u.avatar_url ? (
+                                                    <img src={u.avatar_url as string} alt={u.username as string} class="w-full h-full object-cover" />
+                                                ) : (
+                                                    (u.username as string).charAt(0).toUpperCase()
+                                                )}
+                                            </div>
+                                            <span class="font-bold text-foreground">{u.username}</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class={`px-3 py-1 text-[10px] uppercase tracking-widest rounded-full font-black ${u.role === 'admin' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-secondary/10 text-secondary border border-secondary/20'}`}>
+                                            {u.role}
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-right">
+                                        {u.id !== user.id ? (
+                                            <div class="flex justify-end gap-2">
+                                                <form method="post" action="/api/admin/toggle-role">
+                                                    <input type="hidden" name="userId" value={u.id} />
+                                                    <input type="hidden" name="role" value={u.role === 'admin' ? 'user' : 'admin'} />
+                                                    <button class="px-3 py-1.5 bg-foreground/5 hover:bg-foreground/10 text-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer">
+                                                        <i class="fa-solid fa-rotate mr-1"></i> {u.role === 'admin' ? 'Revocar' : 'Ascender'}
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="/api/admin/delete-user" onsubmit={`return confirm('⚠️ ATENCIÓN: ¿Borrar a ${u.username} y todo su historial? Esta acción es irreversible.')`}>
+                                                    <input type="hidden" name="userId" value={u.id} />
+                                                    <button class="px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-background text-xs font-bold rounded-lg transition-colors cursor-pointer">
+                                                        <i class="fa-solid fa-trash-can"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        ) : (
+                                            <span class="text-foreground/40 text-xs font-bold uppercase tracking-widest mr-2">Espejo (Vos)</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 		</section>
 
-		<section class="bg-background border border-foreground/10 p-6 rounded-lg shadow overflow-x-auto">
-			<h3 class="text-xl font-bold mb-4 border-b border-foreground/10 pb-2">Últimas Tiradas (Máx 50)</h3>
-			<table class="w-full text-left border-collapse">
-				<thead>
-					<tr class="bg-foreground/5 text-foreground/80">
-						<th class="p-3 border-b border-foreground/10">Fecha</th>
-						<th class="p-3 border-b border-foreground/10">Usuario</th>
-						<th class="p-3 border-b border-foreground/10">Dados</th>
-						<th class="p-3 border-b border-foreground/10 text-right">Acciones</th>
-					</tr>
-				</thead>
-				<tbody>
-					{recentRolls.length === 0 && (
-						<tr><td colspan="4" class="p-3 text-center text-foreground/50">No hay tiradas aún.</td></tr>
-					)}
-					{recentRolls.map((r) => (
-						<tr class="border-b border-foreground/5 hover:bg-foreground/5">
-							<td class="p-3 text-sm text-foreground/70">{r.date}</td>
-							<td class="p-3 font-semibold text-foreground flex items-center gap-2">
-								<img src={r.avatar_url as string} alt={r.username as string} class="w-6 h-6 rounded-full bg-foreground/10" />
-								{r.username}
-							</td>
-							<td class="p-3 text-xl tracking-widest">
-								🎲 {r.die1}-{r.die2}-{r.die3}-{r.die4}
-							</td>
-							<td class="p-3 text-right">
-								<form method="post" action="/api/admin/delete-roll" class="inline" onsubmit={`return confirm('¿Seguro que querés anular esta tirada de ${r.username}?')`}>
-									<input type="hidden" name="rollId" value={r.id} />
-									<button class="px-3 py-1 bg-primary/20 hover:bg-primary/30 text-primary rounded text-sm transition font-medium">
-										Anular
-									</button>
-								</form>
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
+		<!-- Rolls Section -->
+		<section class="bg-background border border-foreground/10 p-1 rounded-3xl shadow-lg">
+            <div class="p-6 md:p-8">
+                <div class="flex items-center justify-between mb-6">
+			        <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-dice text-secondary"></i> Últimas 50 Tiradas</h3>
+                </div>
+			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
+                                <th class="p-4 font-bold">Fecha</th>
+                                <th class="p-4 font-bold">Jugador</th>
+                                <th class="p-4 font-bold">Dados</th>
+                                <th class="p-4 font-bold text-right">Justicia</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-foreground/5">
+                            {recentRolls.length === 0 && (
+                                <tr><td colspan="4" class="p-8 text-center text-foreground/40 font-bold">La historia está en blanco.</td></tr>
+                            )}
+                            {recentRolls.map((r) => (
+                                <tr class="hover:bg-foreground/[0.02] transition-colors">
+                                    <td class="p-4 text-sm font-mono text-foreground/60">{r.date}</td>
+                                    <td class="p-4">
+                                        <div class="flex items-center gap-2 font-bold text-foreground">
+                                            <div class="w-6 h-6 rounded-full bg-foreground/10 overflow-hidden flex items-center justify-center text-[10px]">
+                                                {r.avatar_url ? (
+                                                    <img src={r.avatar_url as string} alt={r.username as string} class="w-full h-full object-cover" />
+                                                ) : (
+                                                    (r.username as string).charAt(0).toUpperCase()
+                                                )}
+                                            </div>
+                                            {r.username}
+                                        </div>
+                                    </td>
+                                    <td class="p-4 text-lg font-mono tracking-widest text-foreground/80">
+                                        {r.die1}-{r.die2}-{r.die3}-{r.die4}
+                                    </td>
+                                    <td class="p-4 text-right">
+                                        <form method="post" action="/api/admin/delete-roll" onsubmit={`return confirm('⚠️ ¿Alterar el destino y anular la tirada de ${r.username}?')`}>
+                                            <input type="hidden" name="rollId" value={r.id} />
+                                            <button class="px-3 py-1.5 border border-primary/20 text-primary hover:bg-primary hover:text-background text-xs font-bold rounded-lg transition-colors cursor-pointer">
+                                                <i class="fa-solid fa-ban mr-1"></i> Anular
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 		</section>
 	</div>
 </Layout>

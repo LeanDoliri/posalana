@@ -1,0 +1,39 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+if (Astro.locals.user) {
+	return Astro.redirect("/");
+}
+---
+
+<Layout>
+	<div class="max-w-md mx-auto bg-background border border-foreground/10 p-8 rounded-lg shadow mt-10">
+		<h2 class="text-2xl font-bold mb-6 text-center text-foreground">Recuperar Contraseña</h2>
+		<p class="text-sm text-foreground/70 mb-6 text-center">Si perdiste tu contraseña, podés cambiarla usando la Clave Maestra administrada por el Creador.</p>
+		
+		<form method="post" action="/api/recover" class="space-y-4">
+			<div>
+				<label for="username" class="block text-sm font-semibold mb-1 text-foreground/80">Nombre de Usuario</label>
+				<input type="text" name="username" id="username" required class="w-full bg-foreground/5 border border-foreground/10 rounded px-3 py-2 text-foreground focus:outline-none focus:border-secondary" />
+			</div>
+			
+			<div>
+				<label for="master_key" class="block text-sm font-semibold mb-1 text-foreground/80">Clave Maestra</label>
+				<input type="password" name="master_key" id="master_key" required class="w-full bg-foreground/5 border border-foreground/10 rounded px-3 py-2 text-foreground focus:outline-none focus:border-secondary" />
+			</div>
+
+			<div>
+				<label for="new_password" class="block text-sm font-semibold mb-1 text-foreground/80">Nueva Contraseña</label>
+				<input type="password" name="new_password" id="new_password" required minlength="4" class="w-full bg-foreground/5 border border-foreground/10 rounded px-3 py-2 text-foreground focus:outline-none focus:border-secondary" />
+			</div>
+			
+			<button class="w-full bg-secondary text-background font-bold py-2 rounded hover:opacity-90 transition-opacity">
+				Actualizar Contraseña
+			</button>
+		</form>
+
+        <div class="mt-6 text-center">
+			<a href="/login" class="text-secondary text-sm hover:underline">Volver a Iniciar Sesión</a>
+		</div>
+	</div>
+</Layout>

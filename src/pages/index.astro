@@ -1,7 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import db from '../db/index.js';
-import { getSeasonId } from '../utils/season.js';
 
 if (!Astro.locals.user) {
 	return Astro.redirect('/login');
@@ -35,46 +34,12 @@ const allRollsRes = await db.execute({
 });
 const allRolls = allRollsRes.rows;
 
-// Sort rolls by rules
-const sortedRolls = [...allRolls].sort((a, b) => {
-    if (a.die1 !== b.die1) return (a.die1 as number) - (b.die1 as number);
-    if (a.die2 !== b.die2) return (a.die2 as number) - (b.die2 as number);
-    if (a.die3 !== b.die3) return (a.die3 as number) - (b.die3 as number);
-    return (a.die4 as number) - (b.die4 as number);
-});
-
-// Fetch current season exemptions
-const currentSeason = getSeasonId(dateStr);
-const exemptionsRes = await db.execute({
-    sql: "SELECT user_id, chore_code FROM exemption WHERE season_id = ?",
-    args: [currentSeason]
-});
-const exemptions = exemptionsRes.rows;
-
 const chores = [
-    { label: "LAva los platos", code: "LA", emoji: "🍽️" },
-    { label: "SAca la mesa", code: "SA", emoji: "🧹" },
-    { label: "POne la mesa", code: "PO", emoji: "🍴" }
+    { label: "Lava los platos", code: "LA", emoji: "🍽️" },
+    { label: "Saca la mesa", code: "SA", emoji: "🧹" },
+    { label: "Pone la mesa", code: "PO", emoji: "🍴" }
 ];
-const safeChore = { label: "NAda", code: "NA", emoji: "🎉" };
-
-// Assign chores respecting exemptions (Option A: Shift up)
-const assignedChores = new Map();
-for (const roll of sortedRolls) {
-    assignedChores.set(roll.id, safeChore);
-}
-
-for (const chore of chores) {
-    for (const roll of sortedRolls) {
-        if (assignedChores.get(roll.id) !== safeChore) continue; // Already assigned
-
-        const isExempt = exemptions.some(e => e.user_id === roll.user_id && e.chore_code === chore.code);
-        if (!isExempt) {
-            assignedChores.set(roll.id, chore);
-            break; // Move to the next chore
-        }
-    }
-}
+const safeChore = { label: "Nada", code: "NA", emoji: "🎉" };
 
 // Detect Cláusula Lomito: two rolls with exactly the same dice
 let lomitoActivated = false;
@@ -92,67 +57,108 @@ for (let i = 0; i < allRolls.length; i++) {
 }
 ---
 <Layout>
-    <div class="space-y-8">
-        <section class="bg-background border border-foreground/10 p-6 rounded-lg shadow text-center">
-            <h2 class="text-2xl font-bold mb-2">Tirada del Día</h2>
-            <p class="text-foreground/60 mb-6">{dateStr}</p>
+    <div class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+        
+        <!-- Hero Section -->
+        <section class="relative bg-background border border-foreground/5 p-8 md:p-12 rounded-3xl shadow-xl overflow-hidden text-center group">
+            <!-- Decorative Background Element -->
+            <div class="absolute -top-24 -right-24 w-64 h-64 bg-secondary/10 rounded-full blur-3xl group-hover:bg-secondary/20 transition-all duration-700 pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-accent/10 rounded-full blur-3xl group-hover:bg-accent/20 transition-all duration-700 pointer-events-none"></div>
 
-            {hasRolled && myRoll ? (
-                <div class="inline-block bg-secondary/10 border border-secondary/20 p-4 rounded-xl">
-                    <p class="text-sm text-secondary font-semibold mb-2">Tu tirada:</p>
-                    <div class="flex gap-2 justify-center text-3xl">
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die1 as number)-1]} text-secondary`}></i>
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die2 as number)-1]} text-foreground/40 text-2xl mt-1`}></i>
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die3 as number)-1]} text-foreground/40 text-2xl mt-1`}></i>
-                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die4 as number)-1]} text-foreground/40 text-2xl mt-1`}></i>
+            <div class="relative z-10">
+                <p class="text-secondary font-bold tracking-widest uppercase text-xs mb-2">Tirada Oficial</p>
+                <h2 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-foreground text-balance">{dateStr}</h2>
+                <p class="text-foreground/60 mb-10 max-w-md mx-auto text-pretty">El destino no está escrito, se decide con los dados. ¿Zafás o lavás?</p>
+
+                {hasRolled && myRoll ? (
+                    <div class="inline-flex flex-col items-center bg-secondary/5 border border-secondary/20 p-6 rounded-2xl shadow-sm backdrop-blur-sm">
+                        <p class="text-sm text-secondary font-bold mb-4 uppercase tracking-wider">Tu Suerte Hoy</p>
+                        <div class="flex gap-3 md:gap-4 justify-center text-5xl md:text-6xl drop-shadow-sm">
+                            <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die1 as number)-1]} text-secondary transform hover:scale-110 hover:-rotate-6 transition-transform duration-300`}></i>
+                            <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die2 as number)-1]} text-foreground/30 transform hover:scale-110 hover:rotate-6 transition-transform duration-300`}></i>
+                            <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die3 as number)-1]} text-foreground/30 transform hover:scale-110 hover:-rotate-3 transition-transform duration-300`}></i>
+                            <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(myRoll.die4 as number)-1]} text-foreground/30 transform hover:scale-110 hover:rotate-3 transition-transform duration-300`}></i>
+                        </div>
                     </div>
-                </div>
-            ) : (
-                <form method="post" action="/api/roll">
-                    <button type="submit" class="bg-secondary text-background px-8 py-3 rounded-full text-lg font-bold hover:opacity-90 hover:scale-105 transition-transform shadow-lg cursor-pointer">
-                        <i class="fa-solid fa-dice mr-2"></i> Tirar los Dados
-                    </button>
-                </form>
-            )}
+                ) : (
+                    <form method="post" action="/api/roll">
+                        <button type="submit" class="relative overflow-hidden bg-secondary text-background px-10 py-5 rounded-full text-xl font-bold shadow-[0_8px_30px_rgba(0,204,204,0.3)] hover:shadow-[0_8px_40px_rgba(0,204,204,0.5)] hover:-translate-y-1 active:translate-y-0 active:shadow-[0_4px_15px_rgba(0,204,204,0.3)] transition-all duration-300 cursor-pointer group">
+                            <span class="relative z-10 flex items-center justify-center gap-3">
+                                <i class="fa-solid fa-dice text-2xl group-hover:rotate-180 transition-transform duration-500"></i>
+                                TIRAR LOS DADOS
+                            </span>
+                            <!-- Hover gradient overlay -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                        </button>
+                    </form>
+                )}
+            </div>
         </section>
 
+        <!-- Cláusula Lomito -->
         {lomitoActivated && (
-            <section class="bg-accent/10 border-2 border-accent p-6 rounded-lg shadow text-center">
-                <p class="text-3xl mb-2">🥩🎉🥩</p>
-                <h3 class="text-xl font-bold text-accent">¡CLÁUSULA LOMITO ACTIVADA!</h3>
-                <p class="text-accent/90 mt-2 font-semibold">{lomitoPlayers.join(" y ")} sacaron exactamente la misma tirada.</p>
-                <p class="text-accent/80 mt-1">¡Se comen lomitos con papas!</p>
+            <section class="bg-accent/10 border-2 border-accent/50 p-8 rounded-3xl shadow-lg shadow-accent/10 text-center relative overflow-hidden animate-in zoom-in-95 duration-500">
+                <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNDQzY2RkYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-50"></div>
+                <div class="relative z-10">
+                    <p class="text-5xl mb-4 animate-bounce">🥪🎉🥪</p>
+                    <h3 class="text-2xl md:text-3xl font-black text-accent mb-2 tracking-tight text-balance">¡CLÁUSULA LOMITO ACTIVADA!</h3>
+                    <p class="text-accent/90 text-lg md:text-xl font-semibold mb-1 text-pretty">{lomitoPlayers.join(" y ")} rompieron la matrix.</p>
+                    <p class="text-foreground/70 font-medium text-pretty">Sus dados son idénticos. ¡Hoy se almuerzan lomitos con papas!</p>
+                </div>
             </section>
         )}
 
-        <section class="bg-background border border-foreground/10 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-bold mb-4 border-b border-foreground/10 pb-2">Ranking POSALANA del Día</h3>
+        <!-- Ranking Section -->
+        <section class="bg-background border border-foreground/5 p-6 md:p-10 rounded-3xl shadow-xl">
+            <div class="flex items-center justify-between mb-8 pb-4 border-b border-foreground/5">
+                <h3 class="text-2xl font-black tracking-tight text-foreground flex items-center gap-3 text-balance">
+                    <i class="fa-solid fa-trophy text-secondary"></i> Ranking POSALANA
+                </h3>
+            </div>
             
-            {sortedRolls.length === 0 ? (
-                <p class="text-foreground/50 text-center py-4">Nadie ha tirado los dados todavía hoy.</p>
+            {allRolls.length === 0 ? (
+                <div class="py-16 text-center border-2 border-dashed border-foreground/10 rounded-2xl">
+                    <div class="text-4xl mb-4 text-foreground/20"><i class="fa-solid fa-ghost"></i></div>
+                    <p class="text-foreground/50 font-medium text-lg">Nadie se ha atrevido a tirar todavía.</p>
+                </div>
             ) : (
-                <div class="space-y-3">
-                    {sortedRolls.map((roll) => {
-                        const chore = assignedChores.get(roll.id) || safeChore;
-                        const isSafe = chore.code === 'NA';
+                <div class="grid grid-cols-1 gap-4">
+                    {allRolls.map((roll, index) => {
+                        const chore = index < 3 ? chores[index] : safeChore;
+                        const isSafe = index >= 3;
                         return (
-                            <div class={`flex items-center justify-between p-3 rounded-lg border ${isSafe ? 'bg-secondary/10 border-secondary/20' : 'bg-primary/10 border-primary/20'}`}>
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden">
-                                        {roll.avatar_url && <img src={roll.avatar_url as string} alt={roll.username as string} />}
+                            <div class={`group flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border transition-all duration-300 hover:shadow-md ${isSafe ? 'bg-secondary/5 border-secondary/10 hover:border-secondary/30' : 'bg-primary/5 border-primary/10 hover:border-primary/30'}`}>
+                                
+                                <!-- User Info & Time -->
+                                <div class="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
+                                    <div class={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl overflow-hidden border-2 shadow-sm shrink-0 ${isSafe ? 'border-secondary/20 bg-secondary/10 text-secondary' : 'border-primary/20 bg-primary/10 text-primary'}`}>
+                                        {roll.avatar_url ? (
+                                            <img src={roll.avatar_url as string} alt={roll.username as string} class="w-full h-full object-cover" />
+                                        ) : (
+                                            (roll.username as string).charAt(0).toUpperCase()
+                                        )}
                                     </div>
-                                    <span class="font-semibold">{roll.username}</span>
-                                    <span class={`text-xs px-2 py-1 rounded-full ml-2 font-bold ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background'}`}>{chore.code}</span>
+                                    <div class="flex-grow">
+                                        <div class="flex items-center gap-2">
+                                            <p class="font-black text-foreground text-xl leading-tight">{roll.username}</p>
+                                            <span class={`inline-block text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background'}`}>
+                                                {chore.code}
+                                            </span>
+                                            {roll.time && <span class="text-xs font-mono text-foreground/40 bg-foreground/5 px-2 py-0.5 rounded-md"><i class="fa-regular fa-clock"></i> {roll.time}</span>}
+                                        </div>
+                                        <div class={`font-bold mt-1 text-sm ${isSafe ? 'text-secondary' : 'text-primary'} whitespace-nowrap`}>
+                                            {chore.emoji} {chore.label}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="flex items-center gap-6">
-                                    <div class="flex gap-1 text-xl">
-                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die1 as number)-1]}`}></i>
-                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die2 as number)-1]} text-sm mt-1 opacity-50`}></i>
-                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die3 as number)-1]} text-sm mt-1 opacity-50`}></i>
-                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die4 as number)-1]} text-sm mt-1 opacity-50`}></i>
-                                    </div>
-                                    <div class={`font-bold w-40 text-right ${isSafe ? 'text-secondary' : 'text-primary'}`}>
-                                        {chore.emoji} {chore.label}
+
+                                <!-- Dice Prominent -->
+                                <div class="flex items-center justify-center sm:justify-end bg-background/50 sm:bg-transparent p-4 sm:p-0 rounded-xl w-full sm:w-auto mt-2 sm:mt-0">
+                                    <div class="flex gap-2 text-4xl sm:text-5xl drop-shadow-sm">
+                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die1 as number)-1]} ${isSafe ? 'text-secondary' : 'text-primary'}`}></i>
+                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die2 as number)-1]} text-foreground/30`}></i>
+                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die3 as number)-1]} text-foreground/30`}></i>
+                                        <i class={`fa-solid fa-dice-${['one','two','three','four','five','six'][(roll.die4 as number)-1]} text-foreground/30`}></i>
                                     </div>
                                 </div>
                             </div>
