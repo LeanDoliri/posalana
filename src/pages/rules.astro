@@ -26,6 +26,7 @@ import Layout from '../layouts/Layout.astro';
             <li>El tiro es válido y se registra automáticamente una sola vez por día.</li>
             <li>El participante que saca el número <strong>más bajo</strong> en el primer dado <strong class="text-primary">LAVA</strong>, el segundo más bajo <strong class="text-primary/90">SACA</strong>, y el tercero <strong class="text-primary/80">PONE</strong>.</li>
             <li>En caso de empate en cualquiera de los casos del punto anterior, desempata el siguiente dado y así sucesivamente.</li>
+            <li><strong>Transparencia:</strong> La generación de los números ocurre enteramente en el servidor de forma segura al momento de apretar el botón, garantizando que el resultado es 100% aleatorio e imposible de alterar o predecir desde el celular de los participantes.</li>
         </ol>
 
         <!-- Temporadas -->
@@ -63,6 +64,11 @@ import Layout from '../layouts/Layout.astro';
         <div class="bg-accent/10 border-l-4 border-accent p-4 rounded">
             <p class="text-accent">Si la tirada de dos personas es <strong>exactamente igual</strong> (en orden y valores), el contador de días sin lomitos se reinicia a 0, porque las coincidencias existen y, cuando la magia ocurre, hay que celebrarlo.</p>
             <p class="text-accent mt-2">Cuando los dados de dos personas coincidan de forma exacta, <strong>LUTVIA</strong> garantiza que se almorzarán <strong>lomitos con papas</strong>. 🥩🍟</p>
+            <hr class="border-accent/20 my-3" />
+            <div class="text-sm text-accent/80">
+                <strong>La matemática detrás de la magia:</strong> Hay 1.296 combinaciones posibles al tirar 4 dados ($6^4$). Si juegan 10 personas, se forman 45 pares posibles por día. La probabilidad de que al menos un par coincida en un día cualquiera es del <strong>~3.4%</strong>. 
+                Pero si jugamos 3 veces por semana durante todo un año (156 días), la probabilidad acumulada de que ocurra la Cláusula Lomito al menos una vez asciende a un asombroso <strong>99.5%</strong>. ¡El lomito es estadísticamente inevitable!
+            </div>
         </div>
 
         <!-- Nota del sistema -->
