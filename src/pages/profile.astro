@@ -1,0 +1,144 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const { user } = Astro.locals;
+
+if (!user) {
+	return Astro.redirect("/login");
+}
+---
+
+<Layout>
+	<div class="max-w-md mx-auto bg-background border border-foreground/10 p-8 rounded-lg shadow mt-10">
+		<h2 class="text-2xl font-bold mb-6 text-center text-foreground">Mi Perfil</h2>
+		
+		<div class="flex flex-col items-center space-y-6">
+			<div class="relative group cursor-pointer">
+				<img 
+					src={user.avatar_url as string} 
+					alt={user.username} 
+					id="avatarPreview"
+					class="w-32 h-32 rounded-full border-4 border-secondary/20 object-cover bg-foreground/5 shadow-md"
+				/>
+				<div 
+					class="absolute inset-0 bg-foreground/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+					onclick="document.getElementById('avatarInput').click()"
+				>
+					<i class="fa-solid fa-camera text-background text-2xl"></i>
+				</div>
+			</div>
+			
+			<div class="text-center">
+				<p class="font-bold text-xl text-foreground">{user.username}</p>
+				<p class="text-sm text-foreground/60">{user.role === 'admin' ? 'Administrador' : 'Jugador'}</p>
+			</div>
+
+			<input type="file" id="avatarInput" accept="image/*" class="hidden" />
+			
+			<div id="loadingMessage" class="hidden text-secondary font-semibold text-sm">
+				<i class="fa-solid fa-spinner fa-spin mr-2"></i> Subiendo imagen...
+			</div>
+			<div id="errorMessage" class="hidden text-primary font-semibold text-sm"></div>
+		</div>
+	</div>
+
+	<script>
+		const input = document.getElementById('avatarInput') as HTMLInputElement;
+		const preview = document.getElementById('avatarPreview') as HTMLImageElement;
+		const loading = document.getElementById('loadingMessage');
+		const errorMsg = document.getElementById('errorMessage');
+
+		input?.addEventListener('change', async (e) => {
+			const file = (e.target as HTMLInputElement).files?.[0];
+			if (!file) return;
+
+			// Solo imagenes
+			if (!file.type.startsWith('image/')) {
+				showError("Por favor selecciona una imagen.");
+				return;
+			}
+
+			// Mostrar loading
+			loading?.classList.remove('hidden');
+			errorMsg?.classList.add('hidden');
+
+			try {
+				const base64Image = await compressImage(file, 256, 256, 0.8);
+				
+				const response = await fetch('/api/user/update-avatar', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ avatar: base64Image })
+				});
+
+				if (!response.ok) {
+					throw new Error(await response.text());
+				}
+
+				// Actualizar preview local
+				preview.src = base64Image;
+				
+				// Opcional: recargar la pagina para que se actualice el header
+				window.location.reload();
+
+			} catch (err: any) {
+				showError(err.message || "Ocurrió un error al subir la imagen");
+			} finally {
+				loading?.classList.add('hidden');
+			}
+		});
+
+		function showError(msg: string) {
+			if (errorMsg) {
+				errorMsg.textContent = msg;
+				errorMsg.classList.remove('hidden');
+			}
+		}
+
+		// Comprime la imagen usando un Canvas antes de enviarla
+		function compressImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<string> {
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.readAsDataURL(file);
+				reader.onload = (event) => {
+					const img = new Image();
+					img.src = event.target?.result as string;
+					img.onload = () => {
+						const canvas = document.createElement('canvas');
+						let width = img.width;
+						let height = img.height;
+
+						// Calcular nuevas dimensiones
+						if (width > height) {
+							if (width > maxWidth) {
+								height = Math.round(height * maxWidth / width);
+								width = maxWidth;
+							}
+						} else {
+							if (height > maxHeight) {
+								width = Math.round(width * maxHeight / height);
+								height = maxHeight;
+							}
+						}
+
+						canvas.width = width;
+						canvas.height = height;
+
+						const ctx = canvas.getContext('2d');
+						if (!ctx) {
+							reject(new Error("No se pudo obtener el contexto del canvas"));
+							return;
+						}
+						
+						ctx.drawImage(img, 0, 0, width, height);
+						resolve(canvas.toDataURL('image/jpeg', quality));
+					};
+					img.onerror = (err) => reject(err);
+				};
+				reader.onerror = (err) => reject(err);
+			});
+		}
+	</script>
+</Layout>

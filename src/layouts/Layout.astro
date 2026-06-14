@@ -66,7 +66,10 @@ if (lastLomitoDate) {
 					<a href="/rules" class="hover:text-secondary">Reglas</a>
 					{user ? (
 						<span class="ml-4 font-semibold text-secondary flex items-center gap-2 inline-flex">
-							{user.username}
+							<a href="/profile" class="hover:underline flex items-center gap-2">
+								<img src={user.avatar_url as string} alt={user.username} class="w-6 h-6 rounded-full bg-foreground/10" />
+								{user.username}
+							</a>
 							{user.role === 'admin' && (
 								<a href="/admin" class="bg-primary text-background text-xs px-2 py-1 rounded hover:opacity-80 ml-2">Admin</a>
 							)}
