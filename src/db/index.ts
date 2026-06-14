@@ -1,7 +1,9 @@
 import { createClient } from "@libsql/client";
 
+const dbUrl = process.env.DATABASE_URL || "file:sqlite.db";
+
 const db = createClient({
-  url: "file:sqlite.db",
+  url: dbUrl,
 });
 
 // Initialize database schema
