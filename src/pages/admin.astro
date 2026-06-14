@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import db from "../db/index.js";
+import { getSeasonId, formatSeasonName, calculateSeasonPoints } from "../utils/season.js";
 
 const { user } = Astro.locals;
 
@@ -21,6 +22,18 @@ const rollsRes = await db.execute(`
 	LIMIT 50
 `);
 const recentRolls = rollsRes.rows;
+
+const today = new Date();
+today.setHours(today.getHours() - 3);
+const currentSeasonId = getSeasonId(today.toISOString().split('T')[0]);
+const currentSeasonName = formatSeasonName(currentSeasonId);
+const seasonPoints = await calculateSeasonPoints(db, currentSeasonId);
+
+const exemptionsRes = await db.execute({
+	sql: "SELECT e.id, e.chore_code, u.username FROM exemption e JOIN user u ON e.user_id = u.id WHERE e.season_id = ?",
+	args: [currentSeasonId]
+});
+const currentExemptions = exemptionsRes.rows;
 ---
 
 <Layout>
@@ -29,6 +42,88 @@ const recentRolls = rollsRes.rows;
 			<h2 class="text-3xl font-bold text-foreground">Panel de Administración</h2>
 			<p class="text-foreground/70 mt-2">Gestión de Usuarios y Tiradas</p>
 		</header>
+
+		<section class="bg-background border border-foreground/10 p-6 rounded-lg shadow">
+			<h3 class="text-xl font-bold mb-4 border-b border-foreground/10 pb-2">Temporada Actual: {currentSeasonName}</h3>
+			
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<div>
+					<h4 class="font-bold mb-3">Exenciones Activas</h4>
+					<ul class="space-y-2 mb-4">
+						{currentExemptions.length === 0 && <li class="text-foreground/50 text-sm">No hay exenciones esta temporada.</li>}
+						{currentExemptions.map(e => (
+							<li class="flex items-center justify-between bg-foreground/5 p-2 rounded">
+								<span><strong class="text-primary">{e.chore_code}</strong>: {e.username}</span>
+								<form method="post" action="/api/admin/remove-exemption">
+									<input type="hidden" name="id" value={e.id} />
+									<button class="text-primary hover:underline text-sm">Quitar</button>
+								</form>
+							</li>
+						))}
+					</ul>
+					
+					<form method="post" action="/api/admin/add-exemption" class="bg-foreground/5 p-3 rounded space-y-2">
+						<h5 class="text-sm font-bold">Agregar Exención</h5>
+						<input type="hidden" name="season_id" value={currentSeasonId} />
+						<div class="flex gap-2">
+							<select name="user_id" class="border rounded p-1 text-sm flex-1" required>
+								<option value="">Usuario...</option>
+								{allUsers.map(u => <option value={u.id}>{u.username}</option>)}
+							</select>
+							<select name="chore_code" class="border rounded p-1 text-sm w-20" required>
+								<option value="LA">LA</option>
+								<option value="SA">SA</option>
+								<option value="PO">PO</option>
+							</select>
+						</div>
+						<button class="w-full bg-secondary text-background py-1 rounded text-sm hover:opacity-90">Agregar</button>
+					</form>
+				</div>
+
+				<div>
+					<h4 class="font-bold mb-3">Puntajes de Temporada</h4>
+					<table class="w-full text-left border-collapse text-sm mb-4">
+						<thead>
+							<tr class="bg-foreground/5 text-foreground/80">
+								<th class="p-2 border-b border-foreground/10">Usuario</th>
+								<th class="p-2 border-b border-foreground/10">LA</th>
+								<th class="p-2 border-b border-foreground/10">SA</th>
+								<th class="p-2 border-b border-foreground/10">PO</th>
+							</tr>
+						</thead>
+						<tbody>
+							{seasonPoints.map((sp: any) => (
+								<tr class="border-b border-foreground/5">
+									<td class="p-2">{sp.username}</td>
+									<td class="p-2">{sp.scores.LA}</td>
+									<td class="p-2">{sp.scores.SA}</td>
+									<td class="p-2">{sp.scores.PO}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+
+					<form method="post" action="/api/admin/set-manual-points" class="bg-foreground/5 p-3 rounded space-y-2">
+						<h5 class="text-sm font-bold">Sobreescribir Puntos Totales</h5>
+						<p class="text-xs text-foreground/60">Si cargás un valor acá, pisará el cálculo automático para ese usuario y categoría en esta temporada.</p>
+						<input type="hidden" name="season_id" value={currentSeasonId} />
+						<div class="flex gap-2">
+							<select name="user_id" class="border rounded p-1 text-sm flex-1" required>
+								<option value="">Usuario...</option>
+								{allUsers.map(u => <option value={u.id}>{u.username}</option>)}
+							</select>
+							<select name="chore_code" class="border rounded p-1 text-sm w-20" required>
+								<option value="LA">LA</option>
+								<option value="SA">SA</option>
+								<option value="PO">PO</option>
+							</select>
+							<input type="number" name="points" placeholder="Pts" class="border rounded p-1 text-sm w-16" required min="0" />
+						</div>
+						<button class="w-full bg-accent text-background py-1 rounded text-sm hover:opacity-90">Guardar Puntos</button>
+					</form>
+				</div>
+			</div>
+		</section>
 
 		<section class="bg-background border border-foreground/10 p-6 rounded-lg shadow overflow-x-auto">
 			<h3 class="text-xl font-bold mb-4 border-b border-foreground/10 pb-2">Usuarios Registrados</h3>

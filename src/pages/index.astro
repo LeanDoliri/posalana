@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import db from '../db/index.js';
+import { getSeasonId } from '../utils/season.js';
 
 if (!Astro.locals.user) {
 	return Astro.redirect('/login');
@@ -34,12 +35,46 @@ const allRollsRes = await db.execute({
 });
 const allRolls = allRollsRes.rows;
 
+// Sort rolls by rules
+const sortedRolls = [...allRolls].sort((a, b) => {
+    if (a.die1 !== b.die1) return (a.die1 as number) - (b.die1 as number);
+    if (a.die2 !== b.die2) return (a.die2 as number) - (b.die2 as number);
+    if (a.die3 !== b.die3) return (a.die3 as number) - (b.die3 as number);
+    return (a.die4 as number) - (b.die4 as number);
+});
+
+// Fetch current season exemptions
+const currentSeason = getSeasonId(dateStr);
+const exemptionsRes = await db.execute({
+    sql: "SELECT user_id, chore_code FROM exemption WHERE season_id = ?",
+    args: [currentSeason]
+});
+const exemptions = exemptionsRes.rows;
+
 const chores = [
     { label: "LAva los platos", code: "LA", emoji: "🍽️" },
     { label: "SAca la mesa", code: "SA", emoji: "🧹" },
     { label: "POne la mesa", code: "PO", emoji: "🍴" }
 ];
 const safeChore = { label: "NAda", code: "NA", emoji: "🎉" };
+
+// Assign chores respecting exemptions (Option A: Shift up)
+const assignedChores = new Map();
+for (const roll of sortedRolls) {
+    assignedChores.set(roll.id, safeChore);
+}
+
+for (const chore of chores) {
+    for (const roll of sortedRolls) {
+        if (assignedChores.get(roll.id) !== safeChore) continue; // Already assigned
+
+        const isExempt = exemptions.some(e => e.user_id === roll.user_id && e.chore_code === chore.code);
+        if (!isExempt) {
+            assignedChores.set(roll.id, chore);
+            break; // Move to the next chore
+        }
+    }
+}
 
 // Detect Cláusula Lomito: two rolls with exactly the same dice
 let lomitoActivated = false;
@@ -93,13 +128,13 @@ for (let i = 0; i < allRolls.length; i++) {
         <section class="bg-background border border-foreground/10 p-6 rounded-lg shadow">
             <h3 class="text-xl font-bold mb-4 border-b border-foreground/10 pb-2">Ranking POSALANA del Día</h3>
             
-            {allRolls.length === 0 ? (
+            {sortedRolls.length === 0 ? (
                 <p class="text-foreground/50 text-center py-4">Nadie ha tirado los dados todavía hoy.</p>
             ) : (
                 <div class="space-y-3">
-                    {allRolls.map((roll, index) => {
-                        const chore = index < 3 ? chores[index] : safeChore;
-                        const isSafe = index >= 3;
+                    {sortedRolls.map((roll) => {
+                        const chore = assignedChores.get(roll.id) || safeChore;
+                        const isSafe = chore.code === 'NA';
                         return (
                             <div class={`flex items-center justify-between p-3 rounded-lg border ${isSafe ? 'bg-secondary/10 border-secondary/20' : 'bg-primary/10 border-primary/20'}`}>
                                 <div class="flex items-center gap-3">

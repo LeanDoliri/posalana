@@ -34,6 +34,25 @@ db.executeMultiple(`
       FOREIGN KEY (user_id) REFERENCES user(id),
       UNIQUE(user_id, date)
   );
+
+  CREATE TABLE IF NOT EXISTS exemption (
+      id TEXT NOT NULL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      season_id TEXT NOT NULL,
+      chore_code TEXT NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES user(id),
+      UNIQUE(user_id, season_id, chore_code)
+  );
+
+  CREATE TABLE IF NOT EXISTS manual_points (
+      id TEXT NOT NULL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      season_id TEXT NOT NULL,
+      chore_code TEXT NOT NULL,
+      points INTEGER NOT NULL,
+      FOREIGN KEY (user_id) REFERENCES user(id),
+      UNIQUE(user_id, season_id, chore_code)
+  );
 `).catch(console.error);
 
 // Migration: Add 'role' column if it doesn't exist, and make ldoliri admin
