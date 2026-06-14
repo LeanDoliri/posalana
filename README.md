@@ -19,10 +19,10 @@ La forma definitiva, justa y basada puramente en el azar para dividir las tareas
 
 ## 🛠️ Tecnologías Utilizadas
 
-*   **Framework:** [Astro](https://astro.build/) (con adaptador SSR de Node.js).
+*   **Framework:** [Astro](https://astro.build/) (con adaptador Serverless para Vercel).
 *   **Estilos:** [Tailwind CSS](https://tailwindcss.com/) para un diseño responsive y moderno.
-*   **Base de Datos:** SQLite local manejado a través de `@libsql/client`. Todo vive en un simple archivo `sqlite.db`.
-*   **Despliegue:** Preparado con un `Dockerfile` y configuración nativa para hostear de manera gratuita en **Fly.io** con volúmenes persistentes.
+*   **Base de Datos:** SQLite alojada gratuitamente en la nube usando [Turso](https://turso.tech/) a través de `@libsql/client`.
+*   **Despliegue:** Preparado para hostear de manera **100% gratuita y para siempre** en [Vercel](https://vercel.com/).
 
 ---
 
@@ -41,7 +41,13 @@ Si querés descargar el código y probarlo en tu compu, seguí estos pasos:
    npm install
    ```
 
-3. **Levantar el servidor de desarrollo:**
+3. **Configurar las variables de entorno:**
+   Creá un archivo `.env` en la raíz del proyecto. Si querés usar una base de datos local SQLite para probar, podés dejarlo así:
+   ```env
+   DATABASE_URL="file:sqlite.db"
+   ```
+
+4. **Levantar el servidor de desarrollo:**
    ```bash
    npm run dev
    ```
@@ -50,24 +56,26 @@ La aplicación va a estar disponible en `http://localhost:4321`. La base de dato
 
 ---
 
-## ☁️ Despliegue en Producción (Fly.io)
+## ☁️ Despliegue en Producción (Vercel + Turso)
 
-Este proyecto está configurado para un despliegue sin estrés en Fly.io usando **GitHub Actions**.
+Este proyecto está configurado para un despliegue gratuito y automático en Vercel.
 
-### Despliegue Manual
-Si tenés instalada la herramienta de [flyctl](https://fly.io/docs/flyctl/install/):
-```bash
-fly deploy
-```
+### 1. Base de Datos en Turso (Gratis)
+Como Vercel es un entorno "Serverless" (sin estado), la base de datos no puede vivir en un archivo local. Necesitamos Turso:
+1. Entrá a [Turso](https://turso.tech/) y creá una cuenta con GitHub.
+2. Creá una base de datos nueva.
+3. Obtené la URL de la base de datos (suele ser `libsql://tu-base.turso.io`) y el Token de Autenticación.
 
-### Base de Datos Persistente
-Como la aplicación usa SQLite local, requiere un "Volumen" persistente en el servidor para que los datos no se borren en cada actualización. Podés crearlo así:
-```bash
-fly volumes create data --size 1
-```
-*(El archivo `fly.toml` ya está configurado para montar este volumen en `/data` y leer la base de datos de ahí usando variables de entorno).*
+### 2. Despliegue en Vercel (Gratis)
+1. Subí tu repositorio a GitHub.
+2. Entrá a [Vercel](https://vercel.com/) y creá una cuenta con GitHub.
+3. Tocá "Add New Project" y elegí tu repositorio de POSALANA.
+4. En la sección "Environment Variables" antes de darle a Deploy, agregá:
+   - `DATABASE_URL`: La URL de tu base de Turso.
+   - `DATABASE_AUTH_TOKEN`: El token de tu base de Turso.
+5. Tocá **Deploy**.
 
----
+¡Listo! A partir de ahora, cada vez que hagas un `git push` a tu rama principal (`main`), Vercel va a compilar y actualizar la página automáticamente.
 
 ## 📜 Reglas del Juego
 

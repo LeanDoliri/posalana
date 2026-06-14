@@ -1,9 +1,11 @@
 import { createClient } from "@libsql/client";
 
 const dbUrl = process.env.DATABASE_URL || "file:sqlite.db";
+const dbAuthToken = process.env.DATABASE_AUTH_TOKEN;
 
 const db = createClient({
   url: dbUrl,
+  ...(dbAuthToken ? { authToken: dbAuthToken } : {})
 });
 
 // Initialize database schema
