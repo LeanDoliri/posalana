@@ -16,9 +16,9 @@ const getDieClass = (val: number) => `fa-solid fa-dice-${diceWords[val - 1]}`;
 
 const sizeClasses = {
     sm: "text-sm gap-1",
-    md: "text-lg gap-2",
-    lg: "text-2xl gap-3",
-    xl: "text-6xl gap-6"
+    md: "text-base md:text-lg gap-1.5 md:gap-2",
+    lg: "text-xl md:text-2xl gap-2 md:gap-3",
+    xl: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl gap-3 sm:gap-4 lg:gap-6"
 };
 
 const safeClass = isSafe === undefined ? "text-secondary" : (isSafe ? "text-secondary" : "text-primary");
