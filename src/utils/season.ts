@@ -144,10 +144,6 @@ async function calculateSeasonPointsInternal(db: any, seasonId: string): Promise
     const rollsRes = await db.execute("SELECT r.*, u.username, u.display_name, u.avatar_url FROM roll r JOIN user u ON r.user_id = u.id");
     const allRolls = rollsRes.rows.filter((r: any) => getSeasonId(r.date as string) === seasonId);
 
-    if (allRolls.length === 0) {
-        return [];
-    }
-
     // 2. Get exemptions for this season
     const exemptions = await getExemptionsForSeason(db, seasonId);
 
