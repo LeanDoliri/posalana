@@ -19,9 +19,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
 		return new Response("Invalid form data", { status: 400 });
 	}
 
-	const season_id = formData.get("season_id")?.toString();
+	let season_id = formData.get("season_id")?.toString();
 	const user_id = formData.get("user_id")?.toString();
 	const chore_code = formData.get("chore_code")?.toString();
+
+	if (season_id === "custom") {
+		const customSeason = formData.get("custom_season_id")?.toString()?.trim();
+		if (!customSeason || !/^\d{4}-(verano|otoño|invierno|primavera)$/.test(customSeason)) {
+			return new Response("Formato de temporada inválido. Debe ser AAAA-estación (ej: 2026-otoño).", { status: 400 });
+		}
+		season_id = customSeason;
+	}
 
 	if (!season_id || !user_id || !chore_code) {
 		return new Response("Missing fields", { status: 400 });

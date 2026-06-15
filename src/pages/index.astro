@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import db from '../db/index.js';
-import { getSeasonId } from '../utils/season.js';
+import { getSeasonId, getExemptionsForSeason } from '../utils/season.js';
 import UserAvatar from '../components/UserAvatar.astro';
 import DiceDisplay from '../components/DiceDisplay.astro';
 
@@ -48,11 +48,7 @@ import { assignDailyChores } from '../utils/chores.js';
 
 // Fetch exemptions
 const seasonId = getSeasonId(dateStr);
-const exemptionsRes = await db.execute({
-    sql: "SELECT user_id, chore_code FROM exemption WHERE season_id = ?",
-    args: [seasonId]
-});
-const exemptions = exemptionsRes.rows;
+const exemptions = await getExemptionsForSeason(db, seasonId);
 
 const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDailyChores(allRolls, exemptions);
 ---

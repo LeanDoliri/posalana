@@ -27,18 +27,21 @@ for (const row of allRollsRes.rows) {
     groupedRolls[date].push(row);
 }
 
-import { getSeasonId, getPreviousSeasons, formatSeasonName, calculateSeasonPoints, calculateYearPoints } from '../utils/season.js';
+import { getSeasonId, getPreviousSeasons, formatSeasonName, calculateSeasonPoints, calculateYearPoints, getExemptionsForSeason } from '../utils/season.js';
 import { assignDailyChores } from '../utils/chores.js';
 
 const dates = Object.keys(groupedRolls).sort((a, b) => b.localeCompare(a));
 
-// Fetch all exemptions
-const allExemptionsRes = await db.execute("SELECT * FROM exemption");
-const allExemptions = allExemptionsRes.rows;
+// Calculate unique seasons present in history dates and load their exemptions
+const uniqueSeasonsInHistory = Array.from(new Set(dates.map(date => getSeasonId(date))));
+const exemptionsMap = new Map<string, any[]>();
+for (const sId of uniqueSeasonsInHistory) {
+    exemptionsMap.set(sId, await getExemptionsForSeason(db, sId));
+}
 
 const historyData = dates.map(date => {
     const seasonId = getSeasonId(date);
-    const seasonExemptions = allExemptions.filter(e => e.season_id === seasonId);
+    const seasonExemptions = exemptionsMap.get(seasonId) || [];
     
     const { sortedRolls, rollChoreMap, lomitoActivated, lomitoPlayers } = assignDailyChores(groupedRolls[date], seasonExemptions);
     
@@ -127,16 +130,7 @@ const yearStats = await calculateYearPoints(db, currentYear);
 const sortedYearStats = sortStats(yearStats);
 
 // Fetch exemptions for the current season
-const currentSeasonExemptionsRes = await db.execute({
-    sql: `
-        SELECT e.chore_code, u.username, u.display_name, u.avatar_url 
-        FROM exemption e
-        JOIN user u ON e.user_id = u.id
-        WHERE e.season_id = ?
-    `,
-    args: [currentSeasonId]
-});
-const currentSeasonExemptions = currentSeasonExemptionsRes.rows;
+const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId);
 ---
 
 <Layout>

@@ -59,52 +59,127 @@ export function getPreviousSeasons(seasonId: string, count: number): string[] {
 }
 
 
+// Keep a cache of computed exemptions to prevent infinite loops and redundant work
+const exemptionsCache = new Map<string, any[]>();
+
+export async function getExemptionsForSeason(db: any, seasonId: string): Promise<any[]> {
+    if (exemptionsCache.has(seasonId)) {
+        return exemptionsCache.get(seasonId)!;
+    }
+
+    // Check if there are manual exemptions in the database for this season.
+    const manualExemptionsRes = await db.execute({
+        sql: `
+            SELECT e.user_id, e.chore_code, u.username, u.display_name, u.avatar_url 
+            FROM exemption e
+            JOIN user u ON e.user_id = u.id
+            WHERE e.season_id = ?
+        `,
+        args: [seasonId]
+    });
+    
+    if (manualExemptionsRes.rows.length > 0) {
+        const result = manualExemptionsRes.rows.map((r: any) => ({
+            user_id: r.user_id,
+            chore_code: r.chore_code,
+            username: r.username,
+            display_name: r.display_name,
+            avatar_url: r.avatar_url
+        }));
+        exemptionsCache.set(seasonId, result);
+        return result;
+    }
+
+    // If no manual exemptions, calculate them automatically based on the previous season's scores!
+    const prevSeasonId = getPreviousSeasons(seasonId, 1)[1];
+    if (!prevSeasonId || prevSeasonId === seasonId) {
+        exemptionsCache.set(seasonId, []);
+        return [];
+    }
+
+    // Calculate stats for the previous season
+    const prevStats = await calculateSeasonPointsInternal(db, prevSeasonId);
+    if (prevStats.length === 0) {
+        exemptionsCache.set(seasonId, []);
+        return [];
+    }
+
+    // For each chore (LA, SA, PO), find the player with the highest score in the previous season.
+    const computedExemptions: any[] = [];
+    const chores = ["LA", "SA", "PO"];
+    for (const chore of chores) {
+        let maxScore = 0;
+        let maxPlayers: any[] = [];
+        for (const stat of prevStats) {
+            const score = stat.scores[chore] || 0;
+            if (score > maxScore) {
+                maxScore = score;
+                maxPlayers = [stat];
+            } else if (score === maxScore && score > 0) {
+                maxPlayers.push(stat);
+            }
+        }
+        
+        for (const player of maxPlayers) {
+            computedExemptions.push({
+                user_id: player.id,
+                chore_code: chore,
+                username: player.username,
+                display_name: player.display_name,
+                avatar_url: player.avatar_url
+            });
+        }
+    }
+
+    exemptionsCache.set(seasonId, computedExemptions);
+    return computedExemptions;
+}
+
 export async function calculateSeasonPoints(db: any, seasonId: string) {
+    return calculateSeasonPointsInternal(db, seasonId);
+}
+
+async function calculateSeasonPointsInternal(db: any, seasonId: string): Promise<any[]> {
     // 1. Get all rolls that belong to the season
-    // Since we don't store season_id in roll, we must fetch rolls and filter them, or just fetch all and filter by getSeasonId.
-    // For simplicity, we fetch all rolls (or rolls in a date range, but fetching all is fine for small DBs).
     const rollsRes = await db.execute("SELECT r.*, u.username, u.display_name, u.avatar_url FROM roll r JOIN user u ON r.user_id = u.id");
     const allRolls = rollsRes.rows.filter((r: any) => getSeasonId(r.date as string) === seasonId);
 
-    // 2. Get exemptions and manual points for this season
-    const exemptionsRes = await db.execute({
-        sql: "SELECT user_id, chore_code FROM exemption WHERE season_id = ?",
-        args: [seasonId]
-    });
-    const exemptions = exemptionsRes.rows;
+    if (allRolls.length === 0) {
+        return [];
+    }
 
+    // 2. Get exemptions for this season
+    const exemptions = await getExemptionsForSeason(db, seasonId);
+
+    // 3. Get manual points for this season
     const manualPointsRes = await db.execute({
         sql: "SELECT user_id, chore_code, points FROM manual_points WHERE season_id = ?",
         args: [seasonId]
     });
     const manualPoints = manualPointsRes.rows;
 
-    // 3. Group rolls by date
+    // 4. Group rolls by date
     const rollsByDate = new Map<string, any[]>();
     for (const roll of allRolls) {
         if (!rollsByDate.has(roll.date as string)) rollsByDate.set(roll.date as string, []);
         rollsByDate.get(roll.date as string)!.push(roll);
     }
 
-    // 4. Calculate points
-    // Map: user_id -> { username, display_name, avatar_url, scores: { LA: 0, SA: 0, PO: 0 } }
+    // 5. Calculate points
     const userStats = new Map<string, any>();
     
-    // Initialize users that have manual points or exemptions even if they didn't roll
     const initUser = (userId: string, username: string = "Desconocido", display_name: string = "Desconocido", avatar_url: string = "") => {
         if (!userStats.has(userId)) {
             userStats.set(userId, { id: userId, username, display_name, avatar_url, scores: { LA: 0, SA: 0, PO: 0 } });
         }
     };
 
-    const chores = ["LA", "SA", "PO"];
-    
     for (const [date, dailyRolls] of rollsByDate.entries()) {
         for (const roll of dailyRolls) {
             initUser(roll.user_id as string, roll.username as string, roll.display_name as string, roll.avatar_url as string);
         }
 
-        const { rollChoreMap, lomitoActivated } = assignDailyChores(dailyRolls, exemptions);
+        const { rollChoreMap } = assignDailyChores(dailyRolls, exemptions);
         
         for (const [rollId, chore] of rollChoreMap.entries()) {
             if (chore.code !== "NA") {
@@ -117,7 +192,6 @@ export async function calculateSeasonPoints(db: any, seasonId: string) {
     // Apply manual points
     for (const mp of manualPoints) {
         if (!userStats.has(mp.user_id as string)) {
-            // Find user details from DB
             const uRes = await db.execute({ sql: "SELECT username, display_name, avatar_url FROM user WHERE id = ?", args: [mp.user_id] });
             const u = uRes.rows[0];
             initUser(mp.user_id as string, u?.username as string, u?.display_name as string, u?.avatar_url as string);
@@ -125,7 +199,6 @@ export async function calculateSeasonPoints(db: any, seasonId: string) {
         userStats.get(mp.user_id as string).scores[mp.chore_code as string] = mp.points;
     }
 
-    // Convert map to array
     return Array.from(userStats.values());
 }
 
