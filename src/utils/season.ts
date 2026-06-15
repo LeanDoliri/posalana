@@ -128,3 +128,29 @@ export async function calculateSeasonPoints(db: any, seasonId: string) {
     // Convert map to array
     return Array.from(userStats.values());
 }
+
+export async function calculateYearPoints(db: any, year: string) {
+    const seasons = [`${year}-verano`, `${year}-otoño`, `${year}-invierno`, `${year}-primavera`];
+    const userStats = new Map<string, any>();
+    
+    for (const seasonId of seasons) {
+        const seasonStats = await calculateSeasonPoints(db, seasonId);
+        for (const stat of seasonStats) {
+            if (!userStats.has(stat.id)) {
+                userStats.set(stat.id, {
+                    id: stat.id,
+                    username: stat.username,
+                    display_name: stat.display_name,
+                    avatar_url: stat.avatar_url,
+                    scores: { LA: 0, SA: 0, PO: 0 }
+                });
+            }
+            const user = userStats.get(stat.id);
+            user.scores.LA += stat.scores.LA;
+            user.scores.SA += stat.scores.SA;
+            user.scores.PO += stat.scores.PO;
+        }
+    }
+    
+    return Array.from(userStats.values());
+}

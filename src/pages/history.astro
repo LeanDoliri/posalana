@@ -26,7 +26,7 @@ for (const row of allRollsRes.rows) {
     groupedRolls[date].push(row);
 }
 
-import { getSeasonId } from '../utils/season.js';
+import { getSeasonId, getPreviousSeasons, formatSeasonName, calculateSeasonPoints, calculateYearPoints } from '../utils/season.js';
 import { assignDailyChores } from '../utils/chores.js';
 
 const dates = Object.keys(groupedRolls).sort((a, b) => b.localeCompare(a));
@@ -49,6 +49,32 @@ const historyData = dates.map(date => {
         lomitoPlayers
     };
 });
+
+// Calculate current date in GMT-3 to obtain current season
+const today = new Date();
+today.setHours(today.getHours() - 3);
+const todayStr = today.toISOString().split('T')[0];
+const currentSeasonId = getSeasonId(todayStr);
+const prevSeasonId = getPreviousSeasons(currentSeasonId, 1)[1];
+
+const currentSeasonStats = await calculateSeasonPoints(db, currentSeasonId);
+const prevSeasonStats = await calculateSeasonPoints(db, prevSeasonId);
+
+// Sort alphabetically by display_name (falling back to username)
+const sortStats = (stats: any[]) => {
+    return [...stats].sort((a, b) => {
+        const nameA = String(a.display_name || a.username);
+        const nameB = String(b.display_name || b.username);
+        return nameA.localeCompare(nameB);
+    });
+};
+
+const sortedCurrentStats = sortStats(currentSeasonStats);
+const sortedPrevStats = sortStats(prevSeasonStats);
+
+const currentYear = today.getFullYear().toString();
+const yearStats = await calculateYearPoints(db, currentYear);
+const sortedYearStats = sortStats(yearStats);
 ---
 
 <Layout>
@@ -63,6 +89,141 @@ const historyData = dates.map(date => {
                 <i class="fa-solid fa-database mr-2"></i> {dates.length} días registrados
             </div>
         </header>
+
+        <!-- Resumen de Temporadas -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Temporada Actual -->
+            <div class="bg-background border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group">
+                <div class="absolute -top-12 -right-12 w-36 h-36 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-all duration-500 pointer-events-none"></div>
+                
+                <h3 class="text-xl font-black mb-6 flex items-center gap-2.5 text-foreground relative z-10">
+                    <i class="fa-solid fa-calendar-days text-secondary"></i>
+                    Temporada Actual: <span class="text-secondary">{formatSeasonName(currentSeasonId)}</span>
+                </h3>
+                
+                {sortedCurrentStats.length === 0 ? (
+                    <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en esta temporada.</p>
+                ) : (
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
+                                    <th class="pb-3 font-black">Jugador</th>
+                                    <th class="pb-3 text-center font-black">🧽 LA</th>
+                                    <th class="pb-3 text-center font-black">🗑️ SA</th>
+                                    <th class="pb-3 text-center font-black">🍽️ PO</th>
+                                    <th class="pb-3 text-center font-black text-secondary">TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-foreground/5">
+                                {sortedCurrentStats.map(stat => (
+                                    <tr class="hover:bg-foreground/[0.01] transition-colors">
+                                        <td class="py-3 pr-2">
+                                            <div class="flex items-center gap-2.5">
+                                                <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />
+                                                <span class="font-bold text-foreground">{stat.display_name}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
+                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
+                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.PO}</td>
+                                        <td class="py-3 text-center font-mono font-black text-secondary bg-secondary/5 rounded-lg">{stat.scores.LA + stat.scores.SA + stat.scores.PO}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+
+            <!-- Temporada Anterior -->
+            <div class="bg-background border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group">
+                <div class="absolute -top-12 -right-12 w-36 h-36 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-all duration-500 pointer-events-none"></div>
+                
+                <h3 class="text-xl font-black mb-6 flex items-center gap-2.5 text-foreground relative z-10">
+                    <i class="fa-solid fa-clock-rotate-left text-accent"></i>
+                    Temporada Anterior: <span class="text-accent">{formatSeasonName(prevSeasonId)}</span>
+                </h3>
+                
+                {sortedPrevStats.length === 0 ? (
+                    <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en la temporada anterior.</p>
+                ) : (
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
+                                    <th class="pb-3 font-black">Jugador</th>
+                                    <th class="pb-3 text-center font-black">🧽 LA</th>
+                                    <th class="pb-3 text-center font-black">🗑️ SA</th>
+                                    <th class="pb-3 text-center font-black">🍽️ PO</th>
+                                    <th class="pb-3 text-center font-black text-accent">TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-foreground/5">
+                                {sortedPrevStats.map(stat => (
+                                    <tr class="hover:bg-foreground/[0.01] transition-colors">
+                                        <td class="py-3 pr-2">
+                                            <div class="flex items-center gap-2.5">
+                                                <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />
+                                                <span class="font-bold text-foreground">{stat.display_name}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
+                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
+                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.PO}</td>
+                                        <td class="py-3 text-center font-mono font-black text-accent bg-accent/5 rounded-lg">{stat.scores.LA + stat.scores.SA + stat.scores.PO}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+        </section>
+
+        <!-- Tabla Global del Año -->
+        <div class="bg-background border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group">
+            <div class="absolute -top-12 -right-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-500 pointer-events-none"></div>
+            
+            <h3 class="text-xl font-black mb-6 flex items-center gap-2.5 text-foreground relative z-10">
+                <i class="fa-solid fa-earth-americas text-primary"></i>
+                Tabla Global del Año: <span class="text-primary">{currentYear}</span>
+            </h3>
+            
+            {sortedYearStats.length === 0 ? (
+                <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en este año.</p>
+            ) : (
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
+                                <th class="pb-3 font-black">Jugador</th>
+                                <th class="pb-3 text-center font-black">🧽 LA (Lava)</th>
+                                <th class="pb-3 text-center font-black">🗑️ SA (Saca)</th>
+                                <th class="pb-3 text-center font-black">🍽️ PO (Pone)</th>
+                                <th class="pb-3 text-center font-black text-primary">TOTAL GLOBAL</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-foreground/5">
+                            {sortedYearStats.map(stat => (
+                                <tr class="hover:bg-foreground/[0.01] transition-colors">
+                                    <td class="py-3 pr-2">
+                                        <div class="flex items-center gap-2.5">
+                                            <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />
+                                            <span class="font-bold text-foreground">{stat.display_name}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
+                                    <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
+                                    <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.PO}</td>
+                                    <td class="py-3 text-center font-mono font-black text-primary bg-primary/5 rounded-lg px-2">{stat.scores.LA + stat.scores.SA + stat.scores.PO}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </div>
 
         {dates.length === 0 ? (
             <div class="py-20 text-center border-2 border-dashed border-foreground/10 rounded-3xl">
