@@ -78,7 +78,7 @@ if (lastLomitoDate) {
                         )}
                     </div>
                     <form method="post" action="/api/logout">
-                        <button class="text-primary/80 hover:text-primary font-bold hover:bg-primary/10 px-3 py-1.5 rounded-full transition-colors"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                        <button class="text-primary/80 hover:text-primary font-bold hover:bg-primary/10 px-3 py-1.5 rounded-full transition-colors cursor-pointer"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
                     </form>
                 </div>
             ) : (
@@ -87,7 +87,7 @@ if (lastLomitoDate) {
         </nav>
 
         <!-- Mobile Menu Button -->
-        <button id="mobile-menu-btn" class="md:hidden text-foreground/80 hover:text-foreground text-2xl focus:outline-none transition-transform active:scale-95">
+        <button id="mobile-menu-btn" class="md:hidden text-foreground/80 hover:text-foreground text-2xl focus:outline-none transition-transform active:scale-95 cursor-pointer">
             <i class="fa-solid fa-bars"></i>
         </button>
     </div>
@@ -124,7 +124,7 @@ if (lastLomitoDate) {
                     )}
                 </div>
                 <form method="post" action="/api/logout" class="mt-2">
-                    <button class="w-full text-left p-4 rounded-xl text-primary hover:bg-primary/5 transition-colors font-bold"><i class="fa-solid fa-arrow-right-from-bracket w-8"></i> Cerrar Sesión</button>
+                    <button class="w-full text-left p-4 rounded-xl text-primary hover:bg-primary/5 transition-colors font-bold cursor-pointer"><i class="fa-solid fa-arrow-right-from-bracket w-8"></i> Cerrar Sesión</button>
                 </form>
             </div>
         ) : (

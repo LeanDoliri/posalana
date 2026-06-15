@@ -97,7 +97,7 @@ uniqueSeasons.sort((a, b) => {
                             <input type="text" name="master_key" value={settingsMap.get('master_key') || ''} placeholder="Ej: Lomito123" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
                             <p class="text-xs text-foreground/50 mt-1">Usada en /recover para resetear contraseñas de cualquier usuario.</p>
                         </div>
-                        <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity">
+                        <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity cursor-pointer">
                             Guardar Configuración
                         </button>
                     </form>
@@ -131,7 +131,7 @@ uniqueSeasons.sort((a, b) => {
                                             </div>
                                             <input type="file" id={`avatar-input-${u.id}`} data-user-id={u.id} accept="image/*" class="hidden admin-avatar-input" />
                                             {u.avatar_url && !u.avatar_url.includes('api.dicebear.com') && (
-                                                <button class="remove-user-avatar-btn text-foreground/30 hover:text-primary p-1 rounded-md transition-colors" data-user-id={u.id} title="Quitar foto de perfil y volver al avatar por defecto">
+                                                <button class="remove-user-avatar-btn text-foreground/30 hover:text-primary p-1 rounded-md transition-colors cursor-pointer" data-user-id={u.id} title="Quitar foto de perfil y volver al avatar por defecto">
                                                     <i class="fa-solid fa-trash-can text-xs"></i>
                                                 </button>
                                             )}
@@ -216,7 +216,7 @@ uniqueSeasons.sort((a, b) => {
                                 <input type="number" name="points" min="0" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" placeholder="Ej: 5" required />
                             </div>
                         </div>
-                        <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity mt-2">
+                        <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity mt-2 cursor-pointer">
                             Cargar Puntos
                         </button>
                     </form>
@@ -269,7 +269,7 @@ uniqueSeasons.sort((a, b) => {
                             </select>
                         </div>
                     </div>
-                    <button class="bg-secondary text-background font-bold px-6 py-2.5 rounded-xl hover:opacity-90 transition-opacity mt-2 text-sm shadow-sm">
+                    <button class="bg-secondary text-background font-bold px-6 py-2.5 rounded-xl hover:opacity-90 transition-opacity mt-2 text-sm shadow-sm cursor-pointer">
                         Asignar Exención
                     </button>
                 </form>
