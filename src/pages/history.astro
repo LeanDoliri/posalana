@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import db from '../db/index.js';
 import UserAvatar from '../components/UserAvatar.astro';
 import DiceDisplay from '../components/DiceDisplay.astro';
+import StatsTable from '../components/StatsTable.astro';
 
 if (!Astro.locals.user) {
 	return Astro.redirect('/login');
@@ -50,6 +51,55 @@ const historyData = dates.map(date => {
     };
 });
 
+// Helper to get the Monday of the week for a given date YYYY-MM-DD
+function getMonday(dateStr: string) {
+    const d = new Date(dateStr + 'T12:00:00');
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday (0)
+    const monday = new Date(d.setDate(diff));
+    return monday.toISOString().split('T')[0];
+}
+
+// Helper to format the week range
+function formatWeekRange(mondayStr: string) {
+    if (!mondayStr) return "";
+    const mon = new Date(mondayStr + 'T12:00:00');
+    const sun = new Date(mon);
+    sun.setDate(sun.getDate() + 6);
+    
+    const format = (d: Date) => {
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        return `${day}/${month}`;
+    };
+    return `Semana del ${format(mon)} al ${format(sun)}`;
+}
+
+// Group historyData by calendar week starting on Monday
+const weeksMap = new Map<string, typeof historyData>();
+for (const item of historyData) {
+    const monday = getMonday(item.date);
+    if (!weeksMap.has(monday)) {
+        weeksMap.set(monday, []);
+    }
+    weeksMap.get(monday)!.push(item);
+}
+
+// Sorted week Mondays descending
+const weekMondays = Array.from(weeksMap.keys()).sort((a, b) => b.localeCompare(a));
+
+// Get selected week from URL search params, default to most recent week
+const url = new URL(Astro.request.url);
+const selectedWeek = url.searchParams.get("week") || weekMondays[0] || "";
+
+// Paginated rolls for the selected week
+const paginatedHistoryData = selectedWeek ? (weeksMap.get(selectedWeek) || []) : [];
+
+// Find previous and next week Mondays for pagination controls
+const selectedWeekIndex = weekMondays.indexOf(selectedWeek);
+const nextWeekMonday = selectedWeekIndex > 0 ? weekMondays[selectedWeekIndex - 1] : null; // Index decreases -> newer week
+const prevWeekMonday = selectedWeekIndex !== -1 && selectedWeekIndex < weekMondays.length - 1 ? weekMondays[selectedWeekIndex + 1] : null; // Index increases -> older week
+
 // Calculate current date in GMT-3 to obtain current season
 const today = new Date();
 today.setHours(today.getHours() - 3);
@@ -75,6 +125,18 @@ const sortedPrevStats = sortStats(prevSeasonStats);
 const currentYear = today.getFullYear().toString();
 const yearStats = await calculateYearPoints(db, currentYear);
 const sortedYearStats = sortStats(yearStats);
+
+// Fetch exemptions for the current season
+const currentSeasonExemptionsRes = await db.execute({
+    sql: `
+        SELECT e.chore_code, u.username, u.display_name, u.avatar_url 
+        FROM exemption e
+        JOIN user u ON e.user_id = u.id
+        WHERE e.season_id = ?
+    `,
+    args: [currentSeasonId]
+});
+const currentSeasonExemptions = currentSeasonExemptionsRes.rows;
 ---
 
 <Layout>
@@ -104,34 +166,28 @@ const sortedYearStats = sortStats(yearStats);
                 {sortedCurrentStats.length === 0 ? (
                     <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en esta temporada.</p>
                 ) : (
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
-                                    <th class="pb-3 font-black">Jugador</th>
-                                    <th class="pb-3 text-center font-black">🍽️ PO</th>
-                                    <th class="pb-3 text-center font-black">🗑️ SA</th>
-                                    <th class="pb-3 text-center font-black">🧽 LA</th>
-                                    <th class="pb-3 text-center font-black text-secondary">TOTAL</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-foreground/5">
-                                {sortedCurrentStats.map(stat => (
-                                    <tr class="hover:bg-foreground/[0.01] transition-colors">
-                                        <td class="py-3 pr-2">
-                                            <div class="flex items-center gap-2.5">
-                                                <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />
-                                                <span class="font-bold text-foreground">{stat.display_name}</span>
-                                            </div>
-                                        </td>
-                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.PO}</td>
-                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
-                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
-                                        <td class="py-3 text-center font-mono font-black text-secondary bg-secondary/5 rounded-lg">{stat.scores.LA + stat.scores.SA + stat.scores.PO}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <StatsTable stats={sortedCurrentStats} theme="secondary" />
+                )}
+
+                {currentSeasonExemptions.length > 0 && (
+                    <div class="mt-6 pt-6 border-t border-foreground/10 relative z-10">
+                        <h4 class="text-xs font-black uppercase tracking-wider text-foreground/60 mb-3 flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved text-secondary"></i> Exenciones de la Temporada
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                            {currentSeasonExemptions.map(ex => {
+                                const choreEmoji = ex.chore_code === 'LA' ? '🧽' : ex.chore_code === 'SA' ? '🗑️' : '🍽️';
+                                const choreLabel = ex.chore_code === 'LA' ? 'Lavar' : ex.chore_code === 'SA' ? 'Sacar' : 'Poner';
+                                return (
+                                    <div class="flex items-center gap-2 bg-secondary/5 border border-secondary/20 px-3 py-1.5 rounded-full text-xs">
+                                        <UserAvatar user={{ username: ex.username, display_name: ex.display_name, avatar_url: ex.avatar_url }} size="sm" />
+                                        <span class="font-bold text-foreground">{ex.display_name}</span>
+                                        <span class="text-foreground/50">•</span>
+                                        <span class="text-secondary font-bold font-mono">{choreEmoji} Exento de {choreLabel}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 )}
             </div>
@@ -148,35 +204,7 @@ const sortedYearStats = sortStats(yearStats);
                 {sortedPrevStats.length === 0 ? (
                     <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en la temporada anterior.</p>
                 ) : (
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-sm">
-                            <thead>
-                                <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
-                                    <th class="pb-3 font-black">Jugador</th>
-                                    <th class="pb-3 text-center font-black">🍽️ PO</th>
-                                    <th class="pb-3 text-center font-black">🗑️ SA</th>
-                                    <th class="pb-3 text-center font-black">🧽 LA</th>
-                                    <th class="pb-3 text-center font-black text-accent">TOTAL</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-foreground/5">
-                                {sortedPrevStats.map(stat => (
-                                    <tr class="hover:bg-foreground/[0.01] transition-colors">
-                                        <td class="py-3 pr-2">
-                                            <div class="flex items-center gap-2.5">
-                                                <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />
-                                                <span class="font-bold text-foreground">{stat.display_name}</span>
-                                            </div>
-                                        </td>
-                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.PO}</td>
-                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
-                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
-                                        <td class="py-3 text-center font-mono font-black text-accent bg-accent/5 rounded-lg">{stat.scores.LA + stat.scores.SA + stat.scores.PO}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    <StatsTable stats={sortedPrevStats} theme="accent" />
                 )}
             </div>
         </section>
@@ -193,35 +221,7 @@ const sortedYearStats = sortStats(yearStats);
             {sortedYearStats.length === 0 ? (
                 <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en este año.</p>
             ) : (
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
-                                <th class="pb-3 font-black">Jugador</th>
-                                <th class="pb-3 text-center font-black">🍽️ PO (Pone)</th>
-                                <th class="pb-3 text-center font-black">🗑️ SA (Saca)</th>
-                                <th class="pb-3 text-center font-black">🧽 LA (Lava)</th>
-                                <th class="pb-3 text-center font-black text-primary">TOTAL GLOBAL</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-foreground/5">
-                            {sortedYearStats.map(stat => (
-                                <tr class="hover:bg-foreground/[0.01] transition-colors">
-                                    <td class="py-3 pr-2">
-                                        <div class="flex items-center gap-2.5">
-                                            <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />
-                                            <span class="font-bold text-foreground">{stat.display_name}</span>
-                                        </div>
-                                    </td>
-                                    <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.PO}</td>
-                                    <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
-                                    <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
-                                    <td class="py-3 text-center font-mono font-black text-primary bg-primary/5 rounded-lg px-2">{stat.scores.LA + stat.scores.SA + stat.scores.PO}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                <StatsTable stats={sortedYearStats} theme="primary" sortable={true} />
             )}
         </div>
 
@@ -231,61 +231,237 @@ const sortedYearStats = sortStats(yearStats);
                 <p class="text-foreground/60 font-medium text-lg">Los archivos están vacíos.</p>
             </div>
         ) : (
-            <div class="space-y-12">
-                {historyData.map((data, dateIndex) => (
-                    <section class="relative">
-                        <!-- Timeline visual connector -->
-                        {dateIndex !== dates.length - 1 && (
-                            <div class="absolute left-[1.3rem] md:left-[1.8rem] top-14 bottom-[-3rem] w-px bg-foreground/10 z-0"></div>
-                        )}
-                        
-                        <!-- Date Header -->
-                        <div class="flex items-center gap-4 mb-6 relative z-10">
-                            <div class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-secondary text-background flex items-center justify-center font-black shadow-lg">
-                                <i class="fa-solid fa-calendar-day"></i>
-                            </div>
-                            <h3 class="text-xl md:text-2xl font-black text-foreground">{data.date}</h3>
-                        </div>
+            <div id="historial-seccion" class="space-y-8 scroll-mt-24">
+                <!-- Selector de Semanas (Paginación) -->
+                <div class="flex flex-col sm:flex-row items-center justify-between bg-foreground/5 border border-foreground/10 p-4 rounded-3xl gap-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-week text-secondary text-lg"></i>
+                        <span id="week-range-label" class="font-black text-foreground text-sm tracking-tight">{formatWeekRange(selectedWeek)}</span>
+                    </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                        <a id="prev-week-btn" href={prevWeekMonday ? `?week=${prevWeekMonday}#historial-seccion` : '#'} class={`flex items-center gap-2 bg-background border border-foreground/10 text-foreground hover:bg-foreground/5 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm active:scale-95 ${!prevWeekMonday ? 'pointer-events-none opacity-30 cursor-not-allowed' : ''}`}>
+                            <i class="fa-solid fa-arrow-left"></i> Semana Anterior
+                        </a>
+                        <a id="next-week-btn" href={nextWeekMonday ? `?week=${nextWeekMonday}#historial-seccion` : '#'} class={`flex items-center gap-2 bg-background border border-foreground/10 text-foreground hover:bg-foreground/5 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm active:scale-95 ${!nextWeekMonday ? 'pointer-events-none opacity-30 cursor-not-allowed' : ''}`}>
+                            Semana Siguiente <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
 
-                        <!-- Lomito Indicator -->
-                        {data.lomitoActivated && (
-                            <div class="pl-6 md:pl-10 mb-4 relative z-10">
-                                <div class="bg-accent/10 border border-accent/20 px-4 py-2 rounded-xl inline-block">
-                                    <span class="text-accent font-bold text-sm">🥪 Cláusula Lomito activada por {data.lomitoPlayers.join(" y ")}</span>
-                                </div>
-                            </div>
-                        )}
-
-                        <!-- Rolls Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 md:pl-10 relative z-10">
-                            {data.rolls.map((roll, index) => {
-                                const chore = data.choreMap.get(roll.id);
-                                const isSafe = chore.code === "NA";
-                                return (
-                                    <div class={`group flex flex-row items-center justify-between p-4 rounded-2xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${isSafe ? 'bg-background border-foreground/10 hover:border-secondary/30' : 'bg-primary/5 border-primary/10 hover:border-primary/30'}`}>
+                <div id="weeks-container" class="space-y-12">
+                    {weekMondays.map((monday) => {
+                        const weekData = weeksMap.get(monday) || [];
+                        const isSelected = monday === selectedWeek;
+                        return (
+                            <div data-week={monday} data-week-range={formatWeekRange(monday)} class={`week-container space-y-12 ${isSelected ? '' : 'hidden'}`}>
+                                {weekData.map((data, dateIndex) => (
+                                    <section class="relative">
+                                        {/* Timeline visual connector */}
+                                        {dateIndex !== weekData.length - 1 && (
+                                            <div class="absolute left-[1.3rem] md:left-[1.8rem] top-14 bottom-[-3rem] w-px bg-foreground/10 z-0"></div>
+                                        )}
                                         
-                                        <!-- User -->
-                                        <div class="flex items-center gap-3">
-                                            <UserAvatar user={{ username: roll.username as string, display_name: roll.display_name as string, avatar_url: roll.avatar_url as string }} size="md" />
-                                            <span class="font-bold text-foreground">{roll.display_name}</span>
+                                        {/* Date Header */}
+                                        <div class="flex items-center gap-4 mb-6 relative z-10">
+                                            <div class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-secondary text-background flex items-center justify-center font-black shadow-lg">
+                                                <i class="fa-solid fa-calendar-day"></i>
+                                            </div>
+                                            <h3 class="text-xl md:text-2xl font-black text-foreground">{data.date}</h3>
                                         </div>
 
-                                        <!-- Stats -->
-                                        <div class="flex items-center gap-4">
-                                            <div class="hidden sm:flex items-center opacity-70 group-hover:opacity-100 transition-opacity">
-                                                <DiceDisplay die1={roll.die1 as number} die2={roll.die2 as number} die3={roll.die3 as number} die4={roll.die4 as number} size="sm" isSafe={isSafe} />
+                                        {/* Lomito Indicator */}
+                                        {data.lomitoActivated && (
+                                            <div class="pl-6 md:pl-10 mb-4 relative z-10">
+                                                <div class="bg-accent/10 border border-accent/20 px-4 py-2 rounded-xl inline-block">
+                                                    <span class="text-accent font-bold text-sm">🥪 Cláusula Lomito activada por {data.lomitoPlayers.join(" y ")}</span>
+                                                </div>
                                             </div>
-                                            <div class={`px-3 py-1 rounded-lg text-xs font-black tracking-widest ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background shadow-[0_0_10px_rgba(234,42,88,0.3)]'}`}>
-                                                {chore.code}
-                                            </div>
+                                        )}
+
+                                        {/* Rolls Grid */}
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 md:pl-10 relative z-10">
+                                            {data.rolls.map((roll) => {
+                                                const chore = data.choreMap.get(roll.id);
+                                                const isSafe = chore.code === "NA";
+                                                return (
+                                                    <div class={`group flex flex-row items-center justify-between p-4 rounded-2xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${isSafe ? 'bg-background border-foreground/10 hover:border-secondary/30' : 'bg-primary/5 border-primary/10 hover:border-primary/30'}`}>
+                                                        
+                                                        {/* User */}
+                                                        <div class="flex items-center gap-3">
+                                                            <UserAvatar user={{ username: roll.username as string, display_name: roll.display_name as string, avatar_url: roll.avatar_url as string }} size="md" />
+                                                            <span class="font-bold text-foreground">{roll.display_name}</span>
+                                                        </div>
+
+                                                        {/* Stats */}
+                                                        <div class="flex items-center gap-4">
+                                                            <div class="hidden sm:flex items-center opacity-70 group-hover:opacity-100 transition-opacity">
+                                                                <DiceDisplay die1={roll.die1 as number} die2={roll.die2 as number} die3={roll.die3 as number} die4={roll.die4 as number} size="sm" isSafe={isSafe} />
+                                                            </div>
+                                                            <div class={`px-3 py-1 rounded-lg text-xs font-black tracking-widest ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background shadow-[0_0_10px_rgba(234,42,88,0.3)]'}`}>
+                                                                {chore.code}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </section>
-                ))}
+                                    </section>
+                                ))}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         )}
     </div>
+
+	<script>
+		// Sorting interactive functionality for the yearly global table
+		const table = document.getElementById('global-table');
+		const headers = table?.querySelectorAll('thead th[data-sort]');
+		const tbody = table?.querySelector('tbody');
+
+		let currentSortColumn = '';
+		let currentSortOrder = 'asc';
+
+		headers?.forEach(header => {
+			header.addEventListener('click', () => {
+				const sortKey = header.getAttribute('data-sort');
+				if (!sortKey || !tbody) return;
+
+				const order = (currentSortColumn === sortKey && currentSortOrder === 'asc') ? 'desc' : 'asc';
+				currentSortColumn = sortKey;
+				currentSortOrder = order;
+
+				const rows = Array.from(tbody.querySelectorAll('tr'));
+				rows.sort((rowA, rowB) => {
+					const valA = getRowValue(rowA, sortKey);
+					const valB = getRowValue(rowB, sortKey);
+
+					if (typeof valA === 'number' && typeof valB === 'number') {
+						return order === 'asc' ? valA - valB : valB - valA;
+					} else {
+						return order === 'asc'
+							? String(valA).localeCompare(String(valB))
+							: String(valB).localeCompare(String(valA));
+					}
+				});
+
+				tbody.innerHTML = '';
+				rows.forEach(row => tbody.appendChild(row));
+
+				updateHeaderIndicators(headers, sortKey, order);
+			});
+		});
+
+		function getRowValue(row: HTMLTableRowElement, key: string) {
+			const cell = row.querySelector(`[data-val-${key}]`);
+			if (!cell) return '';
+			const rawVal = cell.getAttribute(`data-val-${key}`);
+			const num = Number(rawVal);
+			return isNaN(num) ? rawVal || '' : num;
+		}
+
+		function updateHeaderIndicators(headers: NodeListOf<Element>, activeKey: string, order: string) {
+			headers.forEach(h => {
+				const key = h.getAttribute('data-sort');
+				const icon = h.querySelector('i');
+				if (icon) {
+					if (key === activeKey) {
+						icon.className = order === 'asc'
+							? 'fa-solid fa-sort-up ml-1 text-primary'
+							: 'fa-solid fa-sort-down ml-1 text-primary';
+					} else {
+						icon.className = 'fa-solid fa-sort ml-1 text-foreground/30 text-[10px]';
+					}
+				}
+			});
+		}
+
+		// Client-side pagination without page reload
+		const prevBtn = document.getElementById('prev-week-btn') as HTMLAnchorElement | null;
+		const nextBtn = document.getElementById('next-week-btn') as HTMLAnchorElement | null;
+		const rangeLabel = document.getElementById('week-range-label');
+		const weekContainers = document.querySelectorAll('.week-container');
+
+		if (weekContainers.length > 0) {
+			const weeks = Array.from(weekContainers).map(el => el.getAttribute('data-week') || '');
+			let currentWeek = new URL(window.location.href).searchParams.get('week') || weeks[0] || '';
+
+			function updatePaginationUI(selected: string, shouldPushState = true) {
+				currentWeek = selected;
+
+				weekContainers.forEach(container => {
+					const week = container.getAttribute('data-week');
+					if (week === selected) {
+						container.classList.remove('hidden');
+						if (rangeLabel) {
+							rangeLabel.textContent = container.getAttribute('data-week-range') || '';
+						}
+					} else {
+						container.classList.add('hidden');
+					}
+				});
+
+				const selectedIndex = weeks.indexOf(selected);
+				const hasPrev = selectedIndex !== -1 && selectedIndex < weeks.length - 1;
+				const hasNext = selectedIndex > 0;
+
+				const prevWeek = hasPrev ? weeks[selectedIndex + 1] : null;
+				const nextWeek = hasNext ? weeks[selectedIndex - 1] : null;
+
+				if (prevBtn) {
+					if (prevWeek) {
+						prevBtn.href = `?week=${prevWeek}#historial-seccion`;
+						prevBtn.classList.remove('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
+					} else {
+						prevBtn.removeAttribute('href');
+						prevBtn.classList.add('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
+					}
+				}
+
+				if (nextBtn) {
+					if (nextWeek) {
+						nextBtn.href = `?week=${nextWeek}#historial-seccion`;
+						nextBtn.classList.remove('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
+					} else {
+						nextBtn.removeAttribute('href');
+						nextBtn.classList.add('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
+					}
+				}
+
+				if (shouldPushState) {
+					const url = new URL(window.location.href);
+					url.searchParams.set('week', selected);
+					url.hash = 'historial-seccion';
+					window.history.pushState({ week: selected }, '', url.toString());
+				}
+			}
+
+			prevBtn?.addEventListener('click', (e) => {
+				e.preventDefault();
+				const selectedIndex = weeks.indexOf(currentWeek);
+				if (selectedIndex !== -1 && selectedIndex < weeks.length - 1) {
+					updatePaginationUI(weeks[selectedIndex + 1]);
+				}
+			});
+
+			nextBtn?.addEventListener('click', (e) => {
+				e.preventDefault();
+				const selectedIndex = weeks.indexOf(currentWeek);
+				if (selectedIndex > 0) {
+					updatePaginationUI(weeks[selectedIndex - 1]);
+				}
+			});
+
+			window.addEventListener('popstate', (e) => {
+				const stateWeek = e.state?.week;
+				const urlParams = new URLSearchParams(window.location.search);
+				const weekFromUrl = stateWeek || urlParams.get('week') || weeks[0] || '';
+				if (weekFromUrl && weeks.includes(weekFromUrl) && weekFromUrl !== currentWeek) {
+					updatePaginationUI(weekFromUrl, false);
+				}
+			});
+		}
+	</script>
 </Layout>

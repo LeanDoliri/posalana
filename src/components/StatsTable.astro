@@ -1,0 +1,101 @@
+---
+import UserAvatar from './UserAvatar.astro';
+
+interface Props {
+  stats: Array<{
+    username: string;
+    display_name: string;
+    avatar_url: string | null;
+    scores: {
+      PO: number;
+      SA: number;
+      LA: number;
+    }
+  }>;
+  theme?: 'primary' | 'secondary' | 'accent';
+  sortable?: boolean;
+}
+
+const { stats, theme = 'primary', sortable = false } = Astro.props;
+
+const themeClasses = {
+  primary: {
+    text: 'text-primary',
+    bg: 'bg-primary/5',
+  },
+  secondary: {
+    text: 'text-secondary',
+    bg: 'bg-secondary/5',
+  },
+  accent: {
+    text: 'text-accent',
+    bg: 'bg-accent/5',
+  }
+};
+
+const activeTheme = themeClasses[theme];
+---
+
+<div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-sm" id={sortable ? "global-table" : undefined}>
+        <thead>
+            <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
+                {sortable ? (
+                    <>
+                        <th class="pb-3 font-black cursor-pointer hover:text-primary transition-colors select-none" data-sort="name">
+                            Jugador <i class="fa-solid fa-sort ml-1 text-foreground/30 text-[10px]"></i>
+                        </th>
+                        <th class="pb-3 text-center font-black cursor-pointer hover:text-primary transition-colors select-none" data-sort="po">
+                            🍽️ PO (Pone) <i class="fa-solid fa-sort ml-1 text-foreground/30 text-[10px]"></i>
+                        </th>
+                        <th class="pb-3 text-center font-black cursor-pointer hover:text-primary transition-colors select-none" data-sort="sa">
+                            🗑️ SA (Saca) <i class="fa-solid fa-sort ml-1 text-foreground/30 text-[10px]"></i>
+                        </th>
+                        <th class="pb-3 text-center font-black cursor-pointer hover:text-primary transition-colors select-none" data-sort="la">
+                            🧽 LA (Lava) <i class="fa-solid fa-sort ml-1 text-foreground/30 text-[10px]"></i>
+                        </th>
+                        <th class={`pb-3 text-center font-black ${activeTheme.text} cursor-pointer hover:text-primary transition-colors select-none`} data-sort="total">
+                            TOTAL GLOBAL <i class="fa-solid fa-sort ml-1 text-foreground/30 text-[10px]"></i>
+                        </th>
+                    </>
+                ) : (
+                    <>
+                        <th class="pb-3 font-black">Jugador</th>
+                        <th class="pb-3 text-center font-black">🍽️ PO</th>
+                        <th class="pb-3 text-center font-black">🗑️ SA</th>
+                        <th class="pb-3 text-center font-black">🧽 LA</th>
+                        <th class={`pb-3 text-center font-black ${activeTheme.text}`}>TOTAL</th>
+                    </>
+                )}
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-foreground/5">
+            {stats.map(stat => {
+                const total = stat.scores.LA + stat.scores.SA + stat.scores.PO;
+                const name = stat.display_name || stat.username;
+                return (
+                    <tr class="hover:bg-foreground/[0.01] transition-colors">
+                        <td class="py-3 pr-2" data-val-name={sortable ? name : undefined}>
+                            <div class="flex items-center gap-2.5">
+                                <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />
+                                <span class="font-bold text-foreground">{stat.display_name}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 text-center font-mono font-bold text-foreground/80" data-val-po={sortable ? stat.scores.PO : undefined}>
+                            {stat.scores.PO}
+                        </td>
+                        <td class="py-3 text-center font-mono font-bold text-foreground/80" data-val-sa={sortable ? stat.scores.SA : undefined}>
+                            {stat.scores.SA}
+                        </td>
+                        <td class="py-3 text-center font-mono font-bold text-foreground/80" data-val-la={sortable ? stat.scores.LA : undefined}>
+                            {stat.scores.LA}
+                        </td>
+                        <td class={`py-3 text-center font-mono font-black ${activeTheme.text} ${activeTheme.bg} rounded-lg px-2`} data-val-total={sortable ? total : undefined}>
+                            {total}
+                        </td>
+                    </tr>
+                );
+            })}
+        </tbody>
+    </table>
+</div>
