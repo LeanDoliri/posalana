@@ -28,6 +28,12 @@ if (!user) {
 				</div>
 			</div>
 			
+			{user.avatar_url && !user.avatar_url.includes('api.dicebear.com') && (
+				<button id="removeAvatarBtn" class="text-xs text-primary hover:underline font-bold mt-1">
+					<i class="fa-solid fa-trash-can mr-1"></i> Eliminar Foto
+				</button>
+			)}
+			
 			<div class="text-center w-full">
 				<p class="text-sm text-foreground/60 mb-2">{user.role === 'admin' ? 'Administrador' : 'Jugador'} | @{user.username}</p>
                 <div class="flex flex-col gap-2 w-full">
@@ -85,6 +91,13 @@ if (!user) {
                 return;
             }
             updateProfile({ display_name: newName });
+        });
+
+        const removeAvatarBtn = document.getElementById('removeAvatarBtn');
+        removeAvatarBtn?.addEventListener('click', () => {
+            if (confirm("¿Seguro que querés quitar tu foto de perfil? Volverás al avatar por defecto.")) {
+                updateProfile({ remove_avatar: true });
+            }
         });
 
 		input?.addEventListener('change', async (e) => {

@@ -19,6 +19,11 @@ export async function POST(context: APIContext): Promise<Response> {
     if (body.avatar && typeof body.avatar === 'string' && body.avatar.length < 500000) {
         updates.push("avatar_url = ?");
         args.push(body.avatar);
+    } else if (body.remove_avatar === true) {
+        const username = context.locals.user!.username;
+        const defaultAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+        updates.push("avatar_url = ?");
+        args.push(defaultAvatar);
     }
 
     if (body.display_name && typeof body.display_name === 'string' && body.display_name.trim().length > 0) {
