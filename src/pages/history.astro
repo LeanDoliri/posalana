@@ -109,9 +109,9 @@ const sortedYearStats = sortStats(yearStats);
                             <thead>
                                 <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
                                     <th class="pb-3 font-black">Jugador</th>
-                                    <th class="pb-3 text-center font-black">🧽 LA</th>
-                                    <th class="pb-3 text-center font-black">🗑️ SA</th>
                                     <th class="pb-3 text-center font-black">🍽️ PO</th>
+                                    <th class="pb-3 text-center font-black">🗑️ SA</th>
+                                    <th class="pb-3 text-center font-black">🧽 LA</th>
                                     <th class="pb-3 text-center font-black text-secondary">TOTAL</th>
                                 </tr>
                             </thead>
@@ -124,9 +124,9 @@ const sortedYearStats = sortStats(yearStats);
                                                 <span class="font-bold text-foreground">{stat.display_name}</span>
                                             </div>
                                         </td>
-                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
-                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
                                         <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.PO}</td>
+                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
+                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
                                         <td class="py-3 text-center font-mono font-black text-secondary bg-secondary/5 rounded-lg">{stat.scores.LA + stat.scores.SA + stat.scores.PO}</td>
                                     </tr>
                                 ))}
@@ -153,9 +153,9 @@ const sortedYearStats = sortStats(yearStats);
                             <thead>
                                 <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
                                     <th class="pb-3 font-black">Jugador</th>
-                                    <th class="pb-3 text-center font-black">🧽 LA</th>
-                                    <th class="pb-3 text-center font-black">🗑️ SA</th>
                                     <th class="pb-3 text-center font-black">🍽️ PO</th>
+                                    <th class="pb-3 text-center font-black">🗑️ SA</th>
+                                    <th class="pb-3 text-center font-black">🧽 LA</th>
                                     <th class="pb-3 text-center font-black text-accent">TOTAL</th>
                                 </tr>
                             </thead>
@@ -168,9 +168,9 @@ const sortedYearStats = sortStats(yearStats);
                                                 <span class="font-bold text-foreground">{stat.display_name}</span>
                                             </div>
                                         </td>
-                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
-                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
                                         <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.PO}</td>
+                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
+                                        <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
                                         <td class="py-3 text-center font-mono font-black text-accent bg-accent/5 rounded-lg">{stat.scores.LA + stat.scores.SA + stat.scores.PO}</td>
                                     </tr>
                                 ))}
@@ -198,9 +198,9 @@ const sortedYearStats = sortStats(yearStats);
                         <thead>
                             <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
                                 <th class="pb-3 font-black">Jugador</th>
-                                <th class="pb-3 text-center font-black">🧽 LA (Lava)</th>
-                                <th class="pb-3 text-center font-black">🗑️ SA (Saca)</th>
                                 <th class="pb-3 text-center font-black">🍽️ PO (Pone)</th>
+                                <th class="pb-3 text-center font-black">🗑️ SA (Saca)</th>
+                                <th class="pb-3 text-center font-black">🧽 LA (Lava)</th>
                                 <th class="pb-3 text-center font-black text-primary">TOTAL GLOBAL</th>
                             </tr>
                         </thead>
@@ -213,9 +213,9 @@ const sortedYearStats = sortStats(yearStats);
                                             <span class="font-bold text-foreground">{stat.display_name}</span>
                                         </div>
                                     </td>
-                                    <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
-                                    <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
                                     <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.PO}</td>
+                                    <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.SA}</td>
+                                    <td class="py-3 text-center font-mono font-bold text-foreground/80">{stat.scores.LA}</td>
                                     <td class="py-3 text-center font-mono font-black text-primary bg-primary/5 rounded-lg px-2">{stat.scores.LA + stat.scores.SA + stat.scores.PO}</td>
                                 </tr>
                             ))}
