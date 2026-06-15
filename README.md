@@ -15,13 +15,17 @@ La forma definitiva, justa y basada puramente en el azar para dividir las tareas
 *   **Tirada Diaria Única:** Cada usuario solo puede tirar los dados una vez por día. El sistema bloquea intentos múltiples.
 *   **Ranking Automático:** Calcula matemáticamente quién saca el número más bajo y asigna automáticamente la peor tarea (Lava), la intermedia (Saca) y la más leve (Pone).
 *   **🥪 Cláusula Lomito:** Si dos personas sacan **exactamente los mismos dados** en el mismo día, se activa el cartel festivo de *Lomito* y el contador de "Días sin Lomito" se reinicia a cero.
-*   **Panel de Administración (Admin Dashboard):** Un usuario maestro puede acceder a una ruta privada para anular tiradas accidentales, promover nuevos administradores o eliminar cuentas maliciosas.
+*   **Historial con Paginación Semanal:** Muestra las tiradas agrupadas por semana calendario (lunes a domingo) con navegación interactiva fluida (client-side) que previene recargas completas, mantiene el scroll y actualiza la URL y el historial del navegador automáticamente.
+*   **Estadísticas y Ordenamiento Interactivo:** Muestra las estadísticas de la temporada actual, anterior y global del año usando el componente `StatsTable`. La tabla del año permite ordenar filas interactivamente por cualquier columna (Jugador, PO, SA, LA, Total).
+*   **Exenciones de Tarea Automáticas:** Las personas con más puntos en una tarea durante la temporada anterior quedan automáticamente eximidas de realizarla en la temporada actual, con soporte para empates, anulaciones manuales y base cases seguros contra loops infinitos.
+*   **Panel de Administración (Admin Dashboard):** Permite configurar variables, promover administradores, eliminar cuentas, anular tiradas accidentales, cargar puntos manuales históricos y gestionar exenciones (crear/borrar).
+*   **Gestión Rápida de Avatares:** El administrador puede cambiar o eliminar las fotos de perfil de todos los usuarios directamente haciendo clic sobre su avatar en el padrón, comprimiendo la imagen en el navegador antes de subirla.
 
 ## 🛠️ Tecnologías Utilizadas
 
-*   **Framework:** [Astro](https://astro.build/) (con adaptador Serverless para Vercel).
-*   **Estilos:** [Tailwind CSS](https://tailwindcss.com/) para un diseño responsive y moderno.
-*   **Base de Datos:** SQLite alojada gratuitamente en la nube usando [Turso](https://turso.tech/) a través de `@libsql/client`.
+*   **Framework:** [Astro](https://astro.build/) (con adaptador Serverless para Vercel y SSR activado).
+*   **Estilos:** [Tailwind CSS v4](https://tailwindcss.com/) para un diseño responsive y moderno.
+*   **Base de Datos:** SQLite alojada en la nube usando [Turso](https://turso.tech/) a través de `@libsql/client`.
 *   **Despliegue:** Preparado para hostear de manera **100% gratuita y para siempre** en [Vercel](https://vercel.com/).
 
 ---
