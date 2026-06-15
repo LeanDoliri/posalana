@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import db from "../db/index.js";
 import UserAvatar from "../components/UserAvatar.astro";
 import DiceDisplay from "../components/DiceDisplay.astro";
+import { getSeasonId, getPreviousSeasons, formatSeasonName } from "../utils/season.js";
 
 const { user } = Astro.locals;
 
@@ -28,6 +29,35 @@ const recentRolls = rollsRes.rows;
 const settingsRes = await db.execute("SELECT key, value FROM settings");
 const settingsMap = new Map();
 settingsRes.rows.forEach((s: any) => settingsMap.set(s.key, s.value));
+
+// Calculate current date in GMT-3 to obtain current season
+const today = new Date();
+today.setHours(today.getHours() - 3);
+const dateStr = today.toISOString().split('T')[0];
+const currentSeason = getSeasonId(dateStr);
+
+// Get current season and last 2 seasons
+const recentSeasons = getPreviousSeasons(currentSeason, 2);
+
+// Fetch distinct season_ids present in manual_points and exemption tables
+const dbSeasonsRes = await db.execute(`
+    SELECT DISTINCT season_id FROM exemption
+    UNION
+    SELECT DISTINCT season_id FROM manual_points
+`);
+const dbSeasons = dbSeasonsRes.rows.map((r: any) => r.season_id).filter(Boolean);
+
+// Combine, de-duplicate and sort (newest to oldest)
+const seasonsOrder = ['verano', 'otoño', 'invierno', 'primavera'];
+const uniqueSeasons = Array.from(new Set([...recentSeasons, ...dbSeasons]));
+uniqueSeasons.sort((a, b) => {
+    const [yearA, nameA] = a.split('-');
+    const [yearB, nameB] = b.split('-');
+    if (yearA !== yearB) {
+        return parseInt(yearB) - parseInt(yearA);
+    }
+    return seasonsOrder.indexOf(nameB) - seasonsOrder.indexOf(nameA);
+});
 ---
 
 <Layout>
@@ -140,14 +170,17 @@ settingsRes.rows.forEach((s: any) => settingsMap.set(s.key, s.value));
                             </div>
                             <div>
                                 <label class="block text-sm font-bold mb-1 text-foreground/80">Temporada</label>
-                                <select name="season_id" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
+                                <select name="season_id" id="season-select" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
                                     <option value="">Seleccionar...</option>
-                                    <option value="2024-verano">Verano 2024</option>
-                                    <option value="2024-otoño">Otoño 2024</option>
-                                    <option value="2024-invierno">Invierno 2024</option>
-                                    <option value="2024-primavera">Primavera 2024</option>
-                                    <option value="2025-verano">Verano 2025</option>
+                                    {uniqueSeasons.map(s => (
+                                        <option value={s}>{formatSeasonName(s)}</option>
+                                    ))}
+                                    <option value="custom">Otra temporada (escribir)...</option>
                                 </select>
+                                <div id="custom-season-container" class="hidden mt-2">
+                                    <input type="text" name="custom_season_id" id="custom-season-input" placeholder="Ej: 2025-invierno" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" />
+                                    <p class="text-[10px] text-foreground/50 mt-1">Formato: AAAA-estación (verano, otoño, invierno, primavera)</p>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold mb-1 text-foreground/80">Tarea</label>
@@ -219,4 +252,20 @@ settingsRes.rows.forEach((s: any) => settingsMap.set(s.key, s.value));
             </div>
 		</section>
 	</div>
+
+	<script>
+		const seasonSelect = document.getElementById('season-select') as HTMLSelectElement;
+		const customSeasonContainer = document.getElementById('custom-season-container');
+		const customSeasonInput = document.getElementById('custom-season-input') as HTMLInputElement;
+
+		seasonSelect?.addEventListener('change', () => {
+			if (seasonSelect.value === 'custom') {
+				customSeasonContainer?.classList.remove('hidden');
+				customSeasonInput?.setAttribute('required', 'true');
+			} else {
+				customSeasonContainer?.classList.add('hidden');
+				customSeasonInput?.removeAttribute('required');
+			}
+		});
+	</script>
 </Layout>

@@ -10,9 +10,17 @@ export async function POST(context: APIContext): Promise<Response> {
 	const params = new URLSearchParams(body);
 
 	const userId = params.get("user_id");
-	const seasonId = params.get("season_id");
+	let seasonId = params.get("season_id");
 	const choreCode = params.get("chore_code");
 	const points = parseInt(params.get("points") || "-1");
+
+	if (seasonId === "custom") {
+		const customSeason = params.get("custom_season_id")?.trim();
+		if (!customSeason || !/^\d{4}-(verano|otoño|invierno|primavera)$/.test(customSeason)) {
+			return new Response("Formato de temporada inválido. Debe ser AAAA-estación (ej: 2025-verano).", { status: 400 });
+		}
+		seasonId = customSeason;
+	}
 
 	if (!userId || !seasonId || !choreCode || points < 0) {
 		return new Response("Datos inválidos", { status: 400 });

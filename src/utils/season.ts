@@ -32,6 +32,33 @@ export function formatSeasonName(seasonId: string): string {
     return `${season} ${year}`;
 }
 
+export function getPreviousSeasons(seasonId: string, count: number): string[] {
+    const seasonsOrder = ['verano', 'otoño', 'invierno', 'primavera'];
+    const parts = seasonId.split('-');
+    if (parts.length !== 2) return [seasonId];
+    
+    let year = parseInt(parts[0]);
+    let seasonName = parts[1];
+    
+    let currentIndex = seasonsOrder.indexOf(seasonName);
+    if (currentIndex === -1) return [seasonId];
+    
+    const result: string[] = [seasonId];
+    
+    for (let i = 0; i < count; i++) {
+        currentIndex--;
+        if (currentIndex < 0) {
+            currentIndex = 3;
+            year--;
+        }
+        const prevSeasonName = seasonsOrder[currentIndex];
+        result.push(`${year}-${prevSeasonName}`);
+    }
+    
+    return result;
+}
+
+
 export async function calculateSeasonPoints(db: any, seasonId: string) {
     // 1. Get all rolls that belong to the season
     // Since we don't store season_id in roll, we must fetch rolls and filter them, or just fetch all and filter by getSeasonId.
