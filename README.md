@@ -26,6 +26,13 @@ La forma definitiva, justa y basada puramente en el azar para dividir las tareas
 
 ---
 
+## 🤖 Para Agentes de IA y LLMs
+
+Si sos una IA asignada a este proyecto, leé inmediatamente el archivo [`AI_CONTEXT.md`](AI_CONTEXT.md) en la raíz del proyecto. Contiene reglas arquitectónicas críticas y lógica de negocio (como la Cláusula Lomito). 
+**Importante:** Cualquier cambio estructural o de lógica del juego debe quedar reflejado actualizando el `README.md` y el `AI_CONTEXT.md`.
+
+---
+
 ## 🚀 Correr el Proyecto Localmente
 
 Si querés descargar el código y probarlo en tu compu, seguí estos pasos:
