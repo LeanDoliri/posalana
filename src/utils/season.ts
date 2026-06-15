@@ -144,15 +144,21 @@ async function calculateSeasonPointsInternal(db: any, seasonId: string): Promise
     const rollsRes = await db.execute("SELECT r.*, u.username, u.display_name, u.avatar_url FROM roll r JOIN user u ON r.user_id = u.id");
     const allRolls = rollsRes.rows.filter((r: any) => getSeasonId(r.date as string) === seasonId);
 
-    // 2. Get exemptions for this season
-    const exemptions = await getExemptionsForSeason(db, seasonId);
-
-    // 3. Get manual points for this season
+    // 2. Get manual points for this season
     const manualPointsRes = await db.execute({
         sql: "SELECT user_id, chore_code, points FROM manual_points WHERE season_id = ?",
         args: [seasonId]
     });
     const manualPoints = manualPointsRes.rows;
+
+    // Base case: If there are no rolls and no manual points, this season is inactive.
+    // We return early to prevent infinite recursion into past empty seasons.
+    if (allRolls.length === 0 && manualPoints.length === 0) {
+        return [];
+    }
+
+    // 3. Get exemptions for this season
+    const exemptions = await getExemptionsForSeason(db, seasonId);
 
     // 4. Group rolls by date
     const rollsByDate = new Map<string, any[]>();
