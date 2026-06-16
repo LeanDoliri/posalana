@@ -28,7 +28,7 @@ for (const row of allRollsRes.rows) {
 }
 
 import { getSeasonId, getPreviousSeasons, formatSeasonName, calculateSeasonPoints, calculateYearPoints, getExemptionsForSeason } from '../utils/season.js';
-import { assignDailyChores } from '../utils/chores.js';
+import { assignDailyChores, chores } from '../utils/chores.js';
 
 const dates = Object.keys(groupedRolls).sort((a, b) => b.localeCompare(a));
 
@@ -50,7 +50,8 @@ const historyData = dates.map(date => {
         rolls: sortedRolls,
         choreMap: rollChoreMap,
         lomitoActivated,
-        lomitoPlayers
+        lomitoPlayers,
+        exemptions: seasonExemptions
     };
 });
 
@@ -277,13 +278,23 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                             {data.rolls.map((roll) => {
                                                 const chore = data.choreMap.get(roll.id);
                                                 const isSafe = chore.code === "NA";
+                                                const userExemptions = (data.exemptions || []).filter(e => String(e.user_id) === String(roll.user_id));
                                                 return (
                                                     <div class={`group flex flex-row items-center justify-between p-4 rounded-2xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${isSafe ? 'bg-background border-foreground/10 hover:border-secondary/30' : 'bg-primary/5 border-primary/10 hover:border-primary/30'}`}>
                                                         
                                                         {/* User */}
-                                                        <div class="flex items-center gap-3">
+                                                        <div class="flex flex-wrap items-center gap-2.5">
                                                             <UserAvatar user={{ username: roll.username as string, display_name: roll.display_name as string, avatar_url: roll.avatar_url as string }} size="md" />
                                                             <span class="font-bold text-foreground">{roll.display_name}</span>
+                                                            {userExemptions.map(ex => {
+                                                                const targetChore = chores.find(c => c.code === ex.chore_code);
+                                                                const choreLabel = targetChore ? targetChore.label.split(' ')[0] : ex.chore_code;
+                                                                return (
+                                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black tracking-wider uppercase bg-accent/10 text-accent border border-accent/20 px-1.5 py-0.5 rounded-md" title={`Exento de: ${targetChore ? targetChore.label : ex.chore_code}`}>
+                                                                        <i class="fa-solid fa-shield-halved text-[7px]"></i> {choreLabel}
+                                                                    </span>
+                                                                )
+                                                            })}
                                                         </div>
 
                                                         {/* Stats */}

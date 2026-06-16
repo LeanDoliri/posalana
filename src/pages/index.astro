@@ -148,6 +148,7 @@ const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDail
                     {sortedRolls.map((roll, index) => {
                         const chore = rollChoreMap.get(roll.id);
                         const isSafe = chore.code === "NA";
+                        const userExemptions = exemptions.filter(e => String(e.user_id) === String(roll.user_id));
                         return (
                             <div class={`group flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border transition-all duration-300 hover:shadow-md ${isSafe ? 'bg-secondary/5 border-secondary/10 hover:border-secondary/30' : 'bg-primary/5 border-primary/10 hover:border-primary/30'}`}>
                                 
@@ -160,6 +161,15 @@ const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDail
                                             <span class={`inline-block text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background'}`}>
                                                 {chore.code}
                                             </span>
+                                            {userExemptions.map(ex => {
+                                                const targetChore = chores.find(c => c.code === ex.chore_code);
+                                                const choreLabel = targetChore ? targetChore.label.split(' ')[0] : ex.chore_code;
+                                                return (
+                                                    <span class="inline-flex items-center gap-1 text-[9px] font-black tracking-wider uppercase bg-accent/10 text-accent border border-accent/20 px-2 py-0.5 rounded-md" title={`Exento de: ${targetChore ? targetChore.label : ex.chore_code}`}>
+                                                        <i class="fa-solid fa-shield-halved text-[8px]"></i> Exento {choreLabel}
+                                                    </span>
+                                                )
+                                            })}
                                         </div>
                                         {roll.time && <span class="text-xs font-mono text-foreground/40 bg-foreground/5 px-2 py-0.5 rounded-md"><i class="fa-regular fa-clock"></i> {roll.time}</span>}
                                         <div class={`font-bold mt-1 text-sm ${isSafe ? 'text-secondary' : 'text-primary'} whitespace-nowrap`}>
