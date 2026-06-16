@@ -6,9 +6,10 @@ export interface Props {
     die4: number;
     isSafe?: boolean;
     size?: "sm" | "md" | "lg" | "xl";
+    color?: string;
 }
 
-const { die1, die2, die3, die4, isSafe, size = "md" } = Astro.props;
+const { die1, die2, die3, die4, isSafe, size = "md", color } = Astro.props;
 
 const diceWords = ['one', 'two', 'three', 'four', 'five', 'six'];
 
@@ -21,7 +22,7 @@ const sizeClasses = {
     xl: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl gap-3 sm:gap-4 lg:gap-6"
 };
 
-const safeClass = isSafe === undefined ? "text-secondary" : (isSafe ? "text-secondary" : "text-primary");
+const safeClass = color || (isSafe === undefined ? "text-secondary" : (isSafe ? "text-secondary" : "text-primary"));
 ---
 
 <div class={`flex items-center justify-center ${sizeClasses[size]}`}>
