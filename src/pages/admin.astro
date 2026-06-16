@@ -82,7 +82,7 @@ uniqueSeasons.sort((a, b) => {
 		</header>
 
 		<!-- Global Settings Section -->
-		<section class="bg-background border border-foreground/10 p-1 rounded-3xl shadow-lg">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg">
             <div class="p-6 md:p-8">
 			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-globe text-accent"></i> Configuración Global</h3>
 			    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -106,7 +106,7 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Users Section -->
-		<section class="bg-background border border-foreground/10 p-1 rounded-3xl shadow-lg">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg">
             <div class="p-6 md:p-8">
 			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-users text-secondary"></i> Padrón de Jugadores</h3>
 			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
@@ -173,7 +173,7 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Manual Points Section -->
-		<section class="bg-background border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8">
             <div class="p-6 md:p-8">
 			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-accent"></i> Carga Histórica de Puntos</h3>
 			    <div class="grid grid-cols-1 gap-8">
@@ -225,7 +225,7 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Exemptions Section -->
-		<section class="bg-background border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8">
             <div class="p-6 md:p-8 border-b border-foreground/5 mb-6">
                 <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-shield-halved text-secondary"></i> Gestión de Exenciones</h3>
                 <p class="text-xs text-foreground/50 mt-1">Configura qué jugadores están exentos de realizar tareas específicas en cada temporada.</p>
@@ -238,7 +238,7 @@ uniqueSeasons.sort((a, b) => {
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-bold mb-1 text-foreground/80">Jugador</label>
-                            <select name="user_id" class="w-full bg-background border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
+                            <select name="user_id" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
                                 <option value="">Seleccionar...</option>
                                 {allUsers.map(u => (
                                     <option value={u.id}>{u.display_name || u.username}</option>
@@ -247,7 +247,7 @@ uniqueSeasons.sort((a, b) => {
                         </div>
                         <div>
                             <label class="block text-sm font-bold mb-1 text-foreground/80">Temporada</label>
-                            <select name="season_id" id="exemption-season-select" class="w-full bg-background border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
+                            <select name="season_id" id="exemption-season-select" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
                                 <option value="">Seleccionar...</option>
                                 {uniqueSeasons.map(s => (
                                     <option value={s}>{formatSeasonName(s)}</option>
@@ -255,13 +255,13 @@ uniqueSeasons.sort((a, b) => {
                                 <option value="custom">Otra temporada (escribir)...</option>
                             </select>
                             <div id="exemption-custom-season-container" class="hidden mt-2">
-                                <input type="text" name="custom_season_id" id="exemption-custom-season-input" placeholder="Ej: 2026-otoño" class="w-full bg-background border border-foreground/10 rounded-xl p-3 text-foreground text-sm" />
+                                <input type="text" name="custom_season_id" id="exemption-custom-season-input" placeholder="Ej: 2026-otoño" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" />
                                 <p class="text-[10px] text-foreground/50 mt-1">Formato: AAAA-estación (verano, otoño, invierno, primavera)</p>
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-bold mb-1 text-foreground/80">Tarea Exenta</label>
-                            <select name="chore_code" class="w-full bg-background border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
+                            <select name="chore_code" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
                                 <option value="">Seleccionar...</option>
                                 <option value="LA">Lavar (LA) 🧽</option>
                                 <option value="SA">Sacar (SA) 🗑️</option>
@@ -326,7 +326,7 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Rolls Section -->
-		<section class="bg-background border border-foreground/10 p-1 rounded-3xl shadow-lg">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg">
             <div class="p-6 md:p-8">
                 <div class="flex items-center justify-between mb-6">
 			        <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-dice text-secondary"></i> Últimas 50 Tiradas</h3>

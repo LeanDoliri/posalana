@@ -57,7 +57,7 @@ const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDail
         
         <!-- Hero Section -->
         {hasRolled && myRoll ? (
-            <section class="relative bg-background/50 border border-foreground/5 p-4 md:p-6 rounded-2xl shadow-sm overflow-hidden flex flex-col sm:flex-row items-center justify-between">
+            <section class="relative bg-white border border-foreground/10 p-4 md:p-6 rounded-2xl shadow-md overflow-hidden flex flex-col sm:flex-row items-center justify-between">
                 <div class="text-center sm:text-left mb-4 sm:mb-0">
                     <p class="text-secondary font-bold tracking-widest uppercase text-[10px] mb-1">Tirada del {dateStr}</p>
                     <p class="text-sm text-foreground/80 font-medium">Ya cumpliste con tu destino de hoy.</p>
@@ -68,7 +68,7 @@ const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDail
                 </div>
             </section>
         ) : (
-            <section class="relative bg-background border border-foreground/5 p-8 md:p-12 rounded-3xl shadow-xl overflow-hidden text-center group">
+            <section class="relative bg-white border border-foreground/10 p-8 md:p-12 rounded-3xl shadow-xl overflow-hidden text-center group">
                 <!-- Decorative Background Element -->
                 <div class="absolute -top-24 -right-24 w-64 h-64 bg-secondary/10 rounded-full blur-3xl group-hover:bg-secondary/20 transition-all duration-700 pointer-events-none"></div>
                 <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-accent/10 rounded-full blur-3xl group-hover:bg-accent/20 transition-all duration-700 pointer-events-none"></div>
@@ -96,7 +96,7 @@ const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDail
         <div id="lomito-container">
             {lomitoActivated && (
                 <>
-                    <section class="bg-accent/10 border-2 border-accent/50 p-8 rounded-3xl shadow-lg shadow-accent/10 text-center relative overflow-hidden animate-in zoom-in-95 duration-500">
+                    <section class="bg-white border-2 border-accent/60 p-8 rounded-3xl shadow-lg shadow-accent/10 text-center relative overflow-hidden animate-in zoom-in-95 duration-500">
                         <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNDQzY2RkYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-50"></div>
                         <div class="relative z-10">
                             <p class="text-5xl mb-4 animate-bounce">🥪🎉🥪</p>
@@ -133,7 +133,7 @@ const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDail
         </div>
 
         <!-- Ranking Section -->
-        <section id="ranking-container" class="bg-background border border-foreground/5 p-6 md:p-10 rounded-3xl shadow-xl">
+        <section id="ranking-container" class="bg-white border border-foreground/10 p-6 md:p-10 rounded-3xl shadow-xl">
             <div class="flex items-center justify-between mb-8 pb-4 border-b border-foreground/5">
                 <h3 class="text-2xl font-black tracking-tight text-foreground flex items-center gap-3 text-balance">
                     <i class="fa-solid fa-trophy text-secondary"></i> Ranking POSALANA
@@ -180,7 +180,7 @@ const { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls } = assignDail
                                     </div>
                                 </div>
 
-                                <div class="flex items-center justify-center sm:justify-end bg-background/50 sm:bg-transparent p-4 sm:p-0 rounded-xl w-full sm:w-auto mt-2 sm:mt-0">
+                                <div class="flex items-center justify-center sm:justify-end bg-white/50 sm:bg-transparent p-4 sm:p-0 rounded-xl w-full sm:w-auto mt-2 sm:mt-0">
                                     <DiceDisplay die1={roll.die1 as number} die2={roll.die2 as number} die3={roll.die3 as number} die4={roll.die4 as number} size="xl" isSafe={isSafe} />
                                 </div>
                             </div>
