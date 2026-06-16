@@ -30,7 +30,7 @@ export async function sendDiscordRoll(
         // Standard notification
         embeds = [{
             title: "🎲 ¡Nueva Tirada Registrada!",
-            description: `**${displayName}** sacó: **${diceStr}**\n\n👉 ¿Y vos? ¿Zafás o lavás? Entrá a probar tu suerte ahora: https://posalana.vercel.app/`,
+            description: `**${displayName}** sacó: **${diceStr}**\n\n👉 ¿Y vos? ¿Zafás o lavás? Entrá a probar tu suerte en la [App de POSALANA](https://posalana.vercel.app/)`,
             color: 52428, // Cyan color (Hex: #00CCCC)
             footer: {
                 text: "POSALANA • Suerte del Día"
@@ -71,35 +71,35 @@ export async function sendDiscordVerdict(
         return;
     }
 
-    const lavaStr = choresAssigned.lava.length > 0 ? choresAssigned.lava.join(", ") : "Nadie";
-    const sacaStr = choresAssigned.saca.length > 0 ? choresAssigned.saca.join(", ") : "Nadie";
     const poneStr = choresAssigned.pone.length > 0 ? choresAssigned.pone.join(", ") : "Nadie";
+    const sacaStr = choresAssigned.saca.length > 0 ? choresAssigned.saca.join(", ") : "Nadie";
+    const lavaStr = choresAssigned.lava.length > 0 ? choresAssigned.lava.join(", ") : "Nadie";
     const zafaronStr = choresAssigned.zafaron.length > 0 ? choresAssigned.zafaron.join(", ") : "Ninguno";
     const exentosStr = choresAssigned.exentos.length > 0 ? choresAssigned.exentos.join(", ") : "Ninguno";
 
     const embed = {
-        title: `🏆 VEREDICTO FINAL - ${dateStr}`,
-        description: "El destino ha hablado. Aquí está la distribución oficial de tareas para hoy:",
+        title: `📜 VEREDICTO FINAL - ${dateStr}`,
+        description: "El destino ha hablado. Aquí está la distribución oficial de tareas para hoy:\n\n👉 Mirá todo el historial y estadísticas en la [App de POSALANA](https://posalana.vercel.app/)",
         color: 15346264, // Primary pink color (Hex: #EA2A58)
         fields: [
             {
-                name: "🧽 LAVA",
-                value: `**${lavaStr}**`,
-                inline: false
-            },
-            {
-                name: "🗑️ SACA",
-                value: `**${sacaStr}**`,
-                inline: false
-            },
-            {
-                name: "🍽️ PONE",
+                name: "🍽️ PO",
                 value: `**${poneStr}**`,
                 inline: false
             },
             {
-                name: "🎉 ZAFARON",
-                value: zafaronStr,
+                name: "🗑️ SA",
+                value: `**${sacaStr}**`,
+                inline: false
+            },
+            {
+                name: "🧽 LA",
+                value: `**${lavaStr}**`,
+                inline: false
+            },
+            {
+                name: "🎉 NA",
+                value: zafaronStr !== "Ninguno" ? `**${zafaronStr}**` : zafaronStr,
                 inline: false
             },
             {
@@ -109,7 +109,7 @@ export async function sendDiscordVerdict(
             }
         ],
         footer: {
-            text: "👉 Mirá todo el historial y estadísticas en detalle en la app: https://posalana.vercel.app/"
+            text: "POSALANA • Veredicto Oficial"
         },
         timestamp: new Date().toISOString()
     };
