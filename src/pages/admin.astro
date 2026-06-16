@@ -101,6 +101,22 @@ uniqueSeasons.sort((a, b) => {
                             Guardar Configuración
                         </button>
                     </form>
+
+                    <!-- Discord Quick Actions -->
+                    <div class="space-y-4 flex flex-col justify-between border-t md:border-t-0 md:border-l border-foreground/10 pt-6 md:pt-0 md:pl-8">
+                        <div>
+                            <h4 class="text-sm font-bold uppercase tracking-wider text-foreground/70 mb-2">Notificaciones de Discord</h4>
+                            <p class="text-xs text-foreground/50 leading-relaxed mb-4">
+                                Publica manualmente el veredicto oficial del día de hoy en el canal de Discord. Esto asignará los roles definitivos (quién lava, quién saca y quién pone) basados en la suerte de hoy.
+                            </p>
+                        </div>
+                        <div class="space-y-3">
+                            <button id="publish-verdict-btn" class="w-full bg-secondary text-background font-bold py-3.5 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-secondary/15">
+                                <i class="fa-solid fa-bullhorn"></i> Publicar Veredicto Final
+                            </button>
+                            <p id="publish-verdict-status" class="text-xs font-semibold text-center hidden"></p>
+                        </div>
+                    </div>
                 </div>
             </div>
 		</section>
@@ -508,5 +524,51 @@ uniqueSeasons.sort((a, b) => {
 				reader.onerror = (err) => reject(err);
 			});
 		}
+
+		// Publish manual verdict to Discord
+		const publishVerdictBtn = document.getElementById('publish-verdict-btn');
+		const publishVerdictStatus = document.getElementById('publish-verdict-status');
+
+		publishVerdictBtn?.addEventListener('click', async () => {
+			if (!confirm('¿Confirmar publicación del Veredicto Final en Discord?')) {
+				return;
+			}
+
+			if (publishVerdictBtn instanceof HTMLButtonElement) {
+				publishVerdictBtn.disabled = true;
+			}
+			if (publishVerdictStatus) {
+				publishVerdictStatus.textContent = 'Enviando veredicto...';
+				publishVerdictStatus.className = 'text-xs font-semibold text-center text-foreground/50 block';
+			}
+
+			try {
+				const res = await fetch('/api/admin/publish-verdict', {
+					method: 'POST'
+				});
+				const data = await res.json();
+
+				if (res.ok && data.success) {
+					if (publishVerdictStatus) {
+						publishVerdictStatus.textContent = '✅ ¡Veredicto publicado exitosamente en Discord!';
+						publishVerdictStatus.className = 'text-xs font-semibold text-center text-emerald-500 block';
+					}
+				} else {
+					if (publishVerdictStatus) {
+						publishVerdictStatus.textContent = `❌ Error: ${data.error || 'No se pudo publicar'}`;
+						publishVerdictStatus.className = 'text-xs font-semibold text-center text-primary block';
+					}
+				}
+			} catch (err: any) {
+				if (publishVerdictStatus) {
+					publishVerdictStatus.textContent = `❌ Error: ${err.message || 'Error de conexión'}`;
+					publishVerdictStatus.className = 'text-xs font-semibold text-center text-primary block';
+				}
+			} finally {
+				if (publishVerdictBtn instanceof HTMLButtonElement) {
+					publishVerdictBtn.disabled = false;
+				}
+			}
+		});
 	</script>
 </Layout>

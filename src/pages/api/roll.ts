@@ -1,5 +1,7 @@
 import type { APIContext } from "astro";
 import db from "../../db/index.js";
+import { assignDailyChores } from "../../utils/chores.js";
+import { sendDiscordRoll } from "../../utils/discord.js";
 
 function rollDie() {
     return Math.floor(Math.random() * 6) + 1;
@@ -62,6 +64,25 @@ export async function POST(context: APIContext): Promise<Response> {
     await db.execute({
         sql: "INSERT INTO roll (id, user_id, date, time, die1, die2, die3, die4) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         args: [id, userId, dateStr, timeStr, d1, d2, d3, d4]
+    });
+
+    // Fetch all rolls of today to check if this roll triggered the Cláusula Lomito
+    const allRollsRes = await db.execute({
+        sql: `
+            SELECT r.id, r.user_id, r.die1, r.die2, r.die3, r.die4, u.display_name, u.username, u.avatar_url 
+            FROM roll r 
+            JOIN user u ON r.user_id = u.id 
+            WHERE r.date = ?
+        `,
+        args: [dateStr]
+    });
+    const allRolls = allRollsRes.rows;
+    const { lomitoActivated, lomitoPlayers } = assignDailyChores(allRolls, []);
+
+    // Send Discord notification asynchronously (don't block the redirect)
+    const displayName = context.locals.user?.display_name || context.locals.user?.username || "Usuario";
+    sendDiscordRoll(displayName, [d1, d2, d3, d4], lomitoActivated, lomitoPlayers).catch(err => {
+        console.error("Error trigger sending Discord roll:", err);
     });
 
 	return context.redirect("/");
