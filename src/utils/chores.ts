@@ -44,8 +44,10 @@ export function assignDailyChores(dailyRolls: any[], exemptions: any[]) {
             
             if (aDice[0] === bDice[0] && aDice[1] === bDice[1] && aDice[2] === bDice[2] && aDice[3] === bDice[3]) {
                 lomitoActivated = true;
-                if (!lomitoPlayers.includes(String(a.display_name))) lomitoPlayers.push(String(a.display_name));
-                if (!lomitoPlayers.includes(String(b.display_name))) lomitoPlayers.push(String(b.display_name));
+                const nameA = a.display_name || a.username || "Usuario";
+                const nameB = b.display_name || b.username || "Usuario";
+                if (!lomitoPlayers.includes(nameA)) lomitoPlayers.push(nameA);
+                if (!lomitoPlayers.includes(nameB)) lomitoPlayers.push(nameB);
             }
         }
     }

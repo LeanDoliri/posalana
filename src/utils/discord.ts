@@ -16,24 +16,43 @@ export async function sendDiscordRoll(
 
     if (lomitoActivated && lomitoPlayers.length > 0) {
         // Lomito Alert!
-        content = "🥪🎉 @here **¡CLÁUSULA LOMITO ACTIVADA!** 🥪🎉";
+        content = "🥪🔥 @here **¡CLÁUSULA LOMITO ACTIVADA!** 🔥🥪";
         embeds = [{
-            title: "🥪 ¡Doble Tirada Idéntica Detectada! 🥪",
-            description: `**${lomitoPlayers.join(" y ")}** han sacado exactamente los mismos dados: **${diceStr}**.\n\n¡Hoy se almuerzan lomitos con papas garantizados por **LUTVIA**! 🍟🥪`,
+            title: "🥪 ¡Se rompió la matrix de la suerte! 🥪",
+            description: `¡La profecía se ha cumplido! **${lomitoPlayers.join(" y ")}** han sacado exactamente la misma tirada:\n👉 **${diceStr}**\n\n¡Hoy se festeja almorzando unos **LOMITOS CON PAPAS** patrocinados por **LUTVIA**! 🍟🤤🥪`,
             color: 13400063, // Soft purple color (Hex: #CC66FF)
             footer: {
-                text: "POSALANA • Cláusula Lomito"
+                text: "POSALANA • Cláusula Lomito 🥪"
             },
             timestamp: new Date().toISOString()
         }];
     } else {
+        // Dynamic commentary based on the first die (d1), which defines sorting in POSALANA
+        const d1 = dice[0];
+        const d2 = dice[1];
+        const d3 = dice[2];
+        const d4 = dice[3];
+
+        let commentary = "";
+        if (d1 === 1 && d2 === 1 && d3 === 1 && d4 === 1) {
+            commentary = "💀 *¡EL PEOR TIRO ABSOLUTO! Cuatro unos. Vayan buscando la esponja...*";
+        } else if (d1 === 6 && d2 === 6 && d3 === 6 && d4 === 6) {
+            commentary = "👑 *¡EL TIRO PERFECTO! Cuatro seis. Esto es un milagro absoluto.*";
+        } else if (d1 <= 2) {
+            commentary = `😰 *¡Zona de peligro! Ese primer dado (${d1}) da mucho frío...*`;
+        } else if (d1 >= 5) {
+            commentary = `😎 *¡Qué tranquilidad! Arrancar con un ${d1} es casi zafar seguro.*`;
+        } else {
+            commentary = `⚖️ *Tirada decente (primer dado: ${d1}). A cruzar los dedos para que otros saquen menos.*`;
+        }
+
         // Standard notification
         embeds = [{
-            title: "🎲 ¡Nueva Tirada Registrada!",
-            description: `**${displayName}** sacó: **${diceStr}**\n\n👉 ¿Y vos? ¿Zafás o lavás? Entrá a probar tu suerte en la [App de POSALANA](https://posalana.vercel.app/)`,
+            title: "🎲 ¡El destino en juego! Nueva tirada",
+            description: `**${displayName}** arrojó los dados de la suerte y obtuvo:\n👉 **${diceStr}**\n\n${commentary}\n\n🔗 ¿Y vos? ¿Zafás o lavás? Medí tu suerte en la [App de POSALANA](https://posalana.vercel.app/)`,
             color: 52428, // Cyan color (Hex: #00CCCC)
             footer: {
-                text: "POSALANA • Suerte del Día"
+                text: "POSALANA • Suerte del Día 🎲"
             },
             timestamp: new Date().toISOString()
         }];
@@ -78,38 +97,11 @@ export async function sendDiscordVerdict(
     const exentosStr = choresAssigned.exentos.length > 0 ? choresAssigned.exentos.join(", ") : "Ninguno";
 
     const embed = {
-        title: `📜 VEREDICTO FINAL - ${dateStr}`,
-        description: "El destino ha hablado. Aquí está la distribución oficial de tareas para hoy:\n\n👉 Mirá todo el historial y estadísticas en la [App de POSALANA](https://posalana.vercel.app/)",
+        title: `📜 EL DECRETO DIARIO - ${dateStr}`,
+        description: `🚨 **¡ATENCIÓN JUGADORES!** El destino ha hablado y las sentencias de hoy son definitivas e inapelables.\n\nAquí tienen la distribución oficial de tareas de la mesa para hoy:\n\n🍽️ **PO:** **${poneStr}**\n🗑️ **SA:** **${sacaStr}**\n🧽 **LA:** **${lavaStr}**\n🎉 **NA:** **${zafaronStr !== "Ninguno" ? zafaronStr : "Ninguno"}**\n🛡️ **EXENTOS HOY:** **${exentosStr !== "Ninguno" ? exentosStr : "Ninguno"}**\n\n👉 *¿Querés apelar con tus estadísticas?* Entrá a la [App de POSALANA](https://posalana.vercel.app/)`,
         color: 15346264, // Primary pink color (Hex: #EA2A58)
-        fields: [
-            {
-                name: "🍽️ PO",
-                value: `**${poneStr}**`,
-                inline: false
-            },
-            {
-                name: "🗑️ SA",
-                value: `**${sacaStr}**`,
-                inline: false
-            },
-            {
-                name: "🧽 LA",
-                value: `**${lavaStr}**`,
-                inline: false
-            },
-            {
-                name: "🎉 NA",
-                value: zafaronStr !== "Ninguno" ? `**${zafaronStr}**` : zafaronStr,
-                inline: false
-            },
-            {
-                name: "🛡️ EXENTOS HOY",
-                value: exentosStr,
-                inline: false
-            }
-        ],
         footer: {
-            text: "POSALANA • Veredicto Oficial"
+            text: "POSALANA • El veredicto del destino 📜"
         },
         timestamp: new Date().toISOString()
     };
