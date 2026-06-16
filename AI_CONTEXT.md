@@ -23,9 +23,17 @@ Si sos un agente de Inteligencia Artificial (AI) leyendo este repositorio, este 
 - **Estilos:** Tailwind CSS (versión v4).
 - **Componentes Compartidos:**
   - `StatsTable.astro`: Renderiza tablas de estadísticas unificadas (Temporada Actual, Anterior y Año) con parámetros opcionales de color (`theme`) e interactividad (`sortable`).
+- **Actualización en Tiempo Real (Short Polling):**
+  - Implementado en `index.astro` mediante consultas periódicas cada 8 segundos al servidor.
+  - **Ahorro de recursos (Page Visibility API):** Si la pestaña se minimiza o pasa a segundo plano, el polling se suspende automáticamente para evitar consultas innecesarias a Turso. Al volver a enfocar la página, se reanuda inmediatamente.
+  - **Reemplazo Atómico:** Compara e inyecta únicamente los nodos `#ranking-container` y `#lomito-container` usando `DOMParser` para evitar refrescar la página. Si se detecta un nuevo Lomito, dispara confetti automáticamente.
+- **Notificaciones de Discord:**
+  - Requiere configurar `DISCORD_WEBHOOK_URL` en las variables de entorno.
+  - **Tirada Automática:** Llama asíncronamente a `sendDiscordRoll` en la API de tirada para publicar la tirada (en formato numérico) y un CTA al sitio.
+  - **Veredicto Manual:** Llama a `/api/admin/publish-verdict` para publicar la asignación final consolidada de tareas del día.
 
 ## 3. UI y Estética (Mandatorio)
-- **Diseño Moderno:** El diseño usa una paleta de colores vibrantes (`primary`, `secondary`, `accent`, `background`, `foreground`) definidos en `src/styles/global.css`.
+- **Diseño Moderno:** El diseño usa una paleta de colores vibrantes (`primary`, `secondary`, `accent`, `background`, `foreground`) definidos en `src/styles/global.css`. Todos los componentes tipo "tarjeta" y la barra de navegación utilizan fondos blancos puros (`bg-white`) con bordes contrastados (`border-foreground/10`) y sombras fluidas para resaltar nítidamente sobre el fondo gris claro del body (`#EDEDED`).
 - **Paginación del Historial:** Agrupado por semana calendario (lunes a domingo). Funciona del lado del cliente sin recargar el navegador (`window.history.pushState` y evento `popstate`), con fallback SSR clásico y ancla `#historial-seccion` para auto-scroll.
 - **Ordenamiento Interactivo:** La "Tabla Global del Año" permite ordenamiento en cliente al hacer clic en sus cabeceras, actualizando iconos de FontAwesome (`fa-sort`, `fa-sort-up`, `fa-sort-down`) en tiempo real.
 - **Responsividad:** Mobile-first obligatorio. En móviles, los dados detallados (`DiceDisplay`) se ocultan inteligentemente en el timeline para mantener el ancho.
@@ -38,6 +46,6 @@ Si sos un agente de Inteligencia Artificial (AI) leyendo este repositorio, este 
   - Cargar puntos manualmente (temporadas pasadas).
   - **Gestión de Exenciones:** Crear (con soporte para temporadas personalizadas) y borrar exenciones manuales que sobrescriben las automáticas.
   - **Fotos de Perfil:** El administrador puede cambiar o eliminar (volviendo al avatar por defecto de Dicebear) las fotos de perfil de todos los usuarios directamente haciendo clic en su avatar en el padrón.
-
+  - **Acción Rápida de Discord:** Permite disparar de forma manual la publicación del veredicto del día (quién lava, quién saca, quién pone) directamente al canal de Discord.
 ---
 **Nota para la IA:** No asumas lógicas estándar de e-commerce o blogs. Este es un juego cerrado entre amigos. Mantené el tono lúdico y respetá estrictamente las variables de los dados.

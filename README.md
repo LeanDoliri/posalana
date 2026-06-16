@@ -20,6 +20,8 @@ La forma definitiva, justa y basada puramente en el azar para dividir las tareas
 *   **Exenciones de Tarea Automáticas:** Las personas con más puntos en una tarea durante la temporada anterior quedan automáticamente eximidas de realizarla en la temporada actual, con soporte para empates, anulaciones manuales y base cases seguros contra loops infinitos.
 *   **Panel de Administración (Admin Dashboard):** Permite configurar variables, promover administradores, eliminar cuentas, anular tiradas accidentales, cargar puntos manuales históricos y gestionar exenciones (crear/borrar).
 *   **Gestión Rápida de Avatares:** El administrador puede cambiar o eliminar las fotos de perfil de todos los usuarios directamente haciendo clic sobre su avatar en el padrón, comprimiendo la imagen en el navegador antes de subirla.
+*   **🔄 Actualización en Tiempo Real:** El ranking de la página de inicio se actualiza automáticamente cada 8 segundos sin necesidad de refrescar la página. Utiliza la *Page Visibility API* para pausar automáticamente las consultas al servidor si el usuario cambia de pestaña, minimizando el consumo de base de datos Turso.
+*   **👾 Notificaciones de Discord:** Integración automática mediante Webhooks de Discord que notifica al instante cada tirada de dados realizada. Además, incluye un botón manual en el panel del administrador para publicar el veredicto oficial de tareas del día.
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -84,6 +86,7 @@ Como Vercel es un entorno "Serverless" (sin estado), la base de datos no puede v
 4. En la sección "Environment Variables" antes de darle a Deploy, agregá:
    - `DATABASE_URL`: La URL de tu base de Turso.
    - `DATABASE_AUTH_TOKEN`: El token de tu base de Turso.
+   - `DISCORD_WEBHOOK_URL`: La URL del Webhook del canal de Discord (opcional, para notificaciones).
 5. Tocá **Deploy**.
 
 ¡Listo! A partir de ahora, cada vez que hagas un `git push` a tu rama principal (`main`), Vercel va a compilar y actualizar la página automáticamente.
