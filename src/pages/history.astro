@@ -114,9 +114,14 @@ const prevSeasonId = getPreviousSeasons(currentSeasonId, 1)[1];
 const currentSeasonStats = await calculateSeasonPoints(db, currentSeasonId);
 const prevSeasonStats = await calculateSeasonPoints(db, prevSeasonId);
 
-// Sort alphabetically by display_name (falling back to username)
+// Sort by total points descending, then alphabetically by display_name (falling back to username)
 const sortStats = (stats: any[]) => {
     return [...stats].sort((a, b) => {
+        const totalA = (a.scores.LA || 0) + (a.scores.SA || 0) + (a.scores.PO || 0);
+        const totalB = (b.scores.LA || 0) + (b.scores.SA || 0) + (b.scores.PO || 0);
+        if (totalB !== totalA) {
+            return totalB - totalA;
+        }
         const nameA = String(a.display_name || a.username);
         const nameB = String(b.display_name || b.username);
         return nameA.localeCompare(nameB);
