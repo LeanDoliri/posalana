@@ -78,7 +78,7 @@ const activeTheme = themeClasses[theme];
                         <td class="py-3 pr-2" data-val-name={sortable ? name : undefined}>
                             <div class="flex items-center gap-2.5">
                                 <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />
-                                <span class="font-bold text-foreground">{stat.display_name}</span>
+                                <span class="font-bold text-foreground">{name}</span>
                             </div>
                         </td>
                         <td class="py-3 text-center font-mono font-bold text-foreground/80" data-val-po={sortable ? stat.scores.PO : undefined}>

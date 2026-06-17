@@ -1,10 +1,23 @@
 import { assignDailyChores } from './chores.js';
 
 export function getSeasonId(dateStr: string): string {
-    const d = new Date(dateStr);
-    const month = d.getMonth() + 1; // 1-12
-    const day = d.getDate();
-    const year = d.getFullYear();
+    // Try to extract only the YYYY-MM-DD part to avoid timezone shifts
+    const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    let year: number;
+    let month: number;
+    let day: number;
+
+    if (match) {
+        year = parseInt(match[1], 10);
+        month = parseInt(match[2], 10);
+        day = parseInt(match[3], 10);
+    } else {
+        // Fallback for other formats (using UTC methods)
+        const d = new Date(dateStr);
+        month = d.getUTCMonth() + 1;
+        day = d.getUTCDate();
+        year = d.getUTCFullYear();
+    }
 
     // Verano: Dec 21 - Mar 20
     // Otoño: Mar 21 - Jun 20
@@ -191,14 +204,14 @@ async function calculateSeasonPointsInternal(db: any, seasonId: string): Promise
         }
     }
 
-    // Apply manual points
+    // Apply manual points (accumulate instead of overwriting)
     for (const mp of manualPoints) {
         if (!userStats.has(mp.user_id as string)) {
             const uRes = await db.execute({ sql: "SELECT username, display_name, avatar_url FROM user WHERE id = ?", args: [mp.user_id] });
             const u = uRes.rows[0];
             initUser(mp.user_id as string, u?.username as string, u?.display_name as string, u?.avatar_url as string);
         }
-        userStats.get(mp.user_id as string).scores[mp.chore_code as string] = mp.points;
+        userStats.get(mp.user_id as string).scores[mp.chore_code as string] += mp.points;
     }
 
     return Array.from(userStats.values());
