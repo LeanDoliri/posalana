@@ -74,7 +74,7 @@ const activeTheme = themeClasses[theme];
                 const total = stat.scores.LA + stat.scores.SA + stat.scores.PO;
                 const name = stat.display_name || stat.username;
                 return (
-                    <tr class="hover:bg-foreground/[0.01] transition-colors">
+                    <tr class="hover:bg-foreground/[0.02] hover:translate-x-0.5 transition-all duration-200">
                         <td class="py-3 pr-2" data-val-name={sortable ? name : undefined}>
                             <div class="flex items-center gap-2.5">
                                 <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />

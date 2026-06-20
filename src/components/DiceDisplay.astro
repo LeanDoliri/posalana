@@ -26,8 +26,8 @@ const safeClass = color || (isSafe === undefined ? "text-secondary" : (isSafe ? 
 ---
 
 <div class={`flex items-center justify-center ${sizeClasses[size]}`}>
-    <i class={`${getDieClass(die1)} ${safeClass} drop-shadow-sm`}></i>
-    <i class={`${getDieClass(die2)} text-foreground/30`}></i>
-    <i class={`${getDieClass(die3)} text-foreground/30`}></i>
-    <i class={`${getDieClass(die4)} text-foreground/30`}></i>
+    <i class={`${getDieClass(die1)} ${safeClass} drop-shadow-sm animate-in fade-in zoom-in-95 duration-300 hover:scale-110 hover:rotate-6 transition-all duration-300 cursor-default`}></i>
+    <i class={`${getDieClass(die2)} text-foreground/30 animate-in fade-in zoom-in-95 duration-300 delay-75 hover:scale-110 hover:-rotate-6 transition-all duration-300 cursor-default`}></i>
+    <i class={`${getDieClass(die3)} text-foreground/30 animate-in fade-in zoom-in-95 duration-300 delay-150 hover:scale-110 hover:rotate-6 transition-all duration-300 cursor-default`}></i>
+    <i class={`${getDieClass(die4)} text-foreground/30 animate-in fade-in zoom-in-95 duration-300 delay-200 hover:scale-110 hover:-rotate-6 transition-all duration-300 cursor-default`}></i>
 </div>

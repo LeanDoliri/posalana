@@ -70,8 +70,8 @@ uniqueSeasons.sort((a, b) => {
 ---
 
 <Layout>
-	<div class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
-		<header class="text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4 border-b border-foreground/5 pb-8">
+	<div class="space-y-10 animate-in fade-in duration-500 ease-out">
+		<header class="text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4 border-b border-foreground/5 pb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-75 ease-out">
 			<div>
 				<h2 class="text-3xl font-black text-foreground tracking-tight"><i class="fa-solid fa-screwdriver-wrench text-primary mr-2"></i> Centro de Control</h2>
 				<p class="text-foreground/60 mt-1">Gestión avanzada de jugadores y manipulación del destino.</p>
@@ -82,7 +82,7 @@ uniqueSeasons.sort((a, b) => {
 		</header>
 
 		<!-- Global Settings Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 ease-out hover-card-lift">
             <div class="p-6 md:p-8">
 			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-globe text-accent"></i> Configuración Global</h3>
 			    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -122,7 +122,7 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Users Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out hover-card-lift">
             <div class="p-6 md:p-8">
 			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-users text-secondary"></i> Padrón de Jugadores</h3>
 			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
@@ -189,7 +189,7 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Manual Points Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 ease-out hover-card-lift">
             <div class="p-6 md:p-8">
 			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-accent"></i> Carga Histórica de Puntos</h3>
 			    <div class="grid grid-cols-1 gap-8">
@@ -241,7 +241,7 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Exemptions Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 ease-out hover-card-lift">
             <div class="p-6 md:p-8 border-b border-foreground/5 mb-6">
                 <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-shield-halved text-secondary"></i> Gestión de Exenciones</h3>
                 <p class="text-xs text-foreground/50 mt-1">Configura qué jugadores están exentos de realizar tareas específicas en cada temporada.</p>
@@ -342,7 +342,7 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Rolls Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[350ms] ease-out hover-card-lift">
             <div class="p-6 md:p-8">
                 <div class="flex items-center justify-between mb-6">
 			        <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-dice text-secondary"></i> Últimas 50 Tiradas</h3>
@@ -391,84 +391,59 @@ uniqueSeasons.sort((a, b) => {
 	</div>
 
 	<script>
-		// Manual points custom season handler
-		const seasonSelect = document.getElementById('season-select') as HTMLSelectElement;
-		const customSeasonContainer = document.getElementById('custom-season-container');
-		const customSeasonInput = document.getElementById('custom-season-input') as HTMLInputElement;
+		document.addEventListener('astro:page-load', () => {
+			// Manual points custom season handler
+			const seasonSelect = document.getElementById('season-select') as HTMLSelectElement;
+			const customSeasonContainer = document.getElementById('custom-season-container');
+			const customSeasonInput = document.getElementById('custom-season-input') as HTMLInputElement;
 
-		seasonSelect?.addEventListener('change', () => {
-			if (seasonSelect.value === 'custom') {
-				customSeasonContainer?.classList.remove('hidden');
-				customSeasonInput?.setAttribute('required', 'true');
-			} else {
-				customSeasonContainer?.classList.add('hidden');
-				customSeasonInput?.removeAttribute('required');
-			}
-		});
-
-		// Exemptions custom season handler
-		const exemptionSeasonSelect = document.getElementById('exemption-season-select') as HTMLSelectElement;
-		const exemptionCustomSeasonContainer = document.getElementById('exemption-custom-season-container');
-		const exemptionCustomSeasonInput = document.getElementById('exemption-custom-season-input') as HTMLInputElement;
-
-		exemptionSeasonSelect?.addEventListener('change', () => {
-			if (exemptionSeasonSelect.value === 'custom') {
-				exemptionCustomSeasonContainer?.classList.remove('hidden');
-				exemptionCustomSeasonInput?.setAttribute('required', 'true');
-			} else {
-				exemptionCustomSeasonContainer?.classList.add('hidden');
-				exemptionCustomSeasonInput?.removeAttribute('required');
-			}
-		});
-
-		// Admin user avatar quick update handler
-		const adminAvatarInputs = document.querySelectorAll('.admin-avatar-input');
-		adminAvatarInputs.forEach(inputEl => {
-			inputEl.addEventListener('change', async (e) => {
-				const input = e.target as HTMLInputElement;
-				const file = input.files?.[0];
-				if (!file) return;
-
-				const userId = input.getAttribute('data-user-id');
-				if (!userId) return;
-
-				if (!file.type.startsWith('image/')) {
-					alert("Por favor selecciona una imagen válida.");
-					return;
-				}
-
-				try {
-					const base64Image = await compressImage(file, 256, 256, 0.8);
-					const response = await fetch('/api/admin/update-user-avatar', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ userId, avatar: base64Image })
-					});
-
-					if (!response.ok) {
-						throw new Error(await response.text());
-					}
-					window.location.reload();
-				} catch (err: any) {
-					alert(err.message || "Ocurrió un error al subir la imagen");
+			seasonSelect?.addEventListener('change', () => {
+				if (seasonSelect.value === 'custom') {
+					customSeasonContainer?.classList.remove('hidden');
+					customSeasonInput?.setAttribute('required', 'true');
+				} else {
+					customSeasonContainer?.classList.add('hidden');
+					customSeasonInput?.removeAttribute('required');
 				}
 			});
-		});
 
-		// Admin user avatar remove handler
-		const removeAvatarBtns = document.querySelectorAll('.remove-user-avatar-btn');
-		removeAvatarBtns.forEach(btn => {
-			btn.addEventListener('click', async (e) => {
-				const button = btn as HTMLButtonElement;
-				const userId = button.getAttribute('data-user-id');
-				if (!userId) return;
+			// Exemptions custom season handler
+			const exemptionSeasonSelect = document.getElementById('exemption-season-select') as HTMLSelectElement;
+			const exemptionCustomSeasonContainer = document.getElementById('exemption-custom-season-container');
+			const exemptionCustomSeasonInput = document.getElementById('exemption-custom-season-input') as HTMLInputElement;
 
-				if (confirm("¿Seguro que querés eliminar la foto de este usuario y restaurar el avatar por defecto?")) {
+			exemptionSeasonSelect?.addEventListener('change', () => {
+				if (exemptionSeasonSelect.value === 'custom') {
+					exemptionCustomSeasonContainer?.classList.remove('hidden');
+					exemptionCustomSeasonInput?.setAttribute('required', 'true');
+				} else {
+					exemptionCustomSeasonContainer?.classList.add('hidden');
+					exemptionCustomSeasonInput?.removeAttribute('required');
+				}
+			});
+
+			// Admin user avatar quick update handler
+			const adminAvatarInputs = document.querySelectorAll('.admin-avatar-input');
+			adminAvatarInputs.forEach(inputEl => {
+				inputEl.addEventListener('change', async (e) => {
+					const input = e.target as HTMLInputElement;
+					const file = input.files?.[0];
+					if (!file) return;
+
+					const userId = input.getAttribute('data-user-id');
+					if (!userId) return;
+
+					if (!file.type.startsWith('image/')) {
+						alert("Por favor selecciona una imagen válida.");
+						return;
+					}
+
 					try {
+						const base64Image = await compressImage(file, 256, 256, 0.8);
 						const response = await fetch('/api/admin/update-user-avatar', {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ userId, removeAvatar: true })
+							body: JSON.stringify({ userId, avatar: base64Image })
 						});
 
 						if (!response.ok) {
@@ -476,7 +451,80 @@ uniqueSeasons.sort((a, b) => {
 						}
 						window.location.reload();
 					} catch (err: any) {
-						alert(err.message || "Ocurrió un error al eliminar la imagen");
+						alert(err.message || "Ocurrió un error al subir la imagen");
+					}
+				});
+			});
+
+			// Admin user avatar remove handler
+			const removeAvatarBtns = document.querySelectorAll('.remove-user-avatar-btn');
+			removeAvatarBtns.forEach(btn => {
+				btn.addEventListener('click', async (e) => {
+					const button = btn as HTMLButtonElement;
+					const userId = button.getAttribute('data-user-id');
+					if (!userId) return;
+
+					if (confirm("¿Seguro que querés eliminar la foto de este usuario y restaurar el avatar por defecto?")) {
+						try {
+							const response = await fetch('/api/admin/update-user-avatar', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ userId, removeAvatar: true })
+							});
+
+							if (!response.ok) {
+								throw new Error(await response.text());
+							}
+							window.location.reload();
+						} catch (err: any) {
+							alert(err.message || "Ocurrió un error al eliminar la imagen");
+						}
+					}
+				});
+			});
+
+			// Publish manual verdict to Discord
+			const publishVerdictBtn = document.getElementById('publish-verdict-btn');
+			const publishVerdictStatus = document.getElementById('publish-verdict-status');
+
+			publishVerdictBtn?.addEventListener('click', async () => {
+				if (!confirm('¿Confirmar publicación del Veredicto Final en Discord?')) {
+					return;
+				}
+
+				if (publishVerdictBtn instanceof HTMLButtonElement) {
+					publishVerdictBtn.disabled = true;
+				}
+				if (publishVerdictStatus) {
+					publishVerdictStatus.textContent = 'Enviando veredicto...';
+					publishVerdictStatus.className = 'text-xs font-semibold text-center text-foreground/50 block';
+				}
+
+				try {
+					const res = await fetch('/api/admin/publish-verdict', {
+						method: 'POST'
+					});
+					const data = await res.json();
+
+					if (res.ok && data.success) {
+						if (publishVerdictStatus) {
+							publishVerdictStatus.textContent = '✅ ¡Veredicto publicado exitosamente en Discord!';
+							publishVerdictStatus.className = 'text-xs font-semibold text-center text-emerald-500 block';
+						}
+					} else {
+						if (publishVerdictStatus) {
+							publishVerdictStatus.textContent = `❌ Error: ${data.error || 'No se pudo publicar'}`;
+							publishVerdictStatus.className = 'text-xs font-semibold text-center text-primary block';
+						}
+					}
+				} catch (err: any) {
+					if (publishVerdictStatus) {
+						publishVerdictStatus.textContent = `❌ Error: ${err.message || 'Error de conexión'}`;
+						publishVerdictStatus.className = 'text-xs font-semibold text-center text-primary block';
+					}
+				} finally {
+					if (publishVerdictBtn instanceof HTMLButtonElement) {
+						publishVerdictBtn.disabled = false;
 					}
 				}
 			});
@@ -524,51 +572,5 @@ uniqueSeasons.sort((a, b) => {
 				reader.onerror = (err) => reject(err);
 			});
 		}
-
-		// Publish manual verdict to Discord
-		const publishVerdictBtn = document.getElementById('publish-verdict-btn');
-		const publishVerdictStatus = document.getElementById('publish-verdict-status');
-
-		publishVerdictBtn?.addEventListener('click', async () => {
-			if (!confirm('¿Confirmar publicación del Veredicto Final en Discord?')) {
-				return;
-			}
-
-			if (publishVerdictBtn instanceof HTMLButtonElement) {
-				publishVerdictBtn.disabled = true;
-			}
-			if (publishVerdictStatus) {
-				publishVerdictStatus.textContent = 'Enviando veredicto...';
-				publishVerdictStatus.className = 'text-xs font-semibold text-center text-foreground/50 block';
-			}
-
-			try {
-				const res = await fetch('/api/admin/publish-verdict', {
-					method: 'POST'
-				});
-				const data = await res.json();
-
-				if (res.ok && data.success) {
-					if (publishVerdictStatus) {
-						publishVerdictStatus.textContent = '✅ ¡Veredicto publicado exitosamente en Discord!';
-						publishVerdictStatus.className = 'text-xs font-semibold text-center text-emerald-500 block';
-					}
-				} else {
-					if (publishVerdictStatus) {
-						publishVerdictStatus.textContent = `❌ Error: ${data.error || 'No se pudo publicar'}`;
-						publishVerdictStatus.className = 'text-xs font-semibold text-center text-primary block';
-					}
-				}
-			} catch (err: any) {
-				if (publishVerdictStatus) {
-					publishVerdictStatus.textContent = `❌ Error: ${err.message || 'Error de conexión'}`;
-					publishVerdictStatus.className = 'text-xs font-semibold text-center text-primary block';
-				}
-			} finally {
-				if (publishVerdictBtn instanceof HTMLButtonElement) {
-					publishVerdictBtn.disabled = false;
-				}
-			}
-		});
 	</script>
 </Layout>

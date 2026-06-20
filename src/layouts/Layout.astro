@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import { ClientRouter } from 'astro:transitions';
 ---
 
 <!doctype html>
@@ -18,6 +19,7 @@ import Footer from "../components/Footer.astro";
 		<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 		<!-- Font Awesome -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+		<ClientRouter />
 	</head>
 	<body class="bg-background text-foreground font-sans min-h-screen flex flex-col selection:bg-secondary/30 selection:text-foreground overflow-x-hidden">
 		

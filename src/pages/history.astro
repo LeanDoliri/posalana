@@ -140,9 +140,9 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
 ---
 
 <Layout>
-    <div class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+    <div class="space-y-10 animate-in fade-in duration-500 ease-out">
         
-        <header class="mb-10 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+        <header class="mb-10 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-75 ease-out">
             <div>
                 <h2 class="text-3xl md:text-4xl font-black tracking-tight text-foreground">Archivos POSALANA</h2>
                 <p class="text-foreground/60 mt-2">El registro inmutable de la suerte pasada.</p>
@@ -153,9 +153,9 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
         </header>
 
         <!-- Resumen de Temporadas -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out">
             <!-- Temporada Actual -->
-            <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group">
+            <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
                 <div class="absolute -top-12 -right-12 w-36 h-36 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-all duration-500 pointer-events-none"></div>
                 
                 <h3 class="text-xl font-black mb-6 flex items-center gap-2.5 text-foreground relative z-10">
@@ -193,7 +193,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
             </div>
 
             <!-- Temporada Anterior -->
-            <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group">
+            <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
                 <div class="absolute -top-12 -right-12 w-36 h-36 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-all duration-500 pointer-events-none"></div>
                 
                 <h3 class="text-xl font-black mb-6 flex items-center gap-2.5 text-foreground relative z-10">
@@ -210,7 +210,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
         </section>
 
         <!-- Tabla Global del Año -->
-        <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group">
+        <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 ease-out hover-card-lift">
             <div class="absolute -top-12 -right-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-500 pointer-events-none"></div>
             
             <h3 class="text-xl font-black mb-6 flex items-center gap-2.5 text-foreground relative z-10">
@@ -231,7 +231,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                 <p class="text-foreground/60 font-medium text-lg">Los archivos están vacíos.</p>
             </div>
         ) : (
-            <div id="historial-seccion" class="space-y-8 scroll-mt-24">
+            <div id="historial-seccion" class="space-y-8 scroll-mt-24 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 ease-out">
                 <!-- Selector de Semanas (Paginación) -->
                 <div class="flex flex-col sm:flex-row items-center justify-between bg-white border border-foreground/10 p-4 rounded-3xl gap-4">
                     <div class="flex items-center gap-2">
@@ -253,7 +253,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                         const weekData = weeksMap.get(monday) || [];
                         const isSelected = monday === selectedWeek;
                         return (
-                            <div data-week={monday} data-week-range={formatWeekRange(monday)} class={`week-container space-y-12 ${isSelected ? '' : 'hidden'}`}>
+                            <div data-week={monday} data-week-range={formatWeekRange(monday)} class={`week-container space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-300 ${isSelected ? '' : 'hidden'}`}>
                                 {weekData.map((data, dateIndex) => (
                                     <section class="relative">
                                         {/* Timeline visual connector */}
@@ -326,152 +326,157 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
     </div>
 
 	<script>
-		// Sorting interactive functionality for the yearly global table
-		const table = document.getElementById('global-table');
-		const headers = table?.querySelectorAll('thead th[data-sort]');
-		const tbody = table?.querySelector('tbody');
+		document.addEventListener('astro:page-load', () => {
+			// Sorting interactive functionality for the yearly global table
+			const table = document.getElementById('global-table');
+			const headers = table?.querySelectorAll('thead th[data-sort]');
+			const tbody = table?.querySelector('tbody');
 
-		let currentSortColumn = '';
-		let currentSortOrder = 'asc';
+			let currentSortColumn = '';
+			let currentSortOrder = 'asc';
 
-		headers?.forEach(header => {
-			header.addEventListener('click', () => {
-				const sortKey = header.getAttribute('data-sort');
-				if (!sortKey || !tbody) return;
+			headers?.forEach(header => {
+				header.addEventListener('click', () => {
+					const sortKey = header.getAttribute('data-sort');
+					if (!sortKey || !tbody) return;
 
-				const order = (currentSortColumn === sortKey && currentSortOrder === 'asc') ? 'desc' : 'asc';
-				currentSortColumn = sortKey;
-				currentSortOrder = order;
+					const order = (currentSortColumn === sortKey && currentSortOrder === 'asc') ? 'desc' : 'asc';
+					currentSortColumn = sortKey;
+					currentSortOrder = order;
 
-				const rows = Array.from(tbody.querySelectorAll('tr'));
-				rows.sort((rowA, rowB) => {
-					const valA = getRowValue(rowA, sortKey);
-					const valB = getRowValue(rowB, sortKey);
+					const rows = Array.from(tbody.querySelectorAll('tr'));
+					rows.sort((rowA, rowB) => {
+						const valA = getRowValue(rowA, sortKey);
+						const valB = getRowValue(rowB, sortKey);
 
-					if (typeof valA === 'number' && typeof valB === 'number') {
-						return order === 'asc' ? valA - valB : valB - valA;
-					} else {
-						return order === 'asc'
-							? String(valA).localeCompare(String(valB))
-							: String(valB).localeCompare(String(valA));
-					}
-				});
-
-				tbody.innerHTML = '';
-				rows.forEach(row => tbody.appendChild(row));
-
-				updateHeaderIndicators(headers, sortKey, order);
-			});
-		});
-
-		function getRowValue(row: HTMLTableRowElement, key: string) {
-			const cell = row.querySelector(`[data-val-${key}]`);
-			if (!cell) return '';
-			const rawVal = cell.getAttribute(`data-val-${key}`);
-			const num = Number(rawVal);
-			return isNaN(num) ? rawVal || '' : num;
-		}
-
-		function updateHeaderIndicators(headers: NodeListOf<Element>, activeKey: string, order: string) {
-			headers.forEach(h => {
-				const key = h.getAttribute('data-sort');
-				const icon = h.querySelector('i');
-				if (icon) {
-					if (key === activeKey) {
-						icon.className = order === 'asc'
-							? 'fa-solid fa-sort-up ml-1 text-primary'
-							: 'fa-solid fa-sort-down ml-1 text-primary';
-					} else {
-						icon.className = 'fa-solid fa-sort ml-1 text-foreground/30 text-[10px]';
-					}
-				}
-			});
-		}
-
-		// Client-side pagination without page reload
-		const prevBtn = document.getElementById('prev-week-btn') as HTMLAnchorElement | null;
-		const nextBtn = document.getElementById('next-week-btn') as HTMLAnchorElement | null;
-		const rangeLabel = document.getElementById('week-range-label');
-		const weekContainers = document.querySelectorAll('.week-container');
-
-		if (weekContainers.length > 0) {
-			const weeks = Array.from(weekContainers).map(el => el.getAttribute('data-week') || '');
-			let currentWeek = new URL(window.location.href).searchParams.get('week') || weeks[0] || '';
-
-			function updatePaginationUI(selected: string, shouldPushState = true) {
-				currentWeek = selected;
-
-				weekContainers.forEach(container => {
-					const week = container.getAttribute('data-week');
-					if (week === selected) {
-						container.classList.remove('hidden');
-						if (rangeLabel) {
-							rangeLabel.textContent = container.getAttribute('data-week-range') || '';
+						if (typeof valA === 'number' && typeof valB === 'number') {
+							return order === 'asc' ? valA - valB : valB - valA;
+						} else {
+							return order === 'asc'
+								? String(valA).localeCompare(String(valB))
+								: String(valB).localeCompare(String(valA));
 						}
-					} else {
-						container.classList.add('hidden');
-					}
+					});
+
+					tbody.innerHTML = '';
+					rows.forEach(row => tbody.appendChild(row));
+
+					updateHeaderIndicators(headers, sortKey, order);
 				});
+			});
 
-				const selectedIndex = weeks.indexOf(selected);
-				const hasPrev = selectedIndex !== -1 && selectedIndex < weeks.length - 1;
-				const hasNext = selectedIndex > 0;
-
-				const prevWeek = hasPrev ? weeks[selectedIndex + 1] : null;
-				const nextWeek = hasNext ? weeks[selectedIndex - 1] : null;
-
-				if (prevBtn) {
-					if (prevWeek) {
-						prevBtn.href = `?week=${prevWeek}#historial-seccion`;
-						prevBtn.classList.remove('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
-					} else {
-						prevBtn.removeAttribute('href');
-						prevBtn.classList.add('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
-					}
-				}
-
-				if (nextBtn) {
-					if (nextWeek) {
-						nextBtn.href = `?week=${nextWeek}#historial-seccion`;
-						nextBtn.classList.remove('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
-					} else {
-						nextBtn.removeAttribute('href');
-						nextBtn.classList.add('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
-					}
-				}
-
-				if (shouldPushState) {
-					const url = new URL(window.location.href);
-					url.searchParams.set('week', selected);
-					url.hash = 'historial-seccion';
-					window.history.pushState({ week: selected }, '', url.toString());
-				}
+			function getRowValue(row: HTMLTableRowElement, key: string) {
+				const cell = row.querySelector(`[data-val-${key}]`);
+				if (!cell) return '';
+				const rawVal = cell.getAttribute(`data-val-${key}`);
+				const num = Number(rawVal);
+				return isNaN(num) ? rawVal || '' : num;
 			}
 
-			prevBtn?.addEventListener('click', (e) => {
-				e.preventDefault();
-				const selectedIndex = weeks.indexOf(currentWeek);
-				if (selectedIndex !== -1 && selectedIndex < weeks.length - 1) {
-					updatePaginationUI(weeks[selectedIndex + 1]);
-				}
-			});
+			function updateHeaderIndicators(headers: NodeListOf<Element>, activeKey: string, order: string) {
+				headers.forEach(h => {
+					const key = h.getAttribute('data-sort');
+					const icon = h.querySelector('i');
+					if (icon) {
+						if (key === activeKey) {
+							icon.className = order === 'asc'
+								? 'fa-solid fa-sort-up ml-1 text-primary'
+								: 'fa-solid fa-sort-down ml-1 text-primary';
+						} else {
+							icon.className = 'fa-solid fa-sort ml-1 text-foreground/30 text-[10px]';
+						}
+					}
+				});
+			}
 
-			nextBtn?.addEventListener('click', (e) => {
-				e.preventDefault();
-				const selectedIndex = weeks.indexOf(currentWeek);
-				if (selectedIndex > 0) {
-					updatePaginationUI(weeks[selectedIndex - 1]);
-				}
-			});
+			// Client-side pagination without page reload
+			const prevBtn = document.getElementById('prev-week-btn') as HTMLAnchorElement | null;
+			const nextBtn = document.getElementById('next-week-btn') as HTMLAnchorElement | null;
+			const rangeLabel = document.getElementById('week-range-label');
+			const weekContainers = document.querySelectorAll('.week-container');
 
-			window.addEventListener('popstate', (e) => {
-				const stateWeek = e.state?.week;
-				const urlParams = new URLSearchParams(window.location.search);
-				const weekFromUrl = stateWeek || urlParams.get('week') || weeks[0] || '';
-				if (weekFromUrl && weeks.includes(weekFromUrl) && weekFromUrl !== currentWeek) {
-					updatePaginationUI(weekFromUrl, false);
+			if (weekContainers.length > 0) {
+				const weeks = Array.from(weekContainers).map(el => el.getAttribute('data-week') || '');
+				let currentWeek = new URL(window.location.href).searchParams.get('week') || weeks[0] || '';
+
+				function updatePaginationUI(selected: string, shouldPushState = true) {
+					currentWeek = selected;
+
+					weekContainers.forEach(container => {
+						const week = container.getAttribute('data-week');
+						if (week === selected) {
+							container.classList.remove('hidden');
+							if (rangeLabel) {
+								rangeLabel.textContent = container.getAttribute('data-week-range') || '';
+							}
+						} else {
+							container.classList.add('hidden');
+						}
+					});
+
+					const selectedIndex = weeks.indexOf(selected);
+					const hasPrev = selectedIndex !== -1 && selectedIndex < weeks.length - 1;
+					const hasNext = selectedIndex > 0;
+
+					const prevWeek = hasPrev ? weeks[selectedIndex + 1] : null;
+					const nextWeek = hasNext ? weeks[selectedIndex - 1] : null;
+
+					if (prevBtn) {
+						if (prevWeek) {
+							prevBtn.href = `?week=${prevWeek}#historial-seccion`;
+							prevBtn.classList.remove('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
+						} else {
+							prevBtn.removeAttribute('href');
+							prevBtn.classList.add('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
+						}
+					}
+
+					if (nextBtn) {
+						if (nextWeek) {
+							nextBtn.href = `?week=${nextWeek}#historial-seccion`;
+							nextBtn.classList.remove('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
+						} else {
+							nextBtn.removeAttribute('href');
+							nextBtn.classList.add('pointer-events-none', 'opacity-30', 'cursor-not-allowed');
+						}
+					}
+
+					if (shouldPushState) {
+						const url = new URL(window.location.href);
+						url.searchParams.set('week', selected);
+						url.hash = 'historial-seccion';
+						window.history.pushState({ week: selected }, '', url.toString());
+					}
 				}
-			});
-		}
+
+				prevBtn?.addEventListener('click', (e) => {
+					e.preventDefault();
+					const selectedIndex = weeks.indexOf(currentWeek);
+					if (selectedIndex !== -1 && selectedIndex < weeks.length - 1) {
+						updatePaginationUI(weeks[selectedIndex + 1]);
+					}
+				});
+
+				nextBtn?.addEventListener('click', (e) => {
+					e.preventDefault();
+					const selectedIndex = weeks.indexOf(currentWeek);
+					if (selectedIndex > 0) {
+						updatePaginationUI(weeks[selectedIndex - 1]);
+					}
+				});
+
+				// We store the handler function in popstate so it can pop cleanly
+				const popStateUpdate = (e: PopStateEvent) => {
+					const stateWeek = e.state?.week;
+					const urlParams = new URLSearchParams(window.location.search);
+					const weekFromUrl = stateWeek || urlParams.get('week') || weeks[0] || '';
+					if (weekFromUrl && weeks.includes(weekFromUrl) && weekFromUrl !== currentWeek) {
+						updatePaginationUI(weekFromUrl, false);
+					}
+				};
+
+				window.addEventListener('popstate', popStateUpdate);
+			}
+		});
 	</script>
 </Layout>

@@ -137,33 +137,35 @@ if (lastLomitoDate) {
 
 <!-- Mobile Menu Script -->
 <script>
-    const btn = document.getElementById('mobile-menu-btn');
-    const menu = document.getElementById('mobile-menu');
-    const icon = btn?.querySelector('i');
-    const links = document.querySelectorAll('.mobile-link');
+    document.addEventListener('astro:page-load', () => {
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const icon = btn?.querySelector('i');
+        const links = document.querySelectorAll('.mobile-link');
 
-    let isMenuOpen = false;
+        let isMenuOpen = false;
 
-    function toggleMenu() {
-        isMenuOpen = !isMenuOpen;
-        if (isMenuOpen) {
-            menu?.classList.remove('translate-x-full');
-            icon?.classList.remove('fa-bars');
-            icon?.classList.add('fa-xmark');
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
-        } else {
-            menu?.classList.add('translate-x-full');
-            icon?.classList.remove('fa-xmark');
-            icon?.classList.add('fa-bars');
-            document.body.style.overflow = '';
+        function toggleMenu() {
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                menu?.classList.remove('translate-x-full');
+                icon?.classList.remove('fa-bars');
+                icon?.classList.add('fa-xmark');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+            } else {
+                menu?.classList.add('translate-x-full');
+                icon?.classList.remove('fa-xmark');
+                icon?.classList.add('fa-bars');
+                document.body.style.overflow = '';
+            }
         }
-    }
 
-    btn?.addEventListener('click', toggleMenu);
-    
-    links.forEach(link => {
-        link.addEventListener('click', () => {
-            if(isMenuOpen) toggleMenu();
+        btn?.addEventListener('click', toggleMenu);
+        
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                if(isMenuOpen) toggleMenu();
+            });
         });
     });
 </script>

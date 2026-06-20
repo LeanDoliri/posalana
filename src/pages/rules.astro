@@ -4,10 +4,10 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout>
   <div
-    class="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out"
+    class="space-y-10 animate-in fade-in duration-500 ease-out"
   >
     <!-- Header Section -->
-    <section class="text-center pb-8 border-b border-foreground/5">
+    <section class="text-center pb-8 border-b border-foreground/5 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-75 ease-out">
       <h2
         class="text-4xl md:text-5xl font-black mb-4 tracking-tight text-foreground text-balance"
       >
@@ -25,9 +25,9 @@ import Layout from "../layouts/Layout.astro";
     </section>
 
     <!-- The Meaning -->
-    <section class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out">
       <div
-        class="bg-white border border-foreground/10 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+        class="bg-white border border-foreground/10 p-8 rounded-3xl shadow-lg hover-card-lift"
       >
         <h3
           class="text-2xl font-bold mb-6 flex items-center gap-3 text-balance"
@@ -97,7 +97,7 @@ import Layout from "../layouts/Layout.astro";
       <!-- Mecánica -->
       <div class="space-y-8">
         <div
-          class="bg-white border border-foreground/10 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+          class="bg-white border border-foreground/10 p-8 rounded-3xl shadow-lg hover-card-lift"
         >
           <h3 class="text-xl font-bold mb-4 flex items-center gap-3">
             <i class="fa-solid fa-dice text-secondary"></i> La Tirada
@@ -120,7 +120,7 @@ import Layout from "../layouts/Layout.astro";
         </div>
 
         <div
-          class="bg-white border border-foreground/10 p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+          class="bg-white border border-foreground/10 p-8 rounded-3xl shadow-lg hover-card-lift"
         >
           <h3 class="text-xl font-bold mb-4 flex items-center gap-3">
             <i class="fa-solid fa-calendar-week text-secondary"></i> Temporadas
@@ -151,11 +151,11 @@ import Layout from "../layouts/Layout.astro";
     </section>
 
     <!-- Horarios y Llegadas Tarde -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 ease-out">
       <!-- Tiempos -->
       <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div
-          class="relative overflow-hidden bg-white border border-secondary/30 rounded-3xl p-6 group shadow-sm hover:shadow-md transition-shadow duration-300"
+          class="relative overflow-hidden bg-white border border-secondary/30 rounded-3xl p-6 group shadow-sm hover-card-lift"
         >
           <div
             class="absolute -right-4 -bottom-4 text-secondary/10 text-8xl group-hover:scale-110 transition-transform duration-500"
@@ -175,7 +175,7 @@ import Layout from "../layouts/Layout.astro";
           </p>
         </div>
         <div
-          class="relative overflow-hidden bg-white border border-primary/30 rounded-3xl p-6 group shadow-sm hover:shadow-md transition-shadow duration-300"
+          class="relative overflow-hidden bg-white border border-primary/30 rounded-3xl p-6 group shadow-sm hover-card-lift"
         >
           <div
             class="absolute -right-4 -bottom-4 text-primary/10 text-8xl group-hover:scale-110 transition-transform duration-500"
@@ -198,7 +198,7 @@ import Layout from "../layouts/Layout.astro";
 
       <!-- Castigos -->
       <div
-        class="bg-white border border-foreground/10 rounded-3xl p-6 flex flex-col justify-center shadow-sm hover:shadow-md transition-shadow duration-300"
+        class="bg-white border border-foreground/10 rounded-3xl p-6 flex flex-col justify-center shadow-sm hover-card-lift"
       >
         <h3 class="font-bold text-foreground mb-3 flex items-center gap-2">
           <i class="fa-solid fa-clock-rotate-left text-primary"></i> Llegadas Tarde
@@ -218,7 +218,7 @@ import Layout from "../layouts/Layout.astro";
 
     <!-- Lomito -->
     <section
-      class="bg-white border border-accent/30 p-8 md:p-10 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden group"
+      class="bg-white border border-accent/30 p-8 md:p-10 rounded-3xl shadow-lg relative overflow-hidden group animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 ease-out hover-card-lift"
     >
       <div
         class="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent"
