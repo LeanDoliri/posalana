@@ -14,7 +14,7 @@ La forma definitiva, justa y basada puramente en el azar para dividir las tareas
 *   **Autenticación Integrada:** Registro e inicio de sesión seguro usando [Lucia Auth](https://lucia-auth.com/).
 *   **Tirada Diaria Única:** Cada usuario solo puede tirar los dados una vez por día. El sistema bloquea intentos múltiples.
 *   **Ranking Automático:** Calcula matemáticamente quién saca el número más bajo y asigna automáticamente la peor tarea (Lava), la intermedia (Saca) y la más leve (Pone).
-*   **🥪 Cláusula Lomito:** Si dos personas sacan **exactamente los mismos dados** en el mismo día, se activa el cartel festivo de *Lomito* y el contador de "Días sin Lomito" se reinicia a cero.
+*   **🥪 Cláusula Lomito:** Si dos personas sacan **exactamente los mismos dados en el mismo orden** en el mismo día, se activa el cartel festivo de *Lomito* y el contador de "Días sin Lomito" se reinicia a cero.
 *   **Historial con Paginación Semanal:** Muestra las tiradas agrupadas por semana calendario (lunes a domingo) con navegación interactiva fluida (client-side) que previene recargas completas, mantiene el scroll y actualiza la URL y el historial del navegador automáticamente.
 *   **Estadísticas y Ordenamiento Interactivo:** Muestra las estadísticas de la temporada actual, anterior y global del año usando el componente `StatsTable`. La tabla del año permite ordenar filas interactivamente por cualquier columna (Jugador, PO, SA, LA, Total).
 *   **Exenciones de Tarea Automáticas:** Las personas con más puntos en una tarea durante la temporada anterior quedan automáticamente eximidas de realizarla en la temporada actual, con soporte para empates, anulaciones manuales y base cases seguros contra loops infinitos.

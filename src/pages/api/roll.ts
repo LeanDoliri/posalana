@@ -77,11 +77,37 @@ export async function POST(context: APIContext): Promise<Response> {
         args: [dateStr]
     });
     const allRolls = allRollsRes.rows;
-    const { lomitoActivated, lomitoPlayers } = assignDailyChores(allRolls, []);
+
+    // Check if the current roll specifically triggered the Lomito Clause (i.e. matches another roll from today in the exact same order)
+    const currentRollMatchesOther = allRolls.some((r: any) => 
+        String(r.user_id) !== String(userId) &&
+        Number(r.die1) === d1 &&
+        Number(r.die2) === d2 &&
+        Number(r.die3) === d3 &&
+        Number(r.die4) === d4
+    );
+
+    let discordLomitoActivated = false;
+    let discordLomitoPlayers: string[] = [];
+    if (currentRollMatchesOther) {
+        discordLomitoActivated = true;
+        const matchingRolls = allRolls.filter((r: any) => 
+            Number(r.die1) === d1 &&
+            Number(r.die2) === d2 &&
+            Number(r.die3) === d3 &&
+            Number(r.die4) === d4
+        );
+        for (const r of matchingRolls) {
+            const name = r.display_name || r.username || "Usuario";
+            if (!discordLomitoPlayers.includes(name)) {
+                discordLomitoPlayers.push(name);
+            }
+        }
+    }
 
     // Send Discord notification asynchronously (don't block the redirect)
     const displayName = context.locals.user?.display_name || context.locals.user?.username || "Usuario";
-    sendDiscordRoll(displayName, [d1, d2, d3, d4], lomitoActivated, lomitoPlayers).catch(err => {
+    sendDiscordRoll(displayName, [d1, d2, d3, d4], discordLomitoActivated, discordLomitoPlayers).catch(err => {
         console.error("Error trigger sending Discord roll:", err);
     });
 

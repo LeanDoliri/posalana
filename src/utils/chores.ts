@@ -38,11 +38,13 @@ export function assignDailyChores(dailyRolls: any[], exemptions: any[]) {
             const a = sortedRolls[i];
             const b = sortedRolls[j];
             
-            // Dice are exactly the same combination (ignoring order)
-            const aDice = [a.die1, a.die2, a.die3, a.die4].map(Number).sort((x, y) => x - y);
-            const bDice = [b.die1, b.die2, b.die3, b.die4].map(Number).sort((x, y) => x - y);
-            
-            if (aDice[0] === bDice[0] && aDice[1] === bDice[1] && aDice[2] === bDice[2] && aDice[3] === bDice[3]) {
+            // Dice are exactly the same values in the exact same order
+            if (
+                Number(a.die1) === Number(b.die1) &&
+                Number(a.die2) === Number(b.die2) &&
+                Number(a.die3) === Number(b.die3) &&
+                Number(a.die4) === Number(b.die4)
+            ) {
                 lomitoActivated = true;
                 const nameA = a.display_name || a.username || "Usuario";
                 const nameB = b.display_name || b.username || "Usuario";
