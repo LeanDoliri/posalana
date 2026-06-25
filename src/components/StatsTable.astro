@@ -37,7 +37,8 @@ const activeTheme = themeClasses[theme];
 ---
 
 <div class="overflow-x-auto">
-    <table class="w-full text-left border-collapse text-sm" id={sortable ? "global-table" : undefined}>
+    <div class="overflow-hidden">
+        <table class="w-full text-left border-collapse text-sm" id={sortable ? "global-table" : undefined}>
         <thead>
             <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
                 {sortable ? (
@@ -74,7 +75,7 @@ const activeTheme = themeClasses[theme];
                 const total = stat.scores.LA + stat.scores.SA + stat.scores.PO;
                 const name = stat.display_name || stat.username;
                 return (
-                    <tr class="hover:bg-foreground/[0.02] transition-colors duration-200">
+                    <tr class="hover:bg-foreground/[0.02] hover:translate-x-0.5 transition-all duration-200">
                         <td class="py-3 pr-2" data-val-name={sortable ? name : undefined}>
                             <div class="flex items-center gap-2.5">
                                 <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />
@@ -97,5 +98,6 @@ const activeTheme = themeClasses[theme];
                 );
             })}
         </tbody>
-    </table>
+        </table>
+    </div>
 </div>
