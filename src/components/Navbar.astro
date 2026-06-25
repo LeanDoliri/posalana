@@ -42,12 +42,12 @@ if (lastLomitoDate) {
     <div class="max-w-5xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
         <!-- Brand & Lomito -->
         <div class="flex items-center gap-3">
-            <h1 class="text-2xl font-black tracking-tighter hover:scale-105 transition-transform origin-left">
-                <a href="/" class="flex">
-                    <span class="text-primary">PO</span>
-                    <span class="text-secondary">SA</span>
-                    <span class="text-accent">LA</span>
-                    <span class="text-foreground">NA</span>
+            <h1 class="text-2xl font-black tracking-tighter origin-left">
+                <a href="/" class="flex logo-container">
+                    <span class="text-primary logo-syllable syllable-1">PO</span>
+                    <span class="text-secondary logo-syllable syllable-2">SA</span>
+                    <span class="text-accent logo-syllable syllable-3">LA</span>
+                    <span class="text-foreground logo-syllable syllable-4">NA</span>
                 </a>
             </h1>
             
@@ -169,3 +169,42 @@ if (lastLomitoDate) {
         });
     });
 </script>
+
+<style>
+    .logo-container {
+        perspective: 1000px;
+    }
+
+    .logo-syllable {
+        display: inline-block;
+        transform-style: preserve-3d;
+        backface-visibility: visible;
+    }
+
+    .logo-container:hover .logo-syllable {
+        animation: roll-die 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+
+    .logo-container:hover .syllable-1 {
+        animation-delay: 0s;
+    }
+    .logo-container:hover .syllable-2 {
+        animation-delay: 0.1s;
+    }
+    .logo-container:hover .syllable-3 {
+        animation-delay: 0.2s;
+    }
+    .logo-container:hover .syllable-4 {
+        animation-delay: 0.3s;
+    }
+
+    @keyframes roll-die {
+        0% {
+            transform: rotateX(0deg);
+        }
+        100% {
+            transform: rotateX(360deg);
+        }
+    }
+</style>
+
