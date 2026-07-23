@@ -16,7 +16,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
 	}
 
 	const last_lomito_date = formData.get("last_lomito_date")?.toString() || "";
-	const master_key = formData.get("master_key")?.toString() || "";
 
 	try {
         if (last_lomito_date) {
@@ -26,15 +25,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
             });
         } else {
             await db.execute("DELETE FROM settings WHERE key = 'last_lomito_date'");
-        }
-        
-        if (master_key) {
-            await db.execute({
-                sql: "INSERT INTO settings (key, value) VALUES ('master_key', ?) ON CONFLICT(key) DO UPDATE SET value = ?",
-                args: [master_key, master_key]
-            });
-        } else {
-            await db.execute("DELETE FROM settings WHERE key = 'master_key'");
         }
 		
 		return new Response(null, {

@@ -17,7 +17,7 @@ if (Astro.locals.user) {
 						<i class="fa-solid fa-unlock-keyhole text-2xl"></i>
 					</div>
 					<h2 class="text-2xl font-black text-foreground tracking-tight">Restablecer Clave</h2>
-					<p class="text-foreground/50 mt-2 font-medium text-sm">Pedile la clave maestra al administrador.</p>
+					<p class="text-foreground/50 mt-2 font-medium text-sm">Ingresá tu usuario y elegí una contraseña nueva.</p>
 				</div>
 
 				<form method="post" action="/api/reset" enctype="application/x-www-form-urlencoded" class="space-y-4">
@@ -41,15 +41,6 @@ if (Astro.locals.user) {
 						</div>
 					</div>
 
-					<div class="space-y-1">
-						<label class="block text-xs font-bold uppercase tracking-wider text-primary/70 ml-1">Clave Maestra</label>
-						<div class="relative">
-							<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-								<i class="fa-solid fa-lock text-primary/40"></i>
-							</div>
-							<input type="password" name="master_key" class="w-full bg-primary/5 border border-primary/20 text-foreground rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" required />
-						</div>
-					</div>
 
 					<button type="submit" class="w-full bg-accent text-background py-3.5 rounded-xl font-bold shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:-translate-y-0.5 active:translate-y-0 transition-all mt-6 cursor-pointer">
 						Restablecer

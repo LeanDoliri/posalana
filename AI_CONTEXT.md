@@ -41,7 +41,8 @@ Si sos un agente de Inteligencia Artificial (AI) leyendo este repositorio, este 
 ## 4. Modo Administrador
 - El usuario inicial con rol de `admin` es `ldoliri`.
 - Existe una ruta protegida `/admin` que permite:
-  - Configurar variables globales (Último Lomito manual y Clave Maestra).
+  - Configurar variables globales (Último Lomito manual).
+  - Ver el registro de cambios de contraseña (tabla `password_reset_log`; el reset en `/reset` es libre, sin clave maestra).
   - Borrar usuarios, anular tiradas y cambiar roles.
   - Cargar puntos manualmente (temporadas pasadas).
   - **Gestión de Exenciones:** Crear (con soporte para temporadas personalizadas) y borrar exenciones manuales que sobrescriben las automáticas.

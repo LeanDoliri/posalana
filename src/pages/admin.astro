@@ -34,6 +34,21 @@ const rollsRes = await db.execute(`
 `);
 const recentRolls = rollsRes.rows;
 
+// Fetch recent password resets
+const resetsRes = await db.execute(`
+	SELECT id, username, created_at FROM password_reset_log
+	ORDER BY created_at DESC
+	LIMIT 50
+`);
+const recentResets = resetsRes.rows;
+
+// Format an ISO timestamp in Argentina time (GMT-3)
+function formatResetDate(iso: string) {
+	const d = new Date(iso);
+	d.setHours(d.getHours() - 3);
+	return d.toISOString().replace('T', ' ').substring(0, 16) + ' (GMT-3)';
+}
+
 // Fetch global settings
 const settingsRes = await db.execute("SELECT key, value FROM settings");
 const settingsMap = new Map();
@@ -91,11 +106,6 @@ uniqueSeasons.sort((a, b) => {
                             <label class="block text-sm font-bold mb-1 text-foreground/80">Último Lomito Manual</label>
                             <input type="date" name="last_lomito_date" value={settingsMap.get('last_lomito_date') || ''} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
                             <p class="text-xs text-foreground/50 mt-1">Al configurarla, esta fecha se usa para el contador de días.</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold mb-1 text-foreground/80">Clave Maestra (Recuperación)</label>
-                            <input type="text" name="master_key" value={settingsMap.get('master_key') || ''} placeholder="Ej: Lomito123" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
-                            <p class="text-xs text-foreground/50 mt-1">Usada en /recover para resetear contraseñas de cualquier usuario.</p>
                         </div>
                         <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity cursor-pointer">
                             Guardar Configuración
@@ -381,6 +391,34 @@ uniqueSeasons.sort((a, b) => {
                                             </button>
                                         </form>
                                     </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+		</section>
+		<!-- Password Resets Section -->
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[400ms] ease-out hover-card-lift">
+            <div class="p-6 md:p-8">
+                <h3 class="text-xl font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-key text-accent"></i> Cambios de Contraseña</h3>
+                <p class="text-xs text-foreground/50 mb-6">Registro de restablecimientos de contraseña hechos desde /reset. Cualquiera puede resetear libremente; acá queda constancia por las dudas.</p>
+			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
+                                <th class="p-4 font-bold">Fecha y Hora</th>
+                                <th class="p-4 font-bold">Usuario</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-foreground/5">
+                            {recentResets.length === 0 && (
+                                <tr><td colspan="2" class="p-8 text-center text-foreground/40 font-bold">Nadie cambió su contraseña todavía.</td></tr>
+                            )}
+                            {recentResets.map((r: any) => (
+                                <tr class="hover:bg-foreground/[0.02] transition-colors">
+                                    <td class="p-4 text-sm font-mono text-foreground/60">{formatResetDate(r.created_at)}</td>
+                                    <td class="p-4 font-bold text-foreground">{r.username}</td>
                                 </tr>
                             ))}
                         </tbody>

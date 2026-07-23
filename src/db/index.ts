@@ -61,6 +61,12 @@ db.executeMultiple(`
       key TEXT NOT NULL PRIMARY KEY,
       value TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS password_reset_log (
+      id TEXT NOT NULL PRIMARY KEY,
+      username TEXT NOT NULL,
+      created_at TEXT NOT NULL
+  );
 `).catch(console.error);
 
 // Migrations
