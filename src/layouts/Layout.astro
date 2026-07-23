@@ -34,5 +34,75 @@ import { ClientRouter } from 'astro:transitions';
 		<script define:vars={{ user: Astro.locals.user }}>
 			console.log("Logged in user:", user);
 		</script>
+
+		<script>
+			// Indicador de carga para navegaciones con ClientRouter.
+			// Los elementos se agregan como hijos directos de <html> (fuera del <body>)
+			// para que sobrevivan al swap de página del router.
+			if (!(window as any).__pageLoaderInit) {
+				(window as any).__pageLoaderInit = true;
+
+				const bar = document.createElement('div');
+				bar.id = 'page-loader';
+
+				const pill = document.createElement('div');
+				pill.id = 'page-loader-pill';
+				pill.innerHTML = '<span class="loader-dice">🎲</span> Tirando los dados...';
+
+				document.documentElement.append(bar, pill);
+
+				let showTimer: ReturnType<typeof setTimeout> | undefined;
+				let pillTimer: ReturnType<typeof setTimeout> | undefined;
+				let trickleTimer: ReturnType<typeof setInterval> | undefined;
+				let progress = 0;
+
+				const clearTimers = () => {
+					clearTimeout(showTimer);
+					clearTimeout(pillTimer);
+					clearInterval(trickleTimer);
+				};
+
+				const start = () => {
+					clearTimers();
+					progress = 0;
+					document.documentElement.classList.add('is-navigating');
+
+					// Solo mostramos la barra si la navegación tarda más de 150ms,
+					// para no parpadear en cargas instantáneas.
+					showTimer = setTimeout(() => {
+						bar.classList.add('is-active');
+						progress = 20;
+						bar.style.width = progress + '%';
+						// Avance progresivo que se frena cerca del 90%
+						trickleTimer = setInterval(() => {
+							progress = Math.min(90, progress + (90 - progress) * 0.12);
+							bar.style.width = progress + '%';
+						}, 250);
+					}, 150);
+
+					// Si demora de verdad, aparece el pill con el dado girando.
+					pillTimer = setTimeout(() => pill.classList.add('is-visible'), 800);
+				};
+
+				const finish = () => {
+					clearTimers();
+					document.documentElement.classList.remove('is-navigating');
+					pill.classList.remove('is-visible');
+
+					if (bar.classList.contains('is-active')) {
+						bar.style.width = '100%';
+						setTimeout(() => {
+							bar.classList.remove('is-active');
+							setTimeout(() => { bar.style.width = '0%'; }, 300);
+						}, 200);
+					} else {
+						bar.style.width = '0%';
+					}
+				};
+
+				document.addEventListener('astro:before-preparation', start);
+				document.addEventListener('astro:page-load', finish);
+			}
+		</script>
 	</body>
 </html>
