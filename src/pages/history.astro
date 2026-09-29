@@ -140,6 +140,7 @@ for (const seasonId of pastSeasonIds) {
         name: formatSeasonName(seasonId),
         range: getSeasonDateRange(seasonId),
         stats: sortStats(await calculateSeasonPoints(db, seasonId)),
+        exemptions: await getExemptionsForSeason(db, seasonId),
     });
 }
 
@@ -165,12 +166,12 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
         </header>
 
         <!-- Resumen de Temporadas -->
-        <section class="grid grid-cols-1 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out">
             <!-- Temporada Actual -->
             <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
                 <div class="absolute -top-12 -right-12 w-36 h-36 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-all duration-500 pointer-events-none"></div>
                 
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-6 relative z-10">
+                <div class="flex flex-col items-start gap-3 mb-6 relative z-10">
                     <h3 class="text-xl font-black flex items-center gap-2.5 text-foreground">
                         <i class="fa-solid fa-calendar-days text-secondary"></i>
                         Temporada Actual
@@ -216,22 +217,42 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
             <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
                 <div class="absolute -top-12 -right-12 w-36 h-36 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-all duration-500 pointer-events-none"></div>
 
-                <div class="flex flex-wrap items-center justify-between gap-3 mb-6 relative z-10">
+                <div class="flex flex-col items-start gap-3 mb-6 relative z-20">
                     <h3 class="text-xl font-black flex items-center gap-2.5 text-foreground">
                         <i class="fa-solid fa-clock-rotate-left text-accent"></i>
                         Temporadas Anteriores
                     </h3>
-                    <div class="relative">
-                        <select
-                            id="past-season-select"
+                    <div id="past-season-dropdown" class="relative">
+                        <button
+                            type="button"
+                            id="past-season-button"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                            aria-controls="past-season-list"
+                            class="flex items-center gap-2 bg-accent/10 border border-accent/20 text-accent font-black text-sm pl-4 pr-3.5 py-2 rounded-full cursor-pointer hover:bg-accent/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 transition-colors"
+                        >
+                            <span id="past-season-label">{pastSeasons[0]?.name}</span>
+                            <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" data-chevron></i>
+                        </button>
+                        <ul
+                            id="past-season-list"
+                            role="listbox"
                             aria-label="Elegir temporada"
-                            class="appearance-none bg-accent/10 border border-accent/20 text-accent font-black text-sm pl-4 pr-9 py-2 rounded-full cursor-pointer hover:bg-accent/15 focus:outline-none focus:ring-2 focus:ring-accent/30 transition-colors"
+                            tabindex="-1"
+                            class="hidden absolute left-0 top-full mt-2 min-w-full w-max max-h-64 overflow-y-auto bg-white border border-foreground/10 rounded-2xl shadow-xl p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150 origin-top-left focus:outline-none"
                         >
                             {pastSeasons.map((season, i) => (
-                                <option value={season.id} selected={i === 0}>{season.name}</option>
+                                <li
+                                    role="option"
+                                    data-season-option={season.id}
+                                    aria-selected={i === 0 ? 'true' : 'false'}
+                                    class="flex items-center justify-between gap-4 px-3.5 py-2 rounded-xl text-sm font-bold text-foreground/70 cursor-pointer hover:bg-accent/10 hover:text-accent aria-selected:bg-accent/10 aria-selected:text-accent data-[active=true]:bg-accent/10 data-[active=true]:text-accent transition-colors"
+                                >
+                                    <span>{season.name}</span>
+                                    <i class="fa-solid fa-check text-xs opacity-0" data-check></i>
+                                </li>
                             ))}
-                        </select>
-                        <i class="fa-solid fa-chevron-down text-accent text-xs absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                        </ul>
                     </div>
                 </div>
 
@@ -242,6 +263,28 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                             <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en esta temporada.</p>
                         ) : (
                             <StatsTable stats={season.stats} theme="accent" />
+                        )}
+
+                        {season.exemptions.length > 0 && (
+                            <div class="mt-6 pt-6 border-t border-foreground/10">
+                                <h4 class="text-xs font-black uppercase tracking-wider text-foreground/60 mb-3 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-shield-halved text-accent"></i> Exenciones de la Temporada
+                                </h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {season.exemptions.map(ex => {
+                                        const choreEmoji = ex.chore_code === 'LA' ? '🧽' : ex.chore_code === 'SA' ? '🗑️' : '🍽️';
+                                        const choreLabel = ex.chore_code === 'LA' ? 'Lavar' : ex.chore_code === 'SA' ? 'Sacar' : 'Poner';
+                                        return (
+                                            <div class="flex items-center gap-2 bg-accent/5 border border-accent/20 px-3 py-1.5 rounded-full text-xs">
+                                                <UserAvatar user={{ username: ex.username, display_name: ex.display_name, avatar_url: ex.avatar_url }} size="sm" />
+                                                <span class="font-bold text-foreground">{ex.display_name}</span>
+                                                <span class="text-foreground/50">•</span>
+                                                <span class="text-accent font-bold font-mono">{choreEmoji} Exento de {choreLabel}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
                         )}
                     </div>
                 ))}
@@ -366,12 +409,76 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
 
 	<script>
 		document.addEventListener('astro:page-load', () => {
-			// Past season selector: toggles the pre-rendered season tables without reloading
-			const pastSeasonSelect = document.getElementById('past-season-select') as HTMLSelectElement | null;
-			pastSeasonSelect?.addEventListener('change', () => {
-				document.querySelectorAll<HTMLElement>('[data-past-season]').forEach(el => {
-					el.classList.toggle('hidden', el.dataset.pastSeason !== pastSeasonSelect.value);
+			// Past season dropdown: toggles the pre-rendered season tables without reloading
+			const seasonDropdown = document.getElementById('past-season-dropdown');
+			const seasonButton = document.getElementById('past-season-button');
+			const seasonList = document.getElementById('past-season-list');
+			const seasonLabel = document.getElementById('past-season-label');
+			const seasonOptions = Array.from(document.querySelectorAll<HTMLElement>('[data-season-option]'));
+			let activeIndex = 0;
+
+			const syncChecks = () => {
+				seasonOptions.forEach(opt => {
+					opt.querySelector('[data-check]')?.classList.toggle('opacity-0', opt.getAttribute('aria-selected') !== 'true');
 				});
+			};
+
+			const setActive = (index: number) => {
+				activeIndex = (index + seasonOptions.length) % seasonOptions.length;
+				seasonOptions.forEach((opt, i) => { opt.dataset.active = String(i === activeIndex); });
+				seasonOptions[activeIndex]?.scrollIntoView({ block: 'nearest' });
+			};
+
+			const openList = (open: boolean) => {
+				if (!seasonList || !seasonButton) return;
+				seasonList.classList.toggle('hidden', !open);
+				seasonButton.setAttribute('aria-expanded', String(open));
+				seasonButton.querySelector('[data-chevron]')?.classList.toggle('rotate-180', open);
+				if (open) {
+					setActive(Math.max(0, seasonOptions.findIndex(o => o.getAttribute('aria-selected') === 'true')));
+					seasonList.focus();
+				}
+			};
+
+			const selectSeason = (opt: HTMLElement) => {
+				const id = opt.dataset.seasonOption;
+				seasonOptions.forEach(o => o.setAttribute('aria-selected', String(o === opt)));
+				if (seasonLabel) seasonLabel.textContent = opt.textContent?.trim() || '';
+				document.querySelectorAll<HTMLElement>('[data-past-season]').forEach(el => {
+					el.classList.toggle('hidden', el.dataset.pastSeason !== id);
+				});
+				syncChecks();
+				openList(false);
+				seasonButton?.focus();
+			};
+
+			syncChecks();
+
+			seasonButton?.addEventListener('click', () => {
+				openList(seasonList?.classList.contains('hidden') ?? false);
+			});
+
+			seasonButton?.addEventListener('keydown', (e) => {
+				if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+					e.preventDefault();
+					openList(true);
+				}
+			});
+
+			seasonOptions.forEach(opt => {
+				opt.addEventListener('click', () => selectSeason(opt));
+				opt.addEventListener('mousemove', () => setActive(seasonOptions.indexOf(opt)));
+			});
+
+			seasonList?.addEventListener('keydown', (e) => {
+				if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIndex + 1); }
+				else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(activeIndex - 1); }
+				else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectSeason(seasonOptions[activeIndex]); }
+				else if (e.key === 'Escape' || e.key === 'Tab') { openList(false); if (e.key === 'Escape') seasonButton?.focus(); }
+			});
+
+			document.addEventListener('click', (e) => {
+				if (seasonDropdown && !seasonDropdown.contains(e.target as Node)) openList(false);
 			});
 
 			// Sorting interactive functionality for the yearly global table
