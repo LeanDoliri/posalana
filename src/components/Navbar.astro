@@ -52,7 +52,7 @@ if (lastLomitoDate) {
             </h1>
             
             <div class="relative group hidden sm:block">
-                <span class="text-xs font-bold bg-accent/10 text-accent px-3 py-1 rounded-full cursor-default shadow-sm border border-accent/20">
+                <span data-lomito-badge class="inline-block text-xs font-bold bg-accent/10 text-accent px-3 py-1 rounded-full cursor-default select-none shadow-sm border border-accent/20">
                     🥪 {daysSinceLomito !== null ? daysSinceLomito : "∞"} {daysSinceLomito === 1 ? 'día' : 'días'} sin lomito
                 </span>
                 <div class="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-foreground/90 backdrop-blur-sm text-background text-xs px-3 py-2 rounded-lg shadow-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 translate-y-1 group-hover:translate-y-0">
@@ -94,7 +94,7 @@ if (lastLomitoDate) {
     
     <!-- Mobile Lomito Indicator -->
     <div class="sm:hidden px-4 pb-3 border-t border-foreground/5 flex justify-center bg-white/50">
-        <span class="text-xs font-bold bg-accent/10 text-accent px-3 py-1 rounded-full cursor-default mt-2">
+        <span data-lomito-badge class="inline-block text-xs font-bold bg-accent/10 text-accent px-3 py-1 rounded-full cursor-default select-none mt-2">
             🥪 {daysSinceLomito !== null ? daysSinceLomito : "∞"} {daysSinceLomito === 1 ? 'día' : 'días'} sin lomito ({lomitoTooltip})
         </span>
     </div>
@@ -134,6 +134,74 @@ if (lastLomitoDate) {
         )}
     </nav>
 </div>
+
+<!-- Easter egg: muchos clicks en el badge de días sin lomito desatan una lluvia de lomitos -->
+<script>
+    if (!(window as any).__lomitoRainInit) {
+        (window as any).__lomitoRainInit = true;
+
+        const CLICKS_NEEDED = 7;
+        const WINDOW_MS = 3000;
+        let clicks: number[] = [];
+        let raining = false;
+
+        const makeItRain = () => {
+            raining = true;
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const count = reduceMotion ? 15 : 70;
+
+            const layer = document.createElement('div');
+            layer.setAttribute('aria-hidden', 'true');
+            layer.style.cssText = 'position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9998;';
+            document.documentElement.append(layer);
+
+            let longest = 0;
+            for (let i = 0; i < count; i++) {
+                const lomito = document.createElement('span');
+                lomito.textContent = Math.random() < 0.85 ? '🥪' : '🍟';
+                const size = 22 + Math.random() * 34;
+                lomito.style.cssText = `position:absolute;top:-80px;left:${Math.random() * 100}vw;font-size:${size}px;line-height:1;will-change:transform;`;
+                layer.append(lomito);
+
+                const delay = Math.random() * 2200;
+                const duration = 2200 + Math.random() * 2200;
+                const drift = (Math.random() - 0.5) * 200;
+                const spin = (Math.random() - 0.5) * 720;
+                longest = Math.max(longest, delay + duration);
+
+                lomito.animate(
+                    [
+                        { transform: 'translate(0, 0) rotate(0deg)' },
+                        { transform: `translate(${drift}px, calc(100vh + 160px)) rotate(${spin}deg)` }
+                    ],
+                    { duration, delay, easing: 'cubic-bezier(0.35, 0, 0.8, 0.6)', fill: 'both' }
+                );
+            }
+
+            setTimeout(() => { layer.remove(); raining = false; }, longest + 200);
+        };
+
+        document.addEventListener('click', (e) => {
+            const badge = (e.target as HTMLElement).closest<HTMLElement>('[data-lomito-badge]');
+            if (!badge || raining) return;
+
+            // Pequeño "rebote" en cada click, así se siente que algo pasa
+            badge.animate(
+                [{ transform: 'scale(1)' }, { transform: 'scale(1.12) rotate(-3deg)' }, { transform: 'scale(1)' }],
+                { duration: 220, easing: 'ease-out' }
+            );
+
+            const now = Date.now();
+            clicks = clicks.filter(t => now - t < WINDOW_MS);
+            clicks.push(now);
+
+            if (clicks.length >= CLICKS_NEEDED) {
+                clicks = [];
+                makeItRain();
+            }
+        });
+    }
+</script>
 
 <!-- Mobile Menu Script -->
 <script>

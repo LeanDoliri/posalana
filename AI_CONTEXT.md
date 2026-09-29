@@ -10,6 +10,7 @@ Si sos un agente de Inteligencia Artificial (AI) leyendo este repositorio, este 
   - La UI debe mostrar el emoji de sanguche (`🥪`) en el Navbar y un banner festivo en el Index y en el Historial.
   - El contador de "Días sin Lomito" se reinicia.
   - El usuario especial `lomitotester` sirve exclusivamente para probar esta cláusula duplicando la tirada del administrador.
+  - **Easter egg (no documentado en el README a propósito):** 7 clicks en menos de 3 segundos sobre el badge "días sin lomito" del Navbar (`[data-lomito-badge]`, desktop y mobile) desatan una lluvia de 🥪/🍟 a pantalla completa (Web Animations API, respeta `prefers-reduced-motion`).
 - **Exenciones (Exemptions):** Quien tenga la mayor cantidad de puntos en una tarea en la temporada `S-1`, queda exento de ella durante toda la temporada `S`.
   - **Cálculo Automático:** Se resuelven dinámicamente comparando los puntajes de la temporada anterior. Si hay empates, todos los empatados se eximen.
   - **Caso Base de Parada Segura:** Si una temporada no tiene tiradas ni puntos cargados a mano, se considera inactiva (`[]`), deteniendo la recursividad histórica para prevenir bucles infinitos en Node.js.
