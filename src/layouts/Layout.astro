@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
+import VerdictFab from "../components/VerdictFab.astro";
 import { ClientRouter } from 'astro:transitions';
 ---
 
@@ -30,6 +31,8 @@ import { ClientRouter } from 'astro:transitions';
 		</main>
 
 		<Footer />
+
+		{Astro.locals.user?.role === 'admin' && <VerdictFab />}
 
 		<script define:vars={{ user: Astro.locals.user }}>
 			console.log("Logged in user:", user);

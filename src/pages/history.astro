@@ -27,7 +27,7 @@ for (const row of allRollsRes.rows) {
     groupedRolls[date].push(row);
 }
 
-import { getSeasonId, getPreviousSeasons, formatSeasonName, calculateSeasonPoints, calculateYearPoints, getExemptionsForSeason } from '../utils/season.js';
+import { getSeasonId, getPreviousSeasons, formatSeasonName, calculateSeasonPoints, calculateYearPoints, getExemptionsForSeason, getPastSeasonsWithData, getSeasonDateRange } from '../utils/season.js';
 import { assignDailyChores, chores } from '../utils/chores.js';
 
 const dates = Object.keys(groupedRolls).sort((a, b) => b.localeCompare(a));
@@ -109,10 +109,8 @@ const today = new Date();
 today.setHours(today.getHours() - 3);
 const todayStr = today.toISOString().split('T')[0];
 const currentSeasonId = getSeasonId(todayStr);
-const prevSeasonId = getPreviousSeasons(currentSeasonId, 1)[1];
 
 const currentSeasonStats = await calculateSeasonPoints(db, currentSeasonId);
-const prevSeasonStats = await calculateSeasonPoints(db, prevSeasonId);
 
 // Sort by total points descending, then alphabetically by display_name (falling back to username)
 const sortStats = (stats: any[]) => {
@@ -129,7 +127,21 @@ const sortStats = (stats: any[]) => {
 };
 
 const sortedCurrentStats = sortStats(currentSeasonStats);
-const sortedPrevStats = sortStats(prevSeasonStats);
+const currentSeasonRange = getSeasonDateRange(currentSeasonId);
+
+// Past seasons with data (newest first) for the "Temporada Anterior" selector.
+// Falls back to the immediate previous season so the card always has something to show.
+const pastSeasonIds = await getPastSeasonsWithData(db, currentSeasonId);
+if (pastSeasonIds.length === 0) pastSeasonIds.push(getPreviousSeasons(currentSeasonId, 1)[1]);
+const pastSeasons = [];
+for (const seasonId of pastSeasonIds) {
+    pastSeasons.push({
+        id: seasonId,
+        name: formatSeasonName(seasonId),
+        range: getSeasonDateRange(seasonId),
+        stats: sortStats(await calculateSeasonPoints(db, seasonId)),
+    });
+}
 
 const currentYear = today.getFullYear().toString();
 const yearStats = await calculateYearPoints(db, currentYear);
@@ -153,21 +165,29 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
         </header>
 
         <!-- Resumen de Temporadas -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out">
+        <section class="grid grid-cols-1 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out">
             <!-- Temporada Actual -->
             <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
                 <div class="absolute -top-12 -right-12 w-36 h-36 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-all duration-500 pointer-events-none"></div>
                 
-                <h3 class="text-xl font-black mb-6 flex items-center gap-2.5 text-foreground relative z-10">
-                    <i class="fa-solid fa-calendar-days text-secondary"></i>
-                    Temporada Actual: <span class="text-secondary">{formatSeasonName(currentSeasonId)}</span>
-                </h3>
-                
-                {sortedCurrentStats.length === 0 ? (
-                    <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en esta temporada.</p>
-                ) : (
-                    <StatsTable stats={sortedCurrentStats} theme="secondary" />
-                )}
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6 relative z-10">
+                    <h3 class="text-xl font-black flex items-center gap-2.5 text-foreground">
+                        <i class="fa-solid fa-calendar-days text-secondary"></i>
+                        Temporada Actual
+                    </h3>
+                    <span class="bg-secondary/10 border border-secondary/20 text-secondary font-black text-sm px-4 py-2 rounded-full">
+                        {formatSeasonName(currentSeasonId)}
+                    </span>
+                </div>
+
+                <div class="relative z-10">
+                    <p class="text-xs text-foreground/50 font-semibold -mt-3 mb-4">{currentSeasonRange.start} — {currentSeasonRange.end}</p>
+                    {sortedCurrentStats.length === 0 ? (
+                        <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en esta temporada.</p>
+                    ) : (
+                        <StatsTable stats={sortedCurrentStats} theme="secondary" />
+                    )}
+                </div>
 
                 {currentSeasonExemptions.length > 0 && (
                     <div class="mt-6 pt-6 border-t border-foreground/10 relative z-10">
@@ -192,20 +212,39 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                 )}
             </div>
 
-            <!-- Temporada Anterior -->
+            <!-- Temporadas Anteriores (con selector) -->
             <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
                 <div class="absolute -top-12 -right-12 w-36 h-36 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-all duration-500 pointer-events-none"></div>
-                
-                <h3 class="text-xl font-black mb-6 flex items-center gap-2.5 text-foreground relative z-10">
-                    <i class="fa-solid fa-clock-rotate-left text-accent"></i>
-                    Temporada Anterior: <span class="text-accent">{formatSeasonName(prevSeasonId)}</span>
-                </h3>
-                
-                {sortedPrevStats.length === 0 ? (
-                    <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en la temporada anterior.</p>
-                ) : (
-                    <StatsTable stats={sortedPrevStats} theme="accent" />
-                )}
+
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-6 relative z-10">
+                    <h3 class="text-xl font-black flex items-center gap-2.5 text-foreground">
+                        <i class="fa-solid fa-clock-rotate-left text-accent"></i>
+                        Temporadas Anteriores
+                    </h3>
+                    <div class="relative">
+                        <select
+                            id="past-season-select"
+                            aria-label="Elegir temporada"
+                            class="appearance-none bg-accent/10 border border-accent/20 text-accent font-black text-sm pl-4 pr-9 py-2 rounded-full cursor-pointer hover:bg-accent/15 focus:outline-none focus:ring-2 focus:ring-accent/30 transition-colors"
+                        >
+                            {pastSeasons.map((season, i) => (
+                                <option value={season.id} selected={i === 0}>{season.name}</option>
+                            ))}
+                        </select>
+                        <i class="fa-solid fa-chevron-down text-accent text-xs absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                {pastSeasons.map((season, i) => (
+                    <div data-past-season={season.id} class:list={["relative z-10", { hidden: i !== 0 }]}>
+                        <p class="text-xs text-foreground/50 font-semibold -mt-3 mb-4">{season.range.start} — {season.range.end}</p>
+                        {season.stats.length === 0 ? (
+                            <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en esta temporada.</p>
+                        ) : (
+                            <StatsTable stats={season.stats} theme="accent" />
+                        )}
+                    </div>
+                ))}
             </div>
         </section>
 
@@ -327,6 +366,14 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
 
 	<script>
 		document.addEventListener('astro:page-load', () => {
+			// Past season selector: toggles the pre-rendered season tables without reloading
+			const pastSeasonSelect = document.getElementById('past-season-select') as HTMLSelectElement | null;
+			pastSeasonSelect?.addEventListener('change', () => {
+				document.querySelectorAll<HTMLElement>('[data-past-season]').forEach(el => {
+					el.classList.toggle('hidden', el.dataset.pastSeason !== pastSeasonSelect.value);
+				});
+			});
+
 			// Sorting interactive functionality for the yearly global table
 			const table = document.getElementById('global-table');
 			const headers = table?.querySelectorAll('thead th[data-sort]');

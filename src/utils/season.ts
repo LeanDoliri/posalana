@@ -71,6 +71,42 @@ export function getPreviousSeasons(seasonId: string, count: number): string[] {
     return result;
 }
 
+const SEASONS_ORDER = ['verano', 'otoño', 'invierno', 'primavera'];
+
+// Numeric key to sort season ids chronologically (e.g. "2026-otoño" -> 20261)
+function seasonSortKey(seasonId: string): number {
+    const [year, name] = seasonId.split('-');
+    return parseInt(year, 10) * 10 + SEASONS_ORDER.indexOf(name);
+}
+
+// Date range covered by a season, formatted as DD/MM/YYYY
+export function getSeasonDateRange(seasonId: string): { start: string; end: string } {
+    const [yearStr, name] = seasonId.split('-');
+    const year = parseInt(yearStr, 10);
+    const ranges: Record<string, [string, string]> = {
+        verano: [`21/12/${year - 1}`, `20/03/${year}`],
+        otoño: [`21/03/${year}`, `20/06/${year}`],
+        invierno: [`21/06/${year}`, `20/09/${year}`],
+        primavera: [`21/09/${year}`, `20/12/${year}`],
+    };
+    const [start, end] = ranges[name] || ['', ''];
+    return { start, end };
+}
+
+// All finished seasons (before the current one) that have rolls or manual points, newest first
+export async function getPastSeasonsWithData(db: any, currentSeasonId: string): Promise<string[]> {
+    const rollDatesRes = await db.execute("SELECT DISTINCT date FROM roll");
+    const manualSeasonsRes = await db.execute("SELECT DISTINCT season_id FROM manual_points");
+
+    const seasons = new Set<string>();
+    for (const r of rollDatesRes.rows) seasons.add(getSeasonId(r.date as string));
+    for (const r of manualSeasonsRes.rows) seasons.add(r.season_id as string);
+
+    const currentKey = seasonSortKey(currentSeasonId);
+    return Array.from(seasons)
+        .filter(s => SEASONS_ORDER.includes(s.split('-')[1]) && seasonSortKey(s) < currentKey)
+        .sort((a, b) => seasonSortKey(b) - seasonSortKey(a));
+}
 
 // Keep a cache of computed exemptions to prevent infinite loops and redundant work
 const exemptionsCache = new Map<string, any[]>();

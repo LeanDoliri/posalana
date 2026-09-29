@@ -1,0 +1,127 @@
+---
+// Burbuja flotante (estilo WhatsApp) para que el admin publique el veredicto
+// final del día en Discord desde cualquier página.
+---
+
+<div id="verdict-fab" class="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-30 flex flex-col items-end gap-3">
+    <!-- Panel de confirmación -->
+    <div
+        id="verdict-fab-panel"
+        class="hidden w-72 bg-white border border-foreground/10 rounded-3xl shadow-2xl p-5 origin-bottom-right animate-in fade-in zoom-in-95 duration-200"
+        role="dialog"
+        aria-labelledby="verdict-fab-title"
+    >
+        <p id="verdict-fab-title" class="font-black text-foreground flex items-center gap-2">
+            <i class="fa-solid fa-scroll text-secondary"></i> Veredicto Final
+        </p>
+        <p class="text-xs text-foreground/60 leading-relaxed mt-1.5">
+            Publica en Discord quién pone, saca y lava hoy, con la cantidad de jugadores que tiraron.
+        </p>
+        <p id="verdict-fab-status" class="hidden text-xs font-semibold mt-3"></p>
+        <div class="flex gap-2 mt-4">
+            <button
+                type="button"
+                data-verdict-close
+                class="flex-1 text-sm font-bold text-foreground/60 bg-foreground/5 hover:bg-foreground/10 py-2.5 rounded-xl transition-colors cursor-pointer"
+            >
+                Cancelar
+            </button>
+            <button
+                type="button"
+                id="verdict-fab-publish"
+                class="flex-1 text-sm font-bold text-background bg-secondary hover:opacity-90 disabled:opacity-50 disabled:cursor-wait py-2.5 rounded-xl transition-opacity flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-secondary/20"
+            >
+                <i class="fa-solid fa-paper-plane"></i> Publicar
+            </button>
+        </div>
+    </div>
+
+    <!-- Burbuja -->
+    <button
+        type="button"
+        id="verdict-fab-toggle"
+        aria-label="Publicar veredicto final en Discord"
+        aria-expanded="false"
+        aria-controls="verdict-fab-panel"
+        title="Publicar veredicto final"
+        class="relative w-14 h-14 md:w-16 md:h-16 rounded-full bg-secondary text-background text-xl md:text-2xl shadow-xl shadow-secondary/30 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center cursor-pointer"
+    >
+        <span class="absolute inset-0 rounded-full bg-secondary animate-ping opacity-20 pointer-events-none"></span>
+        <i class="fa-solid fa-bullhorn relative"></i>
+    </button>
+</div>
+
+<script>
+    // El ClientRouter reemplaza el <body> en cada navegación, así que
+    // delegamos los eventos en el document una sola vez.
+    if (!(window as any).__verdictFabInit) {
+        (window as any).__verdictFabInit = true;
+
+        const getEls = () => ({
+            panel: document.getElementById('verdict-fab-panel'),
+            toggle: document.getElementById('verdict-fab-toggle'),
+            publish: document.getElementById('verdict-fab-publish') as HTMLButtonElement | null,
+            status: document.getElementById('verdict-fab-status'),
+        });
+
+        const setOpen = (open: boolean) => {
+            const { panel, toggle, status } = getEls();
+            if (!panel || !toggle) return;
+            panel.classList.toggle('hidden', !open);
+            toggle.setAttribute('aria-expanded', String(open));
+            if (open && status) {
+                status.className = 'hidden text-xs font-semibold mt-3';
+                status.textContent = '';
+            }
+        };
+
+        const setStatus = (text: string, tone: 'muted' | 'ok' | 'error') => {
+            const { status } = getEls();
+            if (!status) return;
+            const color = tone === 'ok' ? 'text-emerald-500' : tone === 'error' ? 'text-primary' : 'text-foreground/50';
+            status.className = `block text-xs font-semibold mt-3 ${color}`;
+            status.textContent = text;
+        };
+
+        const publishVerdict = async () => {
+            const { publish } = getEls();
+            if (publish) publish.disabled = true;
+            setStatus('Enviando veredicto...', 'muted');
+
+            try {
+                const res = await fetch('/api/admin/publish-verdict', { method: 'POST' });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    setStatus('✅ ¡Veredicto publicado en Discord!', 'ok');
+                } else {
+                    setStatus(`❌ Error: ${data.error || 'No se pudo publicar'}`, 'error');
+                }
+            } catch (err: any) {
+                setStatus(`❌ Error: ${err.message || 'Error de conexión'}`, 'error');
+            } finally {
+                if (publish) publish.disabled = false;
+            }
+        };
+
+        document.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const fab = document.getElementById('verdict-fab');
+            if (!fab) return;
+
+            if (target.closest('#verdict-fab-toggle')) {
+                const { panel } = getEls();
+                setOpen(panel?.classList.contains('hidden') ?? false);
+            } else if (target.closest('[data-verdict-close]')) {
+                setOpen(false);
+            } else if (target.closest('#verdict-fab-publish')) {
+                publishVerdict();
+            } else if (!fab.contains(target)) {
+                setOpen(false);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') setOpen(false);
+        });
+    }
+</script>
