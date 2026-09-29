@@ -146,58 +146,78 @@ if (lastLomitoDate) {
         let raining = false;
 
         const makeItRain = () => {
-            raining = true;
             const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             const count = reduceMotion ? 15 : 70;
+            const perFrame = 10;
 
             const layer = document.createElement('div');
             layer.setAttribute('aria-hidden', 'true');
             layer.style.cssText = 'position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9998;';
             document.documentElement.append(layer);
 
-            let longest = 0;
-            for (let i = 0; i < count; i++) {
-                const lomito = document.createElement('span');
-                lomito.textContent = Math.random() < 0.85 ? '🥪' : '🍟';
-                const size = 22 + Math.random() * 34;
-                lomito.style.cssText = `position:absolute;top:-80px;left:${Math.random() * 100}vw;font-size:${size}px;line-height:1;will-change:transform;`;
-                layer.append(lomito);
+            const animations: Animation[] = [];
+            let created = 0;
 
-                const delay = Math.random() * 2200;
-                const duration = 2200 + Math.random() * 2200;
-                const drift = (Math.random() - 0.5) * 200;
-                const spin = (Math.random() - 0.5) * 720;
-                longest = Math.max(longest, delay + duration);
+            // Creamos los lomitos en tandas, una por frame, para no trabar el hilo principal
+            const spawnBatch = () => {
+                const batch = Math.min(perFrame, count - created);
+                for (let i = 0; i < batch; i++) {
+                    const lomito = document.createElement('span');
+                    lomito.textContent = Math.random() < 0.85 ? '🥪' : '🍟';
+                    const size = 22 + Math.random() * 34;
+                    lomito.style.cssText = `position:absolute;top:-80px;left:${Math.random() * 100}vw;font-size:${size}px;line-height:1;`;
+                    layer.append(lomito);
 
-                lomito.animate(
-                    [
-                        { transform: 'translate(0, 0) rotate(0deg)' },
-                        { transform: `translate(${drift}px, calc(100vh + 160px)) rotate(${spin}deg)` }
-                    ],
-                    { duration, delay, easing: 'cubic-bezier(0.35, 0, 0.8, 0.6)', fill: 'both' }
-                );
-            }
+                    const drift = (Math.random() - 0.5) * 200;
+                    const spin = (Math.random() - 0.5) * 720;
+                    animations.push(lomito.animate(
+                        [
+                            { transform: 'translate(0, 0) rotate(0deg)' },
+                            { transform: `translate(${drift}px, calc(100vh + 160px)) rotate(${spin}deg)` }
+                        ],
+                        {
+                            duration: 2200 + Math.random() * 2200,
+                            delay: Math.random() * 2000,
+                            easing: 'cubic-bezier(0.35, 0, 0.8, 0.6)',
+                            fill: 'both'
+                        }
+                    ));
+                }
+                created += batch;
 
-            setTimeout(() => { layer.remove(); raining = false; }, longest + 200);
+                if (created < count) {
+                    requestAnimationFrame(spawnBatch);
+                } else {
+                    Promise.all(animations.map(a => a.finished)).finally(() => {
+                        layer.remove();
+                        raining = false;
+                    });
+                }
+            };
+
+            requestAnimationFrame(spawnBatch);
         };
 
         document.addEventListener('click', (e) => {
             const badge = (e.target as HTMLElement).closest<HTMLElement>('[data-lomito-badge]');
             if (!badge || raining) return;
 
+            const now = Date.now();
+            clicks = clicks.filter(t => now - t < WINDOW_MS);
+            clicks.push(now);
+            const triggered = clicks.length >= CLICKS_NEEDED;
+
             // Pequeño "rebote" en cada click, así se siente que algo pasa
-            badge.animate(
+            const bounce = badge.animate(
                 [{ transform: 'scale(1)' }, { transform: 'scale(1.12) rotate(-3deg)' }, { transform: 'scale(1)' }],
                 { duration: 220, easing: 'ease-out' }
             );
 
-            const now = Date.now();
-            clicks = clicks.filter(t => now - t < WINDOW_MS);
-            clicks.push(now);
-
-            if (clicks.length >= CLICKS_NEEDED) {
+            if (triggered) {
                 clicks = [];
-                makeItRain();
+                raining = true;
+                // La lluvia arranca recién cuando termina el rebote, así no compiten por el mismo frame
+                bounce.finished.then(makeItRain, makeItRain);
             }
         });
     }
