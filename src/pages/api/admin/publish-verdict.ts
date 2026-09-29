@@ -75,7 +75,9 @@ export async function POST(context: APIContext): Promise<Response> {
         const [year, month, day] = dateStr.split("-");
         const formattedDate = `${day}/${month}/${year}`;
 
-        await sendDiscordVerdict(formattedDate, choresAssigned);
+        const playersCount = new Set(allRolls.map(r => String(r.user_id))).size;
+
+        await sendDiscordVerdict(formattedDate, choresAssigned, playersCount);
 
         return new Response(JSON.stringify({ success: true }), {
             status: 200,

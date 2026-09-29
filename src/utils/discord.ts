@@ -1,3 +1,5 @@
+const BOT_AVATAR_URL = "https://posalana.vercel.app/bot-avatar.png";
+
 export async function sendDiscordRoll(
     displayName: string,
     dice: number[],
@@ -64,7 +66,7 @@ export async function sendDiscordRoll(
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ content, embeds })
+            body: JSON.stringify({ content, embeds, avatar_url: BOT_AVATAR_URL })
         });
         if (!res.ok) {
             console.error("Failed to send Discord notification:", await res.text());
@@ -82,7 +84,8 @@ export async function sendDiscordVerdict(
         pone: string[];
         zafaron: string[];
         exentos: string[];
-    }
+    },
+    playersCount: number
 ) {
     const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
     if (!webhookUrl) {
@@ -98,7 +101,7 @@ export async function sendDiscordVerdict(
 
     const embed = {
         title: `📜 EL DECRETO DIARIO - ${dateStr}`,
-        description: `🚨 **¡ATENCIÓN JUGADORES!** El destino ha hablado y las sentencias de hoy son definitivas e inapelables.\n\nAquí tienen la distribución oficial de tareas de la mesa para hoy:\n\n🍽️ **PO:** **${poneStr}**\n🗑️ **SA:** **${sacaStr}**\n🧽 **LA:** **${lavaStr}**\n🎉 **NA:** **${zafaronStr !== "Ninguno" ? zafaronStr : "Ninguno"}**\n🛡️ **EXENTOS HOY:** **${exentosStr !== "Ninguno" ? exentosStr : "Ninguno"}**\n\n👉 *¿Querés apelar con tus estadísticas?* Entrá a la [App de POSALANA](https://posalana.vercel.app/)`,
+        description: `🚨 **¡ATENCIÓN JUGADORES!** El destino ha hablado y las sentencias de hoy son definitivas e inapelables.\n\n## 🎲 ${playersCount} ${playersCount === 1 ? "jugador tiró" : "jugadores tiraron"} hoy\n\nAquí tienen la distribución oficial de tareas de la mesa para hoy:\n\n🍽️ **PO:** **${poneStr}**\n🗑️ **SA:** **${sacaStr}**\n🧽 **LA:** **${lavaStr}**\n🎉 **NA:** **${zafaronStr !== "Ninguno" ? zafaronStr : "Ninguno"}**\n🛡️ **EXENTOS HOY:** **${exentosStr !== "Ninguno" ? exentosStr : "Ninguno"}**\n\n👉 *¿Querés apelar con tus estadísticas?* Entrá a la [App de POSALANA](https://posalana.vercel.app/)`,
         color: 15346264, // Primary pink color (Hex: #EA2A58)
         footer: {
             text: "POSALANA • El veredicto del destino 📜"
@@ -112,7 +115,7 @@ export async function sendDiscordVerdict(
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ embeds: [embed] })
+            body: JSON.stringify({ embeds: [embed], avatar_url: BOT_AVATAR_URL })
         });
         if (!res.ok) {
             console.error("Failed to send Discord verdict:", await res.text());
