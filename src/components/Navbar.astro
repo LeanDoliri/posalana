@@ -1,6 +1,7 @@
 ---
 import db from "../db/index.js";
 import UserAvatar from "./UserAvatar.astro";
+import { formatDate } from "../utils/date.js";
 
 const { user } = Astro.locals;
 
@@ -33,7 +34,7 @@ if (lastLomitoDate) {
 	const last = new Date(lastLomitoDate + "T12:00:00");
 	const now = new Date(todayStr + "T12:00:00");
 	daysSinceLomito = Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
-	lomitoTooltip = `Último lomito: ${lastLomitoDate}`;
+	lomitoTooltip = `Último lomito: ${formatDate(lastLomitoDate)}`;
 }
 ---
 

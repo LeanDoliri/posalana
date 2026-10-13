@@ -5,6 +5,7 @@ import UserAvatar from "../components/UserAvatar.astro";
 import DiceDisplay from "../components/DiceDisplay.astro";
 import { getSeasonId, getPreviousSeasons, formatSeasonName } from "../utils/season.js";
 import { getArgentinaNow, getRollSchedule, getRollWindowStatus } from "../utils/schedule.js";
+import { formatDate } from "../utils/date.js";
 
 const { user } = Astro.locals;
 
@@ -47,7 +48,8 @@ const recentResets = resetsRes.rows;
 function formatResetDate(iso: string) {
 	const d = new Date(iso);
 	d.setHours(d.getHours() - 3);
-	return d.toISOString().replace('T', ' ').substring(0, 16) + ' (GMT-3)';
+	const local = d.toISOString();
+	return `${formatDate(local)} ${local.substring(11, 16)} (GMT-3)`;
 }
 
 // Fetch global settings
@@ -412,7 +414,7 @@ uniqueSeasons.sort((a, b) => {
                             )}
                             {recentRolls.map((r) => (
                                 <tr class="hover:bg-foreground/[0.02] transition-colors">
-                                    <td class="p-4 text-sm font-mono text-foreground/60">{r.date}</td>
+                                    <td class="p-4 text-sm font-mono text-foreground/60">{formatDate(r.date as string)}</td>
                                     <td class="p-4">
                                         <div class="flex items-center gap-2 font-bold text-foreground">
                                             <UserAvatar user={{ username: r.username as string, display_name: r.display_name as string, avatar_url: r.avatar_url as string }} size="sm" />

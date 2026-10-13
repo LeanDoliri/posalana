@@ -5,6 +5,7 @@ import { getSeasonId, getExemptionsForSeason } from '../utils/season.js';
 import UserAvatar from '../components/UserAvatar.astro';
 import DiceDisplay from '../components/DiceDisplay.astro';
 import ScheduleNotice from '../components/ScheduleNotice.astro';
+import { formatDate } from '../utils/date.js';
 import { getArgentinaNow, getRollSchedule, getRollWindowStatus, SCHEDULE_NOTICE_UNTIL } from '../utils/schedule.js';
 
 if (!Astro.locals.user) {
@@ -190,7 +191,7 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
         {hasRolled && myRoll ? (
             <section class="relative bg-white border border-foreground/10 p-4 md:p-6 rounded-3xl shadow-xl overflow-hidden flex flex-col sm:flex-row items-center justify-between animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out hover-card-lift">
                 <div class="text-center sm:text-left mb-4 sm:mb-0">
-                    <p class="text-secondary font-bold tracking-widest uppercase text-[10px] mb-1">Tirada del {dateStr}</p>
+                    <p class="text-secondary font-bold tracking-widest uppercase text-[10px] mb-1">Tirada del {formatDate(dateStr)}</p>
                     <p class="text-sm text-foreground/80 font-medium">Ya cumpliste con tu destino de hoy.</p>
                 </div>
                 <div class="flex items-center gap-3 bg-secondary/5 border border-secondary/20 px-4 py-2 rounded-xl shadow-inner">
@@ -206,7 +207,7 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
 
                 <div class="relative z-10">
                     <p class="text-secondary font-bold tracking-widest uppercase text-xs mb-2">Tirada Oficial</p>
-                    <h2 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-foreground text-balance">{dateStr}</h2>
+                    <h2 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-foreground text-balance">{formatDate(dateStr)}</h2>
                     {canRoll ? (
                     <>
                     <p class="text-foreground/60 mb-3 max-w-md mx-auto text-pretty">El destino no está escrito, se decide con los dados. ¿Zafás o lavás?</p>

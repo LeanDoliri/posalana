@@ -4,6 +4,7 @@ import db from '../db/index.js';
 import UserAvatar from '../components/UserAvatar.astro';
 import DiceDisplay from '../components/DiceDisplay.astro';
 import StatsTable from '../components/StatsTable.astro';
+import { formatDate } from '../utils/date.js';
 
 if (!Astro.locals.user) {
 	return Astro.redirect('/login');
@@ -74,7 +75,7 @@ function formatWeekRange(mondayStr: string) {
     const format = (d: Date) => {
         const day = String(d.getDate()).padStart(2, '0');
         const month = String(d.getMonth() + 1).padStart(2, '0');
-        return `${day}/${month}`;
+        return `${day}/${month}/${d.getFullYear()}`;
     };
     return `Semana del ${format(mon)} al ${format(sun)}`;
 }
@@ -348,7 +349,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                             <div class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-secondary text-background flex items-center justify-center font-black shadow-lg">
                                                 <i class="fa-solid fa-calendar-day"></i>
                                             </div>
-                                            <h3 class="text-xl md:text-2xl font-black text-foreground">{data.date}</h3>
+                                            <h3 class="text-xl md:text-2xl font-black text-foreground">{formatDate(data.date)}</h3>
                                         </div>
 
                                         {/* Lomito Indicator */}
