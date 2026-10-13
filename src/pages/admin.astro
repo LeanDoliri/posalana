@@ -4,6 +4,7 @@ import db from "../db/index.js";
 import UserAvatar from "../components/UserAvatar.astro";
 import DiceDisplay from "../components/DiceDisplay.astro";
 import { getSeasonId, getPreviousSeasons, formatSeasonName } from "../utils/season.js";
+import { getArgentinaNow, getRollSchedule, getRollWindowStatus } from "../utils/schedule.js";
 
 const { user } = Astro.locals;
 
@@ -55,10 +56,24 @@ const settingsMap = new Map();
 settingsRes.rows.forEach((s: any) => settingsMap.set(s.key, s.value));
 
 // Calculate current date in GMT-3 to obtain current season
-const today = new Date();
-today.setHours(today.getHours() - 3);
-const dateStr = today.toISOString().split('T')[0];
+const now = getArgentinaNow();
+const dateStr = now.dateStr;
 const currentSeason = getSeasonId(dateStr);
+
+// Horario de tirada y estado del veredicto automático de hoy
+const schedule = await getRollSchedule(db);
+const windowStatus = getRollWindowStatus(schedule, now.minutes);
+const windowStatusLabel = {
+    before: { text: `Cerrada · abre a las ${schedule.start}`, cls: 'bg-foreground/10 text-foreground/60' },
+    open: { text: `Abierta · cierra a las ${schedule.end}`, cls: 'bg-emerald-500/10 text-emerald-600' },
+    closed: { text: `Cerrada desde las ${schedule.end}`, cls: 'bg-primary/10 text-primary' },
+}[windowStatus];
+const autoVerdictToday = schedule.autoVerdictLastDate === dateStr;
+const autoVerdictLabel = !schedule.autoVerdictEnabled
+    ? 'Desactivado'
+    : autoVerdictToday
+        ? (schedule.autoVerdictLastAt === 'sin tiradas' ? 'Hoy no se envió (nadie tiró)' : `Enviado hoy a las ${schedule.autoVerdictLastAt}`)
+        : `Pendiente · sale a las ${schedule.end}`;
 
 // Get current season and last 2 seasons
 const recentSeasons = getPreviousSeasons(currentSeason, 2);
@@ -107,6 +122,30 @@ uniqueSeasons.sort((a, b) => {
                             <input type="date" name="last_lomito_date" value={settingsMap.get('last_lomito_date') || ''} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
                             <p class="text-xs text-foreground/50 mt-1">Al configurarla, esta fecha se usa para el contador de días.</p>
                         </div>
+                        <div class="pt-4 border-t border-foreground/10">
+                            <div class="flex items-center justify-between gap-2 mb-3">
+                                <label class="block text-sm font-bold text-foreground/80">Horario de Tirada (GMT-3)</label>
+                                <span class={`text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full ${windowStatusLabel.cls}`}>{windowStatusLabel.text}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <span class="block text-xs font-semibold text-foreground/50 mb-1">Abre</span>
+                                    <input type="time" name="roll_window_start" required value={schedule.start} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-semibold text-foreground/50 mb-1">Cierra</span>
+                                    <input type="time" name="roll_window_end" required value={schedule.end} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
+                                </div>
+                            </div>
+                            <p class="text-xs text-foreground/50 mt-1">Fuera de este horario nadie puede tirar (salvo <code>lomitotester</code>).</p>
+                        </div>
+                        <div>
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" name="auto_verdict_enabled" value="1" checked={schedule.autoVerdictEnabled} class="w-5 h-5 accent-secondary cursor-pointer" />
+                                <span class="text-sm font-bold text-foreground/80">Veredicto automático al cierre</span>
+                            </label>
+                            <p class="text-xs text-foreground/50 mt-1">Publica el veredicto final en Discord a la hora de cierre. Estado de hoy: <strong class="text-foreground/70">{autoVerdictLabel}</strong></p>
+                        </div>
                         <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity cursor-pointer">
                             Guardar Configuración
                         </button>
@@ -117,7 +156,7 @@ uniqueSeasons.sort((a, b) => {
                         <div>
                             <h4 class="text-sm font-bold uppercase tracking-wider text-foreground/70 mb-2">Notificaciones de Discord</h4>
                             <p class="text-xs text-foreground/50 leading-relaxed mb-4">
-                                Publica manualmente el veredicto oficial del día de hoy en el canal de Discord. Esto asignará los roles definitivos (quién lava, quién saca y quién pone) basados en la suerte de hoy.
+                                El veredicto final sale solo a las {schedule.end}. Usá este botón para publicarlo manualmente antes del cierre o para reenviarlo (por ejemplo, si se anuló una tirada).
                             </p>
                         </div>
                         <div class="space-y-3">

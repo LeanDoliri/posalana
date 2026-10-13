@@ -1,9 +1,17 @@
 import type { APIRoute } from "astro";
 import db from "../../../db/index.js";
+import { isValidTime, timeToMinutes } from "../../../utils/schedule.js";
+
+async function setSetting(key: string, value: string) {
+	await db.execute({
+		sql: "INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+		args: [key, value]
+	});
+}
 
 export const POST: APIRoute = async ({ request, locals }) => {
 	const user = locals.user;
-	
+
 	if (!user || user.role !== "admin") {
 		return new Response("Unauthorized", { status: 403 });
 	}
@@ -16,17 +24,28 @@ export const POST: APIRoute = async ({ request, locals }) => {
 	}
 
 	const last_lomito_date = formData.get("last_lomito_date")?.toString() || "";
+	const roll_window_start = formData.get("roll_window_start")?.toString() || "";
+	const roll_window_end = formData.get("roll_window_end")?.toString() || "";
+	const auto_verdict_enabled = formData.get("auto_verdict_enabled") === "1";
+
+	if (!isValidTime(roll_window_start) || !isValidTime(roll_window_end)) {
+		return new Response("El horario de tirada debe tener formato HH:MM", { status: 400 });
+	}
+	if (timeToMinutes(roll_window_start) >= timeToMinutes(roll_window_end)) {
+		return new Response("La hora de apertura tiene que ser anterior a la de cierre", { status: 400 });
+	}
 
 	try {
         if (last_lomito_date) {
-            await db.execute({
-                sql: "INSERT INTO settings (key, value) VALUES ('last_lomito_date', ?) ON CONFLICT(key) DO UPDATE SET value = ?",
-                args: [last_lomito_date, last_lomito_date]
-            });
+            await setSetting("last_lomito_date", last_lomito_date);
         } else {
             await db.execute("DELETE FROM settings WHERE key = 'last_lomito_date'");
         }
-		
+
+		await setSetting("roll_window_start", roll_window_start);
+		await setSetting("roll_window_end", roll_window_end);
+		await setSetting("auto_verdict_enabled", auto_verdict_enabled ? "1" : "0");
+
 		return new Response(null, {
 			status: 302,
 			headers: { Location: "/admin" }

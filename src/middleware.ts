@@ -1,5 +1,7 @@
 import { lucia } from "./auth.js";
 import { defineMiddleware } from "astro:middleware";
+import db from "./db/index.js";
+import { maybeSendAutoVerdict } from "./utils/schedule.js";
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const sessionId = context.cookies.get(lucia.sessionCookieName)?.value ?? null;
@@ -18,6 +20,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		}
 		context.locals.session = session;
 		context.locals.user = user;
+	}
+
+	// Veredicto automático: la primera visita después del cierre de la tirada
+	// (incluido el polling del inicio) lo publica. Nunca debe romper la página.
+	try {
+		await maybeSendAutoVerdict(db);
+	} catch (e) {
+		console.error("No se pudo publicar el veredicto automático:", e);
 	}
 
 	const response = await next();

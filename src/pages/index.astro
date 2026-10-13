@@ -4,6 +4,8 @@ import db from '../db/index.js';
 import { getSeasonId, getExemptionsForSeason } from '../utils/season.js';
 import UserAvatar from '../components/UserAvatar.astro';
 import DiceDisplay from '../components/DiceDisplay.astro';
+import ScheduleNotice from '../components/ScheduleNotice.astro';
+import { getArgentinaNow, getRollSchedule, getRollWindowStatus, SCHEDULE_NOTICE_UNTIL } from '../utils/schedule.js';
 
 if (!Astro.locals.user) {
 	return Astro.redirect('/login');
@@ -11,10 +13,13 @@ if (!Astro.locals.user) {
 
 const user = Astro.locals.user;
 
-// Get today's date in GMT-3
-const today = new Date();
-today.setHours(today.getHours() - 3);
-const dateStr = today.toISOString().split('T')[0];
+// Fecha y horario de tirada en GMT-3
+const now = getArgentinaNow();
+const dateStr = now.dateStr;
+const schedule = await getRollSchedule(db);
+const windowStatus = getRollWindowStatus(schedule, now.minutes);
+const canRoll = windowStatus === 'open' || user.role === 'tester';
+const showScheduleNotice = dateStr <= SCHEDULE_NOTICE_UNTIL;
 
 // Check if user rolled
 const userRollRes = await db.execute({
@@ -181,6 +186,7 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
         </div>
 
         <!-- Hero Section -->
+        <div id="hero-container">
         {hasRolled && myRoll ? (
             <section class="relative bg-white border border-foreground/10 p-4 md:p-6 rounded-3xl shadow-xl overflow-hidden flex flex-col sm:flex-row items-center justify-between animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out hover-card-lift">
                 <div class="text-center sm:text-left mb-4 sm:mb-0">
@@ -201,7 +207,12 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
                 <div class="relative z-10">
                     <p class="text-secondary font-bold tracking-widest uppercase text-xs mb-2">Tirada Oficial</p>
                     <h2 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-foreground text-balance">{dateStr}</h2>
-                    <p class="text-foreground/60 mb-10 max-w-md mx-auto text-pretty">El destino no está escrito, se decide con los dados. ¿Zafás o lavás?</p>
+                    {canRoll ? (
+                    <>
+                    <p class="text-foreground/60 mb-3 max-w-md mx-auto text-pretty">El destino no está escrito, se decide con los dados. ¿Zafás o lavás?</p>
+                    <p class="inline-flex items-center gap-2 text-xs font-bold text-secondary bg-secondary/10 px-3 py-1 rounded-full mb-8">
+                        <i class="fa-regular fa-clock"></i> La tirada cierra a las {schedule.end}
+                    </p>
 
                     <form method="post" action="/api/roll" id="roll-form">
                         <button type="submit" id="roll-button" class="relative overflow-hidden bg-secondary text-background px-10 py-5 rounded-full text-xl font-bold shadow-[0_8px_30px_rgba(0,204,204,0.3)] hover:shadow-[0_8px_40px_rgba(0,204,204,0.5)] hover:-translate-y-1 active:translate-y-0 active:shadow-[0_4px_15px_rgba(0,204,204,0.3)] transition-all duration-300 cursor-pointer group">
@@ -213,9 +224,29 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
                             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
                         </button>
                     </form>
+                    </>
+                    ) : windowStatus === 'before' ? (
+                    <>
+                        <p class="text-foreground/60 mb-8 max-w-md mx-auto text-pretty">Los dados todavía están guardados. Paciencia, que el destino tiene horario.</p>
+                        <div class="inline-flex flex-col items-center gap-1 bg-foreground/5 border border-foreground/10 px-8 py-5 rounded-3xl">
+                            <span class="text-xs font-bold uppercase tracking-widest text-foreground/50"><i class="fa-solid fa-lock mr-1"></i> La tirada abre a las</span>
+                            <span class="text-4xl font-black text-foreground">{schedule.start}</span>
+                            <span class="text-xs text-foreground/50 font-medium">y cierra a las {schedule.end}</span>
+                        </div>
+                    </>
+                    ) : (
+                    <>
+                        <p class="text-foreground/60 mb-8 max-w-md mx-auto text-pretty">La mesa está cerrada y el veredicto final ya es definitivo. Si no tiraste, hoy no jugás.</p>
+                        <div class="inline-flex flex-col items-center gap-1 bg-primary/5 border border-primary/20 px-8 py-5 rounded-3xl">
+                            <span class="text-xs font-bold uppercase tracking-widest text-primary"><i class="fa-solid fa-door-closed mr-1"></i> Tirada cerrada a las {schedule.end}</span>
+                            <span class="text-sm text-foreground/60 font-medium">Volvé mañana de {schedule.start} a {schedule.end}</span>
+                        </div>
+                    </>
+                    )}
                 </div>
             </section>
         )}
+        </div>
 
         <!-- Cláusula Lomito -->
         <div id="lomito-container">
@@ -381,7 +412,16 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
                             oldPodium.innerHTML = newPodium.innerHTML;
                         }
 
-                        // 3. Update Lomito Banner and check for new Lomito activation
+                        // 3. Update Hero (abre/cierra la tirada según el horario)
+                        const newHero = doc.getElementById("hero-container");
+                        const oldHero = document.getElementById("hero-container");
+                        const rollingNow = document.getElementById("roll-overlay")?.classList.contains("flex");
+                        if (!rollingNow && newHero && oldHero && newHero.innerHTML !== oldHero.innerHTML) {
+                            oldHero.innerHTML = newHero.innerHTML;
+                            setupRollAnimation();
+                        }
+
+                        // 4. Update Lomito Banner and check for new Lomito activation
                         const newLomito = doc.getElementById("lomito-container");
                         const oldLomito = document.getElementById("lomito-container");
                         if (newLomito && oldLomito && newLomito.innerHTML !== oldLomito.innerHTML) {
@@ -519,6 +559,8 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
             })();
         </script>
         
+        {showScheduleNotice && <ScheduleNotice start={schedule.start} end={schedule.end} dateStr={dateStr} />}
+
         <!-- Fullscreen Dice Rolling Overlay -->
         <div id="roll-overlay" class="fixed inset-0 z-[100] bg-background/80 backdrop-blur-md hidden flex-col items-center justify-center animate-in fade-in duration-300">
             <div class="bg-white/80 border border-white/20 p-8 sm:p-12 rounded-3xl shadow-2xl flex flex-col items-center gap-8 max-w-md w-[90%] text-center animate-in zoom-in-95 duration-300">

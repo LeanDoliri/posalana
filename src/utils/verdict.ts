@@ -1,0 +1,77 @@
+import type { Client } from "@libsql/client";
+import { assignDailyChores } from "./chores.js";
+import { sendDiscordVerdict } from "./discord.js";
+import { getSeasonId, getExemptionsForSeason } from "./season.js";
+
+/**
+ * Arma el veredicto del día (quién pone, saca, lava, zafa o está exento) y lo
+ * publica en Discord. Lo usan tanto la publicación manual del admin como el
+ * veredicto automático del cierre.
+ */
+export async function publishDailyVerdict(
+    db: Client,
+    dateStr: string,
+    options: { automatic?: boolean } = {}
+): Promise<{ sent: boolean; playersCount: number }> {
+    const seasonId = getSeasonId(dateStr);
+    const exemptions = await getExemptionsForSeason(db, seasonId);
+
+    const allRollsRes = await db.execute({
+        sql: `
+            SELECT r.*, u.username, u.display_name, u.avatar_url
+            FROM roll r
+            JOIN user u ON r.user_id = u.id
+            WHERE r.date = ?
+        `,
+        args: [dateStr]
+    });
+    const allRolls = allRollsRes.rows;
+
+    if (allRolls.length === 0) {
+        return { sent: false, playersCount: 0 };
+    }
+
+    const { rollChoreMap, sortedRolls } = assignDailyChores(allRolls, exemptions);
+
+    const choresAssigned = {
+        lava: [] as string[],
+        saca: [] as string[],
+        pone: [] as string[],
+        zafaron: [] as string[],
+        exentos: [] as string[]
+    };
+
+    for (const roll of sortedRolls) {
+        const displayName = String(roll.display_name || roll.username);
+        const chore = rollChoreMap.get(roll.id);
+
+        if (chore.code === "LA") {
+            choresAssigned.lava.push(displayName);
+        } else if (chore.code === "SA") {
+            choresAssigned.saca.push(displayName);
+        } else if (chore.code === "PO") {
+            choresAssigned.pone.push(displayName);
+        } else {
+            const userExemptions = exemptions.filter(e => String(e.user_id) === String(roll.user_id));
+            if (userExemptions.length > 0) {
+                const exCodes = userExemptions.map(e => e.chore_code).join(", ");
+                choresAssigned.exentos.push(`${displayName} (${exCodes})`);
+            } else {
+                choresAssigned.zafaron.push(displayName);
+            }
+        }
+    }
+
+    // Fecha para el título de Discord (DD/MM/YYYY)
+    const [year, month, day] = dateStr.split("-");
+    const formattedDate = `${day}/${month}/${year}`;
+
+    const playersCount = new Set(allRolls.map(r => String(r.user_id))).size;
+
+    const result = await sendDiscordVerdict(formattedDate, choresAssigned, playersCount, options.automatic ?? false);
+    if (result === "error") {
+        throw new Error("Discord rechazó el veredicto");
+    }
+
+    return { sent: true, playersCount };
+}

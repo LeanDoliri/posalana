@@ -2,6 +2,7 @@ import type { APIContext } from "astro";
 import db from "../../db/index.js";
 import { assignDailyChores } from "../../utils/chores.js";
 import { sendDiscordRoll } from "../../utils/discord.js";
+import { getArgentinaNow, getRollSchedule, getRollWindowStatus } from "../../utils/schedule.js";
 
 function rollDie() {
     return Math.floor(Math.random() * 6) + 1;
@@ -12,16 +13,23 @@ export async function POST(context: APIContext): Promise<Response> {
 		return new Response("No autorizado", { status: 401 });
 	}
 
-    // Get current date in YYYY-MM-DD
-    // Note: To match local timezone, we should ideally use the client's date or a fixed timezone. 
-    // We'll use a simple UTC-3 for Argentina if we can, or just local server time.
-    const today = new Date();
-    // adjust to GMT-3 for Argentina
-    today.setHours(today.getHours() - 3);
-    const dateStr = today.toISOString().split('T')[0];
-    const timeStr = today.toISOString().split('T')[1].substring(0, 5); // HH:mm
+    // Fecha y hora en Argentina (GMT-3)
+    const { dateStr, timeStr, minutes } = getArgentinaNow();
 
     const userId = context.locals.user!.id;
+
+    // Solo se puede tirar dentro del horario oficial (el tester queda afuera de
+    // esta regla para poder probar la Cláusula Lomito a cualquier hora).
+    if (context.locals.user?.role !== 'tester') {
+        const schedule = await getRollSchedule(db);
+        const status = getRollWindowStatus(schedule, minutes);
+        if (status === "before") {
+            return new Response(`Todavía no abrió la tirada: los dados se habilitan a las ${schedule.start}.`, { status: 403 });
+        }
+        if (status === "closed") {
+            return new Response(`La tirada de hoy cerró a las ${schedule.end}. Volvé mañana a las ${schedule.start}.`, { status: 403 });
+        }
+    }
 
     // Check if already rolled
     const existing = await db.execute({

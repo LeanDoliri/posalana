@@ -12,7 +12,8 @@ La forma definitiva, justa y basada puramente en el azar para dividir las tareas
 ## 🌟 Características Principales
 
 *   **Autenticación Integrada:** Registro e inicio de sesión seguro usando [Lucia Auth](https://lucia-auth.com/).
-*   **Tirada Diaria Única:** Cada usuario solo puede tirar los dados una vez por día. El sistema bloquea intentos múltiples.
+*   **Tirada Diaria Única y con Horario:** Cada usuario solo puede tirar los dados una vez por día y solo dentro del horario oficial (por defecto de **10:00 a 12:30**, configurable desde el panel admin). El sistema bloquea intentos múltiples y fuera de hora.
+*   **⏰ Veredicto Automático:** Al cierre de la tirada (12:30) el veredicto final se publica solo en Discord, sin que nadie tenga que apretar nada. Los días en que nadie tiró no se manda ningún mensaje.
 *   **Ranking Automático:** Calcula matemáticamente quién saca el número más bajo y asigna automáticamente la peor tarea (Lava), la intermedia (Saca) y la más leve (Pone).
 *   **🥪 Cláusula Lomito:** Si dos personas sacan **exactamente los mismos dados en el mismo orden** en el mismo día, se activa el cartel festivo de *Lomito* y el contador de "Días sin Lomito" se reinicia a cero.
 *   **Historial con Paginación Semanal:** Muestra las tiradas agrupadas por semana calendario (lunes a domingo) con navegación interactiva fluida (client-side) que previene recargas completas, mantiene el scroll y actualiza la URL y el historial del navegador automáticamente.
@@ -22,7 +23,7 @@ La forma definitiva, justa y basada puramente en el azar para dividir las tareas
 *   **Panel de Administración (Admin Dashboard):** Permite configurar variables, promover administradores, eliminar cuentas, anular tiradas accidentales, cargar puntos manuales históricos y gestionar exenciones (crear/borrar).
 *   **Gestión Rápida de Avatares:** El administrador puede cambiar o eliminar las fotos de perfil de todos los usuarios directamente haciendo clic sobre su avatar en el padrón, comprimiendo la imagen en el navegador antes de subirla.
 *   **🔄 Actualización en Tiempo Real:** El ranking de la página de inicio se actualiza automáticamente cada 8 segundos sin necesidad de refrescar la página. Utiliza la *Page Visibility API* para pausar automáticamente las consultas al servidor si el usuario cambia de pestaña, minimizando el consumo de base de datos Turso.
-*   **👾 Notificaciones de Discord:** Integración automática mediante Webhooks de Discord que notifica al instante cada tirada de dados realizada. Además, el administrador tiene una burbuja flotante visible en todas las páginas para publicar el veredicto oficial de tareas del día (que incluye la cantidad de jugadores que tiraron).
+*   **👾 Notificaciones de Discord:** Integración automática mediante Webhooks de Discord que notifica al instante cada tirada de dados realizada. El veredicto oficial sale automáticamente al cierre de la tirada y, además, el administrador tiene una burbuja flotante visible en todas las páginas para publicarlo o reenviarlo a mano de tareas del día (que incluye la cantidad de jugadores que tiraron).
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -88,13 +89,14 @@ Como Vercel es un entorno "Serverless" (sin estado), la base de datos no puede v
    - `DATABASE_URL`: La URL de tu base de Turso.
    - `DATABASE_AUTH_TOKEN`: El token de tu base de Turso.
    - `DISCORD_WEBHOOK_URL`: La URL del Webhook del canal de Discord (opcional, para notificaciones).
+   - `CRON_SECRET`: Un texto secreto cualquiera (opcional pero recomendado). Vercel lo usa para autenticar el cron diario de `vercel.json` que asegura el veredicto automático.
 5. Tocá **Deploy**.
 
 ¡Listo! A partir de ahora, cada vez que hagas un `git push` a tu rama principal (`main`), Vercel va a compilar y actualizar la página automáticamente.
 
 ## 📜 Reglas del Juego
 
-Las reglas oficiales de POSALANA están publicadas dentro de la misma aplicación, actualizadas por última vez el **16 de Junio de 2026**. Podés consultarlas en la pestaña "Reglas" en el menú principal de navegación.
+Las reglas oficiales de POSALANA están publicadas dentro de la misma aplicación, actualizadas por última vez el **13 de Octubre de 2026**. Podés consultarlas en la pestaña "Reglas" en el menú principal de navegación.
 
 ---
 *Hecho con ❤️ y algo de suerte en los dados.*

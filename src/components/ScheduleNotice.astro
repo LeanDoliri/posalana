@@ -1,0 +1,85 @@
+---
+// Pop-up temporal que anuncia el horario nuevo de la tirada. Se monta en el
+// inicio solo hasta SCHEDULE_NOTICE_UNTIL (ver utils/schedule.ts) y aparece una
+// vez por día: al cerrarlo se guarda la fecha en localStorage.
+interface Props {
+    start: string;
+    end: string;
+    dateStr: string;
+}
+
+const { start, end, dateStr } = Astro.props;
+---
+
+<div
+    id="schedule-notice"
+    data-date={dateStr}
+    class="hidden fixed inset-0 z-[90] items-center justify-center bg-foreground/40 backdrop-blur-sm px-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="schedule-notice-title"
+>
+    <div class="relative bg-white border border-foreground/10 rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 text-center overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+        <div class="absolute -top-16 -right-16 w-40 h-40 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 -left-16 w-40 h-40 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="relative z-10">
+            <p class="text-5xl mb-3">⏰🎲</p>
+            <p class="text-secondary font-bold tracking-widest uppercase text-[10px] mb-1">Nueva modalidad</p>
+            <h3 id="schedule-notice-title" class="text-2xl font-black text-foreground tracking-tight text-balance">¡Los dados ahora tienen horario!</h3>
+
+            <div class="mt-5 bg-secondary/5 border border-secondary/20 rounded-2xl py-4 px-3">
+                <p class="text-xs font-bold uppercase tracking-widest text-foreground/50">Horario de tiración</p>
+                <p class="text-3xl font-black text-foreground mt-1">
+                    {start} <span class="text-foreground/30 font-normal">a</span> {end}
+                </p>
+            </div>
+
+            <ul class="mt-5 space-y-2 text-sm text-foreground/75 text-left">
+                <li class="flex gap-2"><i class="fa-solid fa-lock text-secondary mt-1 w-4 shrink-0"></i><span>Fuera de ese horario la app no deja tirar.</span></li>
+                <li class="flex gap-2"><i class="fa-solid fa-bullhorn text-primary mt-1 w-4 shrink-0"></i><span>A las <strong>{end}</strong> se publica solo el <strong>veredicto final</strong> en Discord.</span></li>
+                <li class="flex gap-2"><i class="fa-solid fa-hourglass-end text-accent mt-1 w-4 shrink-0"></i><span>Si no tiraste antes del cierre, ese día no jugás.</span></li>
+            </ul>
+
+            <button
+                type="button"
+                data-schedule-notice-close
+                class="mt-6 w-full bg-secondary text-background font-bold py-3.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer shadow-md shadow-secondary/20"
+            >
+                ¡Entendido!
+            </button>
+            <a href="/rules" data-schedule-notice-close class="block mt-3 text-xs font-bold text-foreground/50 hover:text-foreground transition-colors">
+                Ver las reglas completas
+            </a>
+        </div>
+    </div>
+</div>
+
+<script is:inline>
+    (function () {
+        const STORAGE_KEY = "posalana-aviso-horario";
+        const modal = document.getElementById("schedule-notice");
+        if (!modal) return;
+
+        const today = modal.dataset.date;
+        let seen = null;
+        try { seen = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+        if (seen === today) return;
+
+        const close = () => {
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+            try { localStorage.setItem(STORAGE_KEY, today); } catch (e) {}
+            document.removeEventListener("keydown", onKey);
+        };
+        const onKey = (e) => { if (e.key === "Escape") close(); };
+
+        modal.querySelectorAll("[data-schedule-notice-close]").forEach((el) => el.addEventListener("click", close));
+        modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+        document.addEventListener("keydown", onKey);
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        modal.querySelector("button[data-schedule-notice-close]")?.focus();
+    })();
+</script>

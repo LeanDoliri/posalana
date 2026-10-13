@@ -5,6 +5,9 @@ Si sos un agente de Inteligencia Artificial (AI) leyendo este repositorio, este 
 
 ## 1. Lógica del Juego (Core Business Logic)
 - **Tirada Diaria:** Los usuarios tiran 4 dados (d6) una vez por día en la ruta `/api/roll`.
+- **Horario de Tirada (desde 13/10/2026):** Solo se puede tirar de **10:00 a 12:30** (GMT-3). Lo valida `/api/roll` (403 fuera de horario; el usuario `tester` queda exceptuado) y el inicio muestra el botón solo con la ventana abierta (el hero `#hero-container` también se refresca por polling). La lógica vive en `src/utils/schedule.ts`; el horario es configurable desde `/admin` (claves `roll_window_start` / `roll_window_end` en `settings`, con defaults en el código).
+- **Veredicto Automático:** Al cierre de la tirada se publica solo el veredicto final en Discord (`maybeSendAutoVerdict`). Se dispara desde el middleware en la primera request posterior al cierre (el polling de 8s del inicio lo hace salir casi en el momento) y desde un cron de Vercel (`vercel.json` → `/api/cron/verdict`, protegido con `CRON_SECRET` si está configurado) como red de seguridad. Es idempotente: hace un "claim" atómico sobre `settings.auto_verdict_last_date` y guarda la hora de envío en `auto_verdict_last_at`; si Discord falla, libera el claim para reintentar. **Si ese día nadie tiró (ej. lunes, viernes y fines de semana, que no se juega) no se envía ningún mensaje**: queda registrado como `sin tiradas`. Se puede desactivar desde `/admin` (`auto_verdict_enabled`).
+- **Aviso de Horario Nuevo:** `ScheduleNotice.astro` es un pop-up que se muestra en el inicio una vez por día (localStorage) hasta `SCHEDULE_NOTICE_UNTIL` (18/10/2026). Pasada esa fecha deja de montarse solo; se puede borrar junto con la constante.
 - **Asignación de Tareas:** Se comparan los dados secuencialmente (primer dado, luego segundo, tercero y cuarto de menor a mayor). El que saca el tiro más bajo tiene la peor suerte y le toca la peor tarea (Lava - LA). El siguiente "Saca" (SA), el siguiente "Pone" (PO), y los demás se salvan ("Nada" o "NA" con emoji 🎉).
 - **Cláusula Lomito:** Si dos usuarios sacan **exactamente los mismos 4 dados en el mismo orden**, se activa la "Cláusula Lomito". 
   - La UI debe mostrar el emoji de sanguche (`🥪`) en el Navbar y un banner festivo en el Index y en el Historial.
@@ -32,7 +35,8 @@ Si sos un agente de Inteligencia Artificial (AI) leyendo este repositorio, este 
 - **Notificaciones de Discord:**
   - Requiere configurar `DISCORD_WEBHOOK_URL` en las variables de entorno.
   - **Tirada Automática:** Llama asíncronamente a `sendDiscordRoll` en la API de tirada para publicar la tirada (en formato numérico) y un CTA al sitio.
-  - **Veredicto Manual:** Llama a `/api/admin/publish-verdict` para publicar la asignación final consolidada de tareas del día. El mensaje destaca la cantidad de jugadores distintos que tiraron ese día. El bot usa `public/bot-avatar.png` como `avatar_url`.
+  - **Veredicto:** La asignación final consolidada de tareas del día se arma en `src/utils/verdict.ts` (`publishDailyVerdict`), compartido entre el veredicto automático del cierre y el manual (`/api/admin/publish-verdict`).
+ El mensaje destaca la cantidad de jugadores distintos que tiraron ese día. El bot usa `public/bot-avatar.png` como `avatar_url`.
 
 ## 3. UI y Estética (Mandatorio)
 - **Diseño Moderno:** El diseño usa una paleta de colores vibrantes (`primary`, `secondary`, `accent`, `background`, `foreground`) definidos en `src/styles/global.css`. Todos los componentes tipo "tarjeta" y la barra de navegación utilizan fondos blancos puros (`bg-white`) con bordes contrastados (`border-foreground/10`) y sombras fluidas para resaltar nítidamente sobre el fondo gris claro del body (`#EDEDED`).
@@ -44,12 +48,13 @@ Si sos un agente de Inteligencia Artificial (AI) leyendo este repositorio, este 
 ## 4. Modo Administrador
 - El usuario inicial con rol de `admin` es `ldoliri`.
 - Existe una ruta protegida `/admin` que permite:
-  - Configurar variables globales (Último Lomito manual).
+  - Configurar variables globales (Último Lomito manual, horario de tirada y veredicto automático on/off, con el estado de la ventana y del veredicto de hoy).
   - Ver el registro de cambios de contraseña (tabla `password_reset_log`; el reset en `/reset` es libre, sin clave maestra).
   - Borrar usuarios, anular tiradas y cambiar roles.
   - Cargar puntos manualmente (temporadas pasadas).
   - **Gestión de Exenciones:** Crear (con soporte para temporadas personalizadas) y borrar exenciones manuales que sobrescriben las automáticas.
   - **Fotos de Perfil:** El administrador puede cambiar o eliminar (volviendo al avatar por defecto de Dicebear) las fotos de perfil de todos los usuarios directamente haciendo clic en su avatar en el padrón.
-  - **Acción Rápida de Discord:** Permite disparar de forma manual la publicación del veredicto del día (quién lava, quién saca, quién pone) directamente al canal de Discord. Además está disponible desde cualquier página mediante la burbuja flotante `VerdictFab`.
+  - **Acción Rápida de Discord:** Permite disparar de forma manual (antes del cierre o como reenvío) la publicación del veredicto del día (quién lava, quién saca, quién pone) directamente al canal de Discord.
+ Además está disponible desde cualquier página mediante la burbuja flotante `VerdictFab`.
 ---
 **Nota para la IA:** No asumas lógicas estándar de e-commerce o blogs. Este es un juego cerrado entre amigos. Mantené el tono lúdico y respetá estrictamente las variables de los dados.

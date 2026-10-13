@@ -85,12 +85,13 @@ export async function sendDiscordVerdict(
         zafaron: string[];
         exentos: string[];
     },
-    playersCount: number
-) {
+    playersCount: number,
+    automatic = false
+): Promise<"ok" | "no-webhook" | "error"> {
     const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
     if (!webhookUrl) {
         console.warn("DISCORD_WEBHOOK_URL is not configured.");
-        return;
+        return "no-webhook";
     }
 
     const poneStr = choresAssigned.pone.length > 0 ? choresAssigned.pone.join(", ") : "Nadie";
@@ -100,11 +101,13 @@ export async function sendDiscordVerdict(
     const exentosStr = choresAssigned.exentos.length > 0 ? choresAssigned.exentos.join(", ") : "Ninguno";
 
     const embed = {
-        title: `📜 EL DECRETO DIARIO - ${dateStr}`,
+        title: `📜 EL DECRETO DIARIO - ${dateStr}${automatic ? " · ⏰ MESA CERRADA" : ""}`,
         description: `🚨 **¡ATENCIÓN JUGADORES!** El destino ha hablado y las sentencias de hoy son definitivas e inapelables.\n\n## 🎲 ${playersCount} ${playersCount === 1 ? "jugador tiró" : "jugadores tiraron"} hoy\n\nAquí tienen la distribución oficial de tareas de la mesa para hoy:\n\n🍽️ **PO:** **${poneStr}**\n🗑️ **SA:** **${sacaStr}**\n🧽 **LA:** **${lavaStr}**\n🎉 **NA:** **${zafaronStr !== "Ninguno" ? zafaronStr : "Ninguno"}**\n🛡️ **EXENTOS HOY:** **${exentosStr !== "Ninguno" ? exentosStr : "Ninguno"}**\n\n👉 *¿Querés apelar con tus estadísticas?* Entrá a la [App de POSALANA](https://posalana.vercel.app/)`,
         color: 15346264, // Primary pink color (Hex: #EA2A58)
         footer: {
-            text: "POSALANA • El veredicto del destino 📜"
+            text: automatic
+                ? "POSALANA • Veredicto automático al cierre de la tirada ⏰"
+                : "POSALANA • El veredicto del destino 📜"
         },
         timestamp: new Date().toISOString()
     };
@@ -119,8 +122,11 @@ export async function sendDiscordVerdict(
         });
         if (!res.ok) {
             console.error("Failed to send Discord verdict:", await res.text());
+            return "error";
         }
+        return "ok";
     } catch (err) {
         console.error("Error sending Discord verdict:", err);
+        return "error";
     }
 }
