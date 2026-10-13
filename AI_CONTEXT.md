@@ -43,6 +43,7 @@ Si sos un agente de Inteligencia Artificial (AI) leyendo este repositorio, este 
 - **Paginación del Historial:** Agrupado por semana calendario (lunes a domingo). Funciona del lado del cliente sin recargar el navegador (`window.history.pushState` y evento `popstate`), con fallback SSR clásico y ancla `#historial-seccion` para auto-scroll.
 - **Selector de Temporadas Anteriores:** En `history.astro`, la tarjeta "Temporadas Anteriores" (al lado de "Temporada Actual", mismo diseño: título en una fila y temporada debajo) lista todas las temporadas cerradas con tiradas o puntos manuales (`getPastSeasonsWithData`), por defecto la más reciente. Cada temporada muestra su tabla y sus exenciones (`getExemptionsForSeason`). Todo se renderiza en SSR y un dropdown propio (listbox accesible con teclado, no `<select>` nativo) solo alterna cuál se ve (sin recargar).
 - **Ordenamiento Interactivo:** La "Tabla Global del Año" permite ordenamiento en cliente al hacer clic en sus cabeceras, actualizando iconos de FontAwesome (`fa-sort`, `fa-sort-up`, `fa-sort-down`) en tiempo real.
+- **Página 404:** `src/pages/404.astro` muestra un "tiro inválido" 4 · 👻 · 4 (el dado del medio es un fantasma) con botón para volver al inicio y un "Tirar de nuevo" que solo re-anima los dados (cliente, sin requests).
 - **Responsividad:** Mobile-first obligatorio. En móviles, los dados detallados (`DiceDisplay`) se ocultan inteligentemente en el timeline para mantener el ancho.
 
 ## 4. Modo Administrador
