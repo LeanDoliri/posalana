@@ -18,10 +18,10 @@ if (!user) {
 					src={user.avatar_url as string} 
 					alt={user.username} 
 					id="avatarPreview"
-					class="w-32 h-32 rounded-lutvia-pildora border-4 border-secondary/20 object-cover bg-foreground/5 shadow-md"
+					class="w-32 h-32 rounded-pildora border-4 border-secondary/20 object-cover bg-foreground/5 shadow-md"
 				/>
 				<div 
-					class="absolute inset-0 bg-foreground/50 rounded-lutvia-pildora flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+					class="absolute inset-0 bg-foreground/50 rounded-pildora flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
 					onclick="document.getElementById('avatarInput').click()"
 				>
 					<i class="fa-solid fa-camera text-background text-2xl"></i>
@@ -38,8 +38,8 @@ if (!user) {
 				<p class="text-sm text-foreground/60 mb-2">{user.role === 'admin' ? 'Administrador' : 'Jugador'} | @{user.username}</p>
                 <div class="flex flex-col gap-2 w-full">
                     <label class="text-sm font-bold text-foreground/80 text-left">Tu Nombre Real</label>
-                    <input type="text" id="nameInput" value={user.display_name} class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-lutvia-radio-chico px-4 py-2 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all" />
-                    <button id="saveNameBtn" class="bg-secondary/20 text-secondary hover:bg-secondary hover:text-background font-bold py-2 rounded-lutvia-radio-chico transition-colors w-full mt-2 cursor-pointer">
+                    <input type="text" id="nameInput" value={user.display_name} class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-chico px-4 py-2 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all" />
+                    <button id="saveNameBtn" class="bg-secondary/20 text-secondary hover:bg-secondary hover:text-background font-bold py-2 rounded-chico transition-colors w-full mt-2 cursor-pointer">
                         Guardar Nombre
                     </button>
                 </div>

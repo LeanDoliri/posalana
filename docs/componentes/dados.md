@@ -23,4 +23,4 @@ Sin `isSafe` ni `color`, el dado que decide va en cyan.
 
 ## Sistema de diseño
 
-Colores de la paleta. El dado cyan sobre blanco (2.00), los grises al 30 % y el movimiento al pasar el mouse están en los **Permitidos** del perfil POSALANA.
+Colores de la paleta y Montserrat. El dado cyan sobre blanco (2.00) y los grises al 30 % están en el pendiente de contraste de [`diseno.md`](../diseno.md); el movimiento al pasar el mouse es una decisión de POSALANA.

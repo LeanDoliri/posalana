@@ -6,7 +6,7 @@ Una tirada del día en el ranking de la portada: quién tiró, a qué hora, qué
 
 ## Anatomía
 
-- **Bloque** con `lutvia-radio-chico` (10px), fondo al 8 % del color de la tarea (`primary/8`, `secondary/8`, `accent/8`; `foreground/[0.02]` si zafó) y borde del mismo color.
+- **Bloque** con `rounded-chico` (10px), fondo al 8 % del color de la tarea (`primary/8`, `secondary/8`, `accent/8`; `foreground/[0.02]` si zafó) y borde del mismo color.
 - **Avatar** `lg` con borde cyan al 20 %.
 - **Nombre** en Black 900, `text-xl`.
 - **Etiquetas**:
@@ -27,4 +27,4 @@ Una tirada del día en el ranking de la portada: quién tiró, a qué hora, qué
 
 ## Sistema de diseño
 
-Colores, tipografía y radios del sistema. El texto en color, los textos de 9 y 10 px, los fondos al 8 % y el crecimiento de tu fila están en los **Permitidos** del perfil POSALANA.
+Colores de la paleta, Montserrat y los radios de POSALANA. Los fondos al 8 %, los textos de 9 y 10 px y el crecimiento de tu fila son decisiones de POSALANA; el texto en color y el gris claro sobre relleno de color están en el pendiente de contraste de [`diseno.md`](../diseno.md).
