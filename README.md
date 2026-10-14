@@ -28,7 +28,7 @@ La forma definitiva, justa y basada puramente en el azar para dividir las tareas
 ## 🛠️ Tecnologías Utilizadas
 
 *   **Framework:** [Astro](https://astro.build/) (con adaptador Serverless para Vercel y SSR activado).
-*   **Estilos:** [Tailwind CSS v4](https://tailwindcss.com/) para un diseño responsive y moderno.
+*   **Estilos:** [Tailwind CSS v4](https://tailwindcss.com/) con el sistema de diseño de Lutvia ([LUTVIA-DEV/lutvia-ds](https://github.com/LUTVIA-DEV/lutvia-ds) v2.0.0, copiado en `src/styles/lutvia/`). Las decisiones de diseño están en [`docs/diseno.md`](docs/diseno.md) y las piezas propias del juego en [`docs/componentes/`](docs/componentes/).
 *   **Base de Datos:** SQLite alojada en la nube usando [Turso](https://turso.tech/) a través de `@libsql/client`.
 *   **Despliegue:** Preparado para hostear de manera **100% gratuita y para siempre** en [Vercel](https://vercel.com/).
 

@@ -1,0 +1,16 @@
+/* Copiado de LUTVIA-DEV/lutvia-ds v2.0.0 (css/tailwind.css). No editar a mano: para actualizar, se copia de nuevo desde el tag. */
+/* Lutvia · capa para Tailwind v4 · v2.0.0
+ * GENERADO por scripts/build-css.mjs desde project/tokens.json. No editar a mano. */
+/* Uso: @import "tailwindcss"; @import "@lutvia/ds/tailwind.css";
+ * Clases: bg-lutvia-cyan, text-lutvia-oscuro, border-lutvia-gris… */
+@import "./lutvia.css";
+
+@theme inline {
+  --color-lutvia-rosa: var(--lutvia-rosa);
+  --color-lutvia-cyan: var(--lutvia-cyan);
+  --color-lutvia-amarillo: var(--lutvia-amarillo);
+  --color-lutvia-violeta: var(--lutvia-violeta);
+  --color-lutvia-gris: var(--lutvia-gris);
+  --color-lutvia-oscuro: var(--lutvia-oscuro);
+  --color-lutvia-blanco: var(--lutvia-blanco);
+}

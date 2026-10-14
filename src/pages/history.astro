@@ -161,7 +161,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                 <h2 class="text-3xl md:text-4xl font-black tracking-tight text-foreground">Archivos POSALANA</h2>
                 <p class="text-foreground/60 mt-2">El registro inmutable de la suerte pasada.</p>
             </div>
-            <div class="bg-white border border-foreground/10 px-4 py-2 rounded-full text-sm font-bold text-foreground/70 shadow-sm">
+            <div class="bg-white border border-foreground/10 px-4 py-2 rounded-pildora text-sm font-bold text-foreground/70 shadow-sm">
                 <i class="fa-solid fa-database mr-2"></i> {dates.length} días registrados
             </div>
         </header>
@@ -170,14 +170,14 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
         <section class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out">
             <!-- Temporada Actual -->
             <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
-                <div class="absolute -top-12 -right-12 w-36 h-36 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-all duration-500 pointer-events-none"></div>
+                <div class="absolute -top-12 -right-12 w-36 h-36 bg-secondary/5 rounded-pildora blur-2xl group-hover:bg-secondary/10 transition-all duration-500 pointer-events-none"></div>
                 
                 <div class="flex flex-col items-start gap-3 mb-6 relative z-10">
                     <h3 class="text-xl font-black flex items-center gap-2.5 text-foreground">
                         <i class="fa-solid fa-calendar-days text-secondary"></i>
                         Temporada Actual
                     </h3>
-                    <span class="bg-secondary/10 border border-secondary/20 text-secondary font-black text-sm px-4 py-2 rounded-full">
+                    <span class="bg-secondary/10 border border-secondary/20 text-secondary font-black text-sm px-4 py-2 rounded-pildora">
                         {formatSeasonName(currentSeasonId)}
                     </span>
                 </div>
@@ -201,11 +201,11 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                 const choreEmoji = ex.chore_code === 'LA' ? '🧽' : ex.chore_code === 'SA' ? '🗑️' : '🍽️';
                                 const choreLabel = ex.chore_code === 'LA' ? 'Lavar' : ex.chore_code === 'SA' ? 'Sacar' : 'Poner';
                                 return (
-                                    <div class="flex items-center gap-2 bg-secondary/5 border border-secondary/20 px-3 py-1.5 rounded-full text-xs">
+                                    <div class="flex items-center gap-2 bg-secondary/5 border border-secondary/20 px-3 py-1.5 rounded-pildora text-xs">
                                         <UserAvatar user={{ username: ex.username, display_name: ex.display_name, avatar_url: ex.avatar_url }} size="sm" />
                                         <span class="font-bold text-foreground">{ex.display_name}</span>
                                         <span class="text-foreground/50">•</span>
-                                        <span class="text-secondary font-bold font-mono">{choreEmoji} Exento de {choreLabel}</span>
+                                        <span class="text-secondary font-bold tabular-nums">{choreEmoji} Exento de {choreLabel}</span>
                                     </div>
                                 );
                             })}
@@ -216,7 +216,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
 
             <!-- Temporadas Anteriores (con selector) -->
             <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
-                <div class="absolute -top-12 -right-12 w-36 h-36 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-all duration-500 pointer-events-none"></div>
+                <div class="absolute -top-12 -right-12 w-36 h-36 bg-accent/5 rounded-pildora blur-2xl group-hover:bg-accent/10 transition-all duration-500 pointer-events-none"></div>
 
                 <div class="flex flex-col items-start gap-3 mb-6 relative z-20">
                     <h3 class="text-xl font-black flex items-center gap-2.5 text-foreground">
@@ -230,7 +230,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                             aria-haspopup="listbox"
                             aria-expanded="false"
                             aria-controls="past-season-list"
-                            class="flex items-center gap-2 bg-accent/10 border border-accent/20 text-accent font-black text-sm pl-4 pr-3.5 py-2 rounded-full cursor-pointer hover:bg-accent/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 transition-colors"
+                            class="flex items-center gap-2 bg-accent/10 border border-accent/20 text-accent font-black text-sm pl-4 pr-3.5 py-2 rounded-pildora cursor-pointer hover:bg-accent/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 transition-colors"
                         >
                             <span id="past-season-label">{pastSeasons[0]?.name}</span>
                             <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" data-chevron></i>
@@ -240,14 +240,14 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                             role="listbox"
                             aria-label="Elegir temporada"
                             tabindex="-1"
-                            class="hidden absolute left-0 top-full mt-2 min-w-full w-max max-h-64 overflow-y-auto bg-white border border-foreground/10 rounded-2xl shadow-xl p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150 origin-top-left focus:outline-none"
+                            class="hidden absolute left-0 top-full mt-2 min-w-full w-max max-h-64 overflow-y-auto bg-white border border-foreground/10 rounded-bloque shadow-xl p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150 origin-top-left focus:outline-none"
                         >
                             {pastSeasons.map((season, i) => (
                                 <li
                                     role="option"
                                     data-season-option={season.id}
                                     aria-selected={i === 0 ? 'true' : 'false'}
-                                    class="flex items-center justify-between gap-4 px-3.5 py-2 rounded-xl text-sm font-bold text-foreground/70 cursor-pointer hover:bg-accent/10 hover:text-accent aria-selected:bg-accent/10 aria-selected:text-accent data-[active=true]:bg-accent/10 data-[active=true]:text-accent transition-colors"
+                                    class="flex items-center justify-between gap-4 px-3.5 py-2 rounded-chico text-sm font-bold text-foreground/70 cursor-pointer hover:bg-accent/10 hover:text-accent aria-selected:bg-accent/10 aria-selected:text-accent data-[active=true]:bg-accent/10 data-[active=true]:text-accent transition-colors"
                                 >
                                     <span>{season.name}</span>
                                     <i class="fa-solid fa-check text-xs opacity-0" data-check></i>
@@ -276,11 +276,11 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                         const choreEmoji = ex.chore_code === 'LA' ? '🧽' : ex.chore_code === 'SA' ? '🗑️' : '🍽️';
                                         const choreLabel = ex.chore_code === 'LA' ? 'Lavar' : ex.chore_code === 'SA' ? 'Sacar' : 'Poner';
                                         return (
-                                            <div class="flex items-center gap-2 bg-accent/5 border border-accent/20 px-3 py-1.5 rounded-full text-xs">
+                                            <div class="flex items-center gap-2 bg-accent/5 border border-accent/20 px-3 py-1.5 rounded-pildora text-xs">
                                                 <UserAvatar user={{ username: ex.username, display_name: ex.display_name, avatar_url: ex.avatar_url }} size="sm" />
                                                 <span class="font-bold text-foreground">{ex.display_name}</span>
                                                 <span class="text-foreground/50">•</span>
-                                                <span class="text-accent font-bold font-mono">{choreEmoji} Exento de {choreLabel}</span>
+                                                <span class="text-accent font-bold tabular-nums">{choreEmoji} Exento de {choreLabel}</span>
                                             </div>
                                         );
                                     })}
@@ -294,7 +294,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
 
         <!-- Tabla Global del Año -->
         <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 ease-out hover-card-lift">
-            <div class="absolute -top-12 -right-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-500 pointer-events-none"></div>
+            <div class="absolute -top-12 -right-12 w-48 h-48 bg-primary/5 rounded-pildora blur-3xl group-hover:bg-primary/10 transition-all duration-500 pointer-events-none"></div>
             
             <h3 class="text-xl font-black mb-6 flex items-center gap-2.5 text-foreground relative z-10">
                 <i class="fa-solid fa-earth-americas text-primary"></i>
@@ -309,7 +309,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
         </div>
 
         {dates.length === 0 ? (
-            <div class="py-20 text-center border-2 border-dashed border-foreground/10 rounded-3xl">
+            <div class="py-20 text-center border-2 border-dashed border-foreground/10 rounded-bloque">
                 <div class="text-5xl mb-4 text-foreground/20"><i class="fa-solid fa-folder-open"></i></div>
                 <p class="text-foreground/60 font-medium text-lg">Los archivos están vacíos.</p>
             </div>
@@ -322,10 +322,10 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                         <span id="week-range-label" class="font-black text-foreground text-sm tracking-tight">{formatWeekRange(selectedWeek)}</span>
                     </div>
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                        <a id="prev-week-btn" href={prevWeekMonday ? `?week=${prevWeekMonday}#historial-seccion` : '#'} class={`flex items-center gap-2 bg-white border border-foreground/10 text-foreground hover:bg-foreground/5 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm active:scale-95 ${!prevWeekMonday ? 'pointer-events-none opacity-30 cursor-not-allowed' : ''}`}>
+                        <a id="prev-week-btn" href={prevWeekMonday ? `?week=${prevWeekMonday}#historial-seccion` : '#'} class={`flex items-center gap-2 bg-white border border-foreground/10 text-foreground hover:bg-foreground/5 px-4 py-2 rounded-pildora text-xs font-bold transition-all shadow-sm active:scale-95 ${!prevWeekMonday ? 'pointer-events-none opacity-30 cursor-not-allowed' : ''}`}>
                             <i class="fa-solid fa-arrow-left"></i> Semana Anterior
                         </a>
-                        <a id="next-week-btn" href={nextWeekMonday ? `?week=${nextWeekMonday}#historial-seccion` : '#'} class={`flex items-center gap-2 bg-white border border-foreground/10 text-foreground hover:bg-foreground/5 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm active:scale-95 ${!nextWeekMonday ? 'pointer-events-none opacity-30 cursor-not-allowed' : ''}`}>
+                        <a id="next-week-btn" href={nextWeekMonday ? `?week=${nextWeekMonday}#historial-seccion` : '#'} class={`flex items-center gap-2 bg-white border border-foreground/10 text-foreground hover:bg-foreground/5 px-4 py-2 rounded-pildora text-xs font-bold transition-all shadow-sm active:scale-95 ${!nextWeekMonday ? 'pointer-events-none opacity-30 cursor-not-allowed' : ''}`}>
                             Semana Siguiente <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
@@ -346,7 +346,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                         
                                         {/* Date Header */}
                                         <div class="flex items-center gap-4 mb-6 relative z-10">
-                                            <div class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-secondary text-background flex items-center justify-center font-black shadow-lg">
+                                            <div class="w-10 h-10 md:w-14 md:h-14 rounded-pildora bg-secondary text-background flex items-center justify-center font-black shadow-lg">
                                                 <i class="fa-solid fa-calendar-day"></i>
                                             </div>
                                             <h3 class="text-xl md:text-2xl font-black text-foreground">{formatDate(data.date)}</h3>
@@ -355,7 +355,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                         {/* Lomito Indicator */}
                                         {data.lomitoActivated && (
                                             <div class="pl-6 md:pl-10 mb-4 relative z-10">
-                                                <div class="bg-accent/10 border border-accent/20 px-4 py-2 rounded-xl inline-block">
+                                                <div class="bg-accent/10 border border-accent/20 px-4 py-2 rounded-chico inline-block">
                                                     <span class="text-accent font-bold text-sm">🥪 Cláusula Lomito activada por {data.lomitoPlayers.join(" y ")}</span>
                                                 </div>
                                             </div>
@@ -368,7 +368,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                                 const isSafe = chore.code === "NA";
                                                 const userExemptions = (data.exemptions || []).filter(e => String(e.user_id) === String(roll.user_id));
                                                 return (
-                                                    <div class={`group flex flex-row items-center justify-between p-4 rounded-2xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${isSafe ? 'bg-white border-foreground/10 hover:border-secondary/30' : 'bg-white border-primary/20 hover:border-primary/40'}`}>
+                                                    <div class={`group flex flex-row items-center justify-between p-4 rounded-chico border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${isSafe ? 'bg-white border-foreground/10 hover:border-secondary/30' : 'bg-white border-primary/20 hover:border-primary/40'}`}>
                                                         
                                                         {/* User */}
                                                         <div class="flex flex-wrap items-center gap-2.5">
@@ -378,7 +378,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                                                 const targetChore = chores.find(c => c.code === ex.chore_code);
                                                                 const choreLabel = targetChore ? targetChore.label.split(' ')[0] : ex.chore_code;
                                                                 return (
-                                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black tracking-wider uppercase bg-accent/10 text-accent border border-accent/20 px-1.5 py-0.5 rounded-md" title={`Exento de: ${targetChore ? targetChore.label : ex.chore_code}`}>
+                                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black tracking-wider uppercase bg-accent/10 text-accent border border-accent/20 px-1.5 py-0.5 rounded-chico" title={`Exento de: ${targetChore ? targetChore.label : ex.chore_code}`}>
                                                                         <i class="fa-solid fa-shield-halved text-[7px]"></i> {choreLabel}
                                                                     </span>
                                                                 )
@@ -390,7 +390,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                                             <div class="hidden sm:flex items-center opacity-70 group-hover:opacity-100 transition-opacity">
                                                                 <DiceDisplay die1={roll.die1 as number} die2={roll.die2 as number} die3={roll.die3 as number} die4={roll.die4 as number} size="sm" isSafe={isSafe} />
                                                             </div>
-                                                            <div class={`px-3 py-1 rounded-lg text-xs font-black tracking-widest ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background shadow-[0_0_10px_rgba(234,42,88,0.3)]'}`}>
+                                                            <div class={`px-3 py-1 rounded-chico text-xs font-black tracking-widest ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background shadow-[0_0_10px_rgba(234,42,88,0.3)]'}`}>
                                                                 {chore.code}
                                                             </div>
                                                         </div>

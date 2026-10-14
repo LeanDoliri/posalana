@@ -81,16 +81,16 @@ const activeTheme = themeClasses[theme];
                                 <span class="font-bold text-foreground">{name}</span>
                             </div>
                         </td>
-                        <td class="py-3 text-center font-mono font-bold text-foreground/80" data-val-po={sortable ? stat.scores.PO : undefined}>
+                        <td class="py-3 text-center tabular-nums font-bold text-foreground/80" data-val-po={sortable ? stat.scores.PO : undefined}>
                             {stat.scores.PO}
                         </td>
-                        <td class="py-3 text-center font-mono font-bold text-foreground/80" data-val-sa={sortable ? stat.scores.SA : undefined}>
+                        <td class="py-3 text-center tabular-nums font-bold text-foreground/80" data-val-sa={sortable ? stat.scores.SA : undefined}>
                             {stat.scores.SA}
                         </td>
-                        <td class="py-3 text-center font-mono font-bold text-foreground/80" data-val-la={sortable ? stat.scores.LA : undefined}>
+                        <td class="py-3 text-center tabular-nums font-bold text-foreground/80" data-val-la={sortable ? stat.scores.LA : undefined}>
                             {stat.scores.LA}
                         </td>
-                        <td class={`py-3 text-center font-mono font-black ${activeTheme.text} ${activeTheme.bg} rounded-lg px-2`} data-val-total={sortable ? total : undefined}>
+                        <td class={`py-3 text-center tabular-nums font-black ${activeTheme.text} ${activeTheme.bg} rounded-chico px-2`} data-val-total={sortable ? total : undefined}>
                             {total}
                         </td>
                     </tr>

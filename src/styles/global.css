@@ -1,16 +1,37 @@
 @import "tailwindcss";
+@import "./lutvia/tailwind.css";
+
+/* Sistema de diseño de Lutvia (lutvia-ds v2.0.0, copiado en ./lutvia/): de ahí salen los colores y Montserrat.
+ * Los nombres de siempre apuntan a los tokens de la marca; el resto (radios, sombras,
+ * movimiento) es de POSALANA y está documentado en docs/diseno.md. */
+@theme inline {
+  --color-primary: var(--lutvia-rosa);
+  --color-secondary: var(--lutvia-cyan);
+  --color-accent: var(--lutvia-violeta);
+  --color-background: var(--lutvia-gris);
+  --color-foreground: var(--lutvia-oscuro);
+}
+
+/* Radios de POSALANA: chico (filas, campos, botones), bloque (contenedores) y píldora */
+@theme {
+  --radius-chico: 10px;
+  --radius-bloque: 14px;
+  --radius-pildora: 999px;
+}
+
+/* Mínimo de accesibilidad del sistema: con movimiento reducido, nada de animaciones ni transiciones */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
 @theme {
   --font-sans: 'Montserrat', sans-serif;
 
-  /* Paleta de Colores de la Marca */
-  --color-primary: #EA2A58;
-  --color-secondary: #00CCCC;
-  --color-accent: #CC66FF;
-  
-  /* Colores Base */
-  --color-background: #EDEDED;
-  --color-foreground: #3C3C3B;
 
   /* Keyframes de Animaciones */
   @keyframes enter {
@@ -193,7 +214,7 @@ html.is-navigating {
   z-index: 9999;
   background: linear-gradient(90deg, var(--color-primary), var(--color-accent), var(--color-secondary));
   box-shadow: 0 0 12px rgba(204, 102, 255, 0.6), 0 0 4px rgba(234, 42, 88, 0.4);
-  border-radius: 0 9999px 9999px 0;
+  border-radius: 0 var(--radius-pildora) var(--radius-pildora) 0;
   opacity: 0;
   pointer-events: none;
   overflow: hidden;
@@ -223,7 +244,7 @@ html.is-navigating {
   padding: 0.625rem 1.25rem;
   background: white;
   border: 1px solid rgba(60, 60, 59, 0.1);
-  border-radius: 9999px;
+  border-radius: var(--radius-pildora);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   font-family: var(--font-sans);
   font-size: 0.8125rem;

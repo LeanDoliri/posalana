@@ -20,15 +20,15 @@ const { start, end, dateStr } = Astro.props;
     aria-labelledby="schedule-notice-title"
 >
     <div class="relative bg-white border border-foreground/10 rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 text-center overflow-hidden animate-in zoom-in-95 fade-in duration-300">
-        <div class="absolute -top-16 -right-16 w-40 h-40 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
-        <div class="absolute -bottom-16 -left-16 w-40 h-40 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -top-16 -right-16 w-40 h-40 bg-secondary/10 rounded-pildora blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 -left-16 w-40 h-40 bg-primary/10 rounded-pildora blur-2xl pointer-events-none"></div>
 
         <div class="relative z-10">
             <p class="text-5xl mb-3">⏰🎲</p>
             <p class="text-secondary font-bold tracking-widest uppercase text-[10px] mb-1">Nueva modalidad</p>
             <h3 id="schedule-notice-title" class="text-2xl font-black text-foreground tracking-tight text-balance">¡Los dados ahora tienen horario!</h3>
 
-            <div class="mt-5 bg-secondary/5 border border-secondary/20 rounded-2xl py-4 px-3">
+            <div class="mt-5 bg-secondary/5 border border-secondary/20 rounded-bloque py-4 px-3">
                 <p class="text-xs font-bold uppercase tracking-widest text-foreground/50">Horario de tiración</p>
                 <p class="text-3xl font-black text-foreground mt-1">
                     {start} <span class="text-foreground/30 font-normal">a</span> {end}
@@ -44,7 +44,7 @@ const { start, end, dateStr } = Astro.props;
             <button
                 type="button"
                 data-schedule-notice-close
-                class="mt-6 w-full bg-secondary text-background font-bold py-3.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer shadow-md shadow-secondary/20"
+                class="mt-6 w-full bg-secondary text-background font-bold py-3.5 rounded-chico hover:opacity-90 transition-opacity cursor-pointer shadow-md shadow-secondary/20"
             >
                 ¡Entendido!
             </button>
