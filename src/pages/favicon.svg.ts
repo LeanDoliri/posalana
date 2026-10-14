@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { colorLutvia } from "../utils/tokens.js";
 
-// El favicon se arma con los tokens de @lutvia/ds: dos dados, cyan atrás y rosa adelante.
+// El favicon se arma con los tokens de lutvia-ds: dos dados, cyan atrás y rosa adelante.
 // Se sirve desde el servidor con caché larga (prerenderizarlo correría el middleware y la base en el build).
 
 export const GET: APIRoute = () => {

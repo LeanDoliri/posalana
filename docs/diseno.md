@@ -1,10 +1,10 @@
 # Diseño de POSALANA
 
-POSALANA sigue las reglas mínimas de la marca de [LUTVIA-DEV/lutvia-ds](https://github.com/LUTVIA-DEV/lutvia-ds) (`@lutvia/ds` 2.0.0). Todo lo demás lo decide el proyecto y queda documentado acá. Las piezas propias tienen ficha en [`componentes/`](componentes/).
+POSALANA sigue las reglas mínimas de la marca de [LUTVIA-DEV/lutvia-ds](https://github.com/LUTVIA-DEV/lutvia-ds) (v2.0.0). El CSS del sistema está copiado en `src/styles/lutvia/` (el repo es privado y Vercel no puede instalarlo como dependencia); para actualizar, se copia `css/lutvia.css` y `css/tailwind.css` del tag nuevo. Todo lo demás lo decide el proyecto y queda documentado acá. Las piezas propias tienen ficha en [`componentes/`](componentes/).
 
 ## Lo que viene del sistema
 
-- **Colores:** los seis de la marca y el blanco, más sus tintas y opacidades. `src/styles/global.css` importa `@lutvia/ds/tailwind.css` y define los nombres de siempre sobre los tokens: `primary` → `lutvia-rosa`, `secondary` → `lutvia-cyan`, `accent` → `lutvia-violeta`, `background` → `lutvia-gris` y `foreground` → `lutvia-oscuro`. No se agregan colores fuera de la paleta. Fuera del CSS (favicon y embeds de Discord), los colores se leen de los tokens con `src/utils/tokens.ts`.
+- **Colores:** los seis de la marca y el blanco, más sus tintas y opacidades. `src/styles/global.css` importa `./lutvia/tailwind.css` y define los nombres de siempre sobre los tokens: `primary` → `lutvia-rosa`, `secondary` → `lutvia-cyan`, `accent` → `lutvia-violeta`, `background` → `lutvia-gris` y `foreground` → `lutvia-oscuro`. No se agregan colores fuera de la paleta. Fuera del CSS (favicon y embeds de Discord), los colores se leen de los tokens con `src/utils/tokens.ts`.
 - **Tipografía:** Montserrat, de 400 a 900, también en horas y fechas, con `tabular-nums` (nada de `font-mono`).
 - **Accesibilidad mínima:** todo se usa con teclado y con foco visible. Con `prefers-reduced-motion: reduce`, `global.css` apaga animaciones y transiciones.
 

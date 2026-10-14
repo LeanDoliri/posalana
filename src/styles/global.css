@@ -1,7 +1,7 @@
 @import "tailwindcss";
-@import "@lutvia/ds/tailwind.css";
+@import "./lutvia/tailwind.css";
 
-/* Sistema de diseño de Lutvia (@lutvia/ds 2.0): de ahí salen los colores y Montserrat.
+/* Sistema de diseño de Lutvia (lutvia-ds v2.0.0, copiado en ./lutvia/): de ahí salen los colores y Montserrat.
  * Los nombres de siempre apuntan a los tokens de la marca; el resto (radios, sombras,
  * movimiento) es de POSALANA y está documentado en docs/diseno.md. */
 @theme inline {

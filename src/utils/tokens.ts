@@ -1,12 +1,12 @@
-// Lee los colores de marca desde los tokens de @lutvia/ds (lutvia.css) para usarlos fuera del CSS:
+// Lee los colores de marca desde los tokens de lutvia-ds (src/styles/lutvia/lutvia.css) para usarlos fuera del CSS:
 // el favicon generado y los embeds de Discord. Así ningún color se escribe a mano en el proyecto.
-import lutviaCss from "@lutvia/ds/lutvia.css?raw";
+import lutviaCss from "../styles/lutvia/lutvia.css?raw";
 
 export type ColorLutvia = "rosa" | "cyan" | "amarillo" | "violeta" | "gris" | "oscuro" | "blanco";
 
 export function colorLutvia(nombre: ColorLutvia): string {
     const match = lutviaCss.match(new RegExp(`--lutvia-${nombre}:\\s*(#[0-9a-fA-F]{6})`));
-    if (!match) throw new Error(`No existe el token --lutvia-${nombre} en @lutvia/ds`);
+    if (!match) throw new Error(`No existe el token --lutvia-${nombre} en src/styles/lutvia/lutvia.css`);
     return match[1];
 }
 

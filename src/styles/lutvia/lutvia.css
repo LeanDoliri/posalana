@@ -1,0 +1,16 @@
+/* Copiado de LUTVIA-DEV/lutvia-ds v2.0.0 (css/lutvia.css). No editar a mano: para actualizar, se copia de nuevo desde el tag. */
+/* Lutvia · tokens · v2.0.0
+ * GENERADO por scripts/build-css.mjs desde project/tokens.json. No editar a mano. */
+/* Fuentes: este archivo no las carga. En el <head>:
+ * <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,900;1,300;1,700&display=swap"> */
+
+:root {
+  --lutvia-rosa: #ea2a58;
+  --lutvia-cyan: #00cccc;
+  --lutvia-amarillo: #ffcc00;
+  --lutvia-violeta: #cc66ff;
+  --lutvia-gris: #ededed;
+  --lutvia-oscuro: #3c3c3b;
+  --lutvia-blanco: #ffffff;
+  --font-sans: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
