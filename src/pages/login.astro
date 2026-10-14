@@ -7,49 +7,54 @@ if (Astro.locals.user) {
 ---
 
 <Layout>
-	<div class="min-h-[70vh] flex items-center justify-center animate-in fade-in slide-in-from-bottom-4">
-		<div class="w-full max-w-md bg-lutvia-blanco p-10 rounded-3xl shadow-xl">
-			<div class="text-center mb-8">
-				<div class="inline-flex items-center justify-center w-16 h-16 rounded-lutvia-pildora bg-lutvia-gris text-lutvia-oscuro mb-4" aria-hidden="true">
-					<i class="fa-solid fa-user-lock text-2xl"></i>
-				</div>
-				<h2 class="text-3xl font-black text-lutvia-oscuro tracking-tight">Bienvenido</h2>
-				<p class="text-lutvia-texto-suave mt-2 font-medium">Ingresá para probar tu suerte.</p>
-			</div>
-
-			<form method="post" action="/api/login" enctype="application/x-www-form-urlencoded" class="space-y-5">
-				<div class="space-y-1">
-					<label for="login-username" class="block text-sm font-bold">Usuario</label>
-					<div class="relative">
-						<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-lutvia-texto-suave" aria-hidden="true">
-							<i class="fa-solid fa-user"></i>
-						</div>
-						<input type="text" id="login-username" name="username" autocomplete="username" class="campo pl-10" placeholder="Tu usuario" required />
+	<div class="min-h-[70vh] flex items-center justify-center animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+		<div class="w-full max-w-md relative group">
+			<!-- Decorative background blur -->
+			<div class="absolute -inset-1 bg-gradient-to-r from-secondary to-accent rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+			
+			<div class="relative bg-lutvia-blanco border border-foreground/10 p-10 rounded-3xl shadow-2xl">
+				<div class="text-center mb-8">
+					<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary/10 text-secondary mb-4">
+						<i class="fa-solid fa-user-lock text-2xl" aria-hidden="true"></i>
 					</div>
+					<h2 class="text-3xl font-black text-foreground tracking-tight">Bienvenido</h2>
+					<p class="text-lutvia-texto-suave mt-2 font-medium">Ingresá para probar tu suerte.</p>
 				</div>
 
-				<div class="space-y-1">
-					<label for="login-password" class="block text-sm font-bold">Contraseña</label>
-					<div class="relative">
-						<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-lutvia-texto-suave" aria-hidden="true">
-							<i class="fa-solid fa-key"></i>
+				<form method="post" action="/api/login" enctype="application/x-www-form-urlencoded" class="space-y-5">
+					<div class="space-y-1">
+						<label class="block text-xs font-bold uppercase tracking-wider text-lutvia-texto-suave ml-1">Usuario</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+								<i class="fa-solid fa-user text-lutvia-texto-suave" aria-hidden="true"></i>
+							</div>
+							<input type="text" name="username" class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" placeholder="Tu nombre" required />
 						</div>
-						<input type="password" id="login-password" name="password" autocomplete="current-password" class="campo pl-10" required />
 					</div>
+
+					<div class="space-y-1">
+						<label class="block text-xs font-bold uppercase tracking-wider text-lutvia-texto-suave ml-1">Contraseña</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+								<i class="fa-solid fa-key text-lutvia-texto-suave" aria-hidden="true"></i>
+							</div>
+							<input type="password" name="password" class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" placeholder="••••••••" required />
+						</div>
+					</div>
+
+					<button type="submit" class="w-full bg-secondary text-foreground py-3.5 rounded-xl font-bold shadow-lg shadow-secondary/20 hover:shadow-secondary/40 motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0 transition-all mt-6 flex items-center justify-center gap-2 cursor-pointer">
+						Entrar al Juego <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+					</button>
+				</form>
+
+				<div class="mt-8 pt-6 border-t border-foreground/5 text-center space-y-3">
+					<p class="text-sm font-semibold text-lutvia-texto-suave">
+						¿No tenés cuenta? <a href="/register" class="text-foreground underline underline-offset-2 decoration-1 hover:decoration-primary hover:decoration-2 transition-colors">Registrate acá</a>
+					</p>
+					<p class="text-sm font-semibold">
+						<a href="/reset" class="text-foreground underline underline-offset-2 decoration-1 hover:decoration-primary hover:decoration-2 transition-colors">¿Olvidaste tu contraseña?</a>
+					</p>
 				</div>
-
-				<button type="submit" class="boton boton-principal w-full py-3.5 mt-6">
-					<i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> Entrar al juego
-				</button>
-			</form>
-
-			<div class="mt-8 pt-6 border-t border-lutvia-oscuro-16 text-center space-y-3">
-				<p class="text-sm font-semibold text-lutvia-oscuro">
-					¿No tenés cuenta? <a href="/register" class="enlace">Registrate acá</a>
-				</p>
-				<p class="text-sm font-semibold">
-					<a href="/reset" class="enlace">¿Olvidaste tu contraseña?</a>
-				</p>
 			</div>
 		</div>
 	</div>

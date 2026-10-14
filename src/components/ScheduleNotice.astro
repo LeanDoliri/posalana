@@ -11,43 +11,47 @@ interface Props {
 const { start, end, dateStr } = Astro.props;
 ---
 
-<!-- Fondo lleno en lutvia-gris (sin velo transparente ni desenfoque) y la tarjeta blanca encima -->
 <div
     id="schedule-notice"
     data-date={dateStr}
-    class="hidden fixed inset-0 z-[90] items-center justify-center bg-lutvia-gris px-4"
+    class="hidden fixed inset-0 z-[90] items-center justify-center bg-foreground/40 backdrop-blur-sm px-4"
     role="dialog"
     aria-modal="true"
     aria-labelledby="schedule-notice-title"
 >
-    <div class="bg-lutvia-blanco rounded-3xl shadow-xl max-w-md w-full p-6 sm:p-8 text-center animate-in zoom-in-95 fade-in">
-        <i class="fa-solid fa-clock text-5xl text-lutvia-rosa mb-4" aria-hidden="true"></i>
-        <p class="rotulo mb-1">Nueva modalidad</p>
-        <h3 id="schedule-notice-title" class="text-2xl font-black text-lutvia-oscuro tracking-tight text-balance">¡Los dados ahora tienen horario!</h3>
+    <div class="relative bg-lutvia-blanco border border-foreground/10 rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 text-center overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+        <div class="absolute -top-16 -right-16 w-40 h-40 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 -left-16 w-40 h-40 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
 
-        <div class="mt-5 bg-lutvia-gris rounded-lutvia-radio py-4 px-3">
-            <p class="rotulo">Horario de tiración</p>
-            <p class="text-3xl font-black text-lutvia-oscuro mt-1 tabular-nums">
-                {start} <span class="text-lutvia-texto-suave font-normal">a</span> {end}
-            </p>
+        <div class="relative z-10">
+            <p class="text-5xl mb-3">⏰🎲</p>
+            <p class="text-lutvia-texto-suave font-bold tracking-widest uppercase text-xs mb-1">Nueva modalidad</p>
+            <h3 id="schedule-notice-title" class="text-2xl font-black text-foreground tracking-tight text-balance">¡Los dados ahora tienen horario!</h3>
+
+            <div class="mt-5 bg-secondary/5 border border-secondary/20 rounded-2xl py-4 px-3">
+                <p class="text-xs font-bold uppercase tracking-widest text-lutvia-texto-suave">Horario de tiración</p>
+                <p class="text-3xl font-black text-foreground mt-1">
+                    {start} <span class="text-lutvia-texto-suave font-normal">a</span> {end}
+                </p>
+            </div>
+
+            <ul class="mt-5 space-y-2 text-sm text-foreground text-left">
+                <li class="flex gap-2"><i class="fa-solid fa-lock text-secondary mt-1 w-4 shrink-0" aria-hidden="true"></i><span>Fuera de ese horario la app no deja tirar.</span></li>
+                <li class="flex gap-2"><i class="fa-solid fa-bullhorn text-primary mt-1 w-4 shrink-0" aria-hidden="true"></i><span>A las <strong>{end}</strong> se publica solo el <strong>veredicto final</strong> en Discord.</span></li>
+                <li class="flex gap-2"><i class="fa-solid fa-hourglass-end text-accent mt-1 w-4 shrink-0" aria-hidden="true"></i><span>Si no tiraste antes del cierre, ese día no jugás.</span></li>
+            </ul>
+
+            <button
+                type="button"
+                data-schedule-notice-close
+                class="mt-6 w-full bg-secondary text-foreground font-bold py-3.5 rounded-xl hover:opacity-90 transition-opacity cursor-pointer shadow-md shadow-secondary/20"
+            >
+                ¡Entendido!
+            </button>
+            <a href="/rules" data-schedule-notice-close class="block mt-3 text-xs font-bold text-lutvia-texto-suave hover:text-foreground transition-colors">
+                Ver las reglas completas
+            </a>
         </div>
-
-        <ul class="mt-5 space-y-2 text-sm text-lutvia-oscuro text-left">
-            <li class="flex gap-2"><i class="fa-solid fa-lock fa-fw mt-1 shrink-0" aria-hidden="true"></i><span>Fuera de ese horario la app no deja tirar.</span></li>
-            <li class="flex gap-2"><i class="fa-solid fa-bullhorn fa-fw text-lutvia-rosa mt-1 shrink-0" aria-hidden="true"></i><span>A las <strong>{end}</strong> se publica solo el <strong>veredicto final</strong> en Discord.</span></li>
-            <li class="flex gap-2"><i class="fa-solid fa-hourglass-end fa-fw text-lutvia-violeta mt-1 shrink-0" aria-hidden="true"></i><span>Si no tiraste antes del cierre, ese día no jugás.</span></li>
-        </ul>
-
-        <button
-            type="button"
-            data-schedule-notice-close
-            class="boton boton-principal mt-6 w-full"
-        >
-            ¡Entendido!
-        </button>
-        <a href="/rules" data-schedule-notice-close class="enlace inline-block mt-4 text-sm font-semibold">
-            Ver las reglas completas
-        </a>
     </div>
 </div>
 

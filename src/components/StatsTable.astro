@@ -12,76 +12,86 @@ interface Props {
       LA: number;
     }
   }>;
+  theme?: 'primary' | 'secondary' | 'accent';
   sortable?: boolean;
 }
 
-const { stats, sortable = false } = Astro.props;
+const { stats, theme = 'primary', sortable = false } = Astro.props;
 
-const columns = [
-  { key: "po", label: "PO", hint: "Pone", emoji: "🍽️" },
-  { key: "sa", label: "SA", hint: "Saca", emoji: "🗑️" },
-  { key: "la", label: "LA", hint: "Lava", emoji: "🧽" },
-];
+const themeClasses = {
+  primary: {
+    text: 'text-foreground',
+    bg: 'bg-primary/5',
+  },
+  secondary: {
+    text: 'text-foreground',
+    bg: 'bg-secondary/5',
+  },
+  accent: {
+    text: 'text-foreground',
+    bg: 'bg-accent/5',
+  }
+};
+
+const activeTheme = themeClasses[theme];
 ---
 
 <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse text-sm" id={sortable ? "global-table" : undefined}>
         <thead>
-            <tr class="border-b border-lutvia-oscuro-16 rotulo">
+            <tr class="border-b border-foreground/10 text-lutvia-texto-suave text-xs uppercase tracking-widest font-black">
                 {sortable ? (
                     <>
-                        <th class="pb-3 font-bold" data-sort="name" aria-sort="none">
-                            <button type="button" class="sort-button">
-                                <i class="fa-solid fa-sort" aria-hidden="true"></i> Jugador
-                            </button>
+                        <th class="pb-3 font-black cursor-pointer hover:text-foreground transition-colors select-none" data-sort="name">
+                            Jugador <i class="fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs" aria-hidden="true"></i>
                         </th>
-                        {columns.map(col => (
-                            <th class="pb-3 text-center font-bold" data-sort={col.key} aria-sort="none">
-                                <button type="button" class="sort-button">
-                                    <i class="fa-solid fa-sort" aria-hidden="true"></i> <span aria-hidden="true">{col.emoji}</span> {col.label} ({col.hint})
-                                </button>
-                            </th>
-                        ))}
-                        <th class="pb-3 text-center font-bold" data-sort="total" aria-sort="none">
-                            <button type="button" class="sort-button">
-                                <i class="fa-solid fa-sort" aria-hidden="true"></i> Total global
-                            </button>
+                        <th class="pb-3 text-center font-black cursor-pointer hover:text-foreground transition-colors select-none" data-sort="po">
+                            🍽️ PO (Pone) <i class="fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs" aria-hidden="true"></i>
+                        </th>
+                        <th class="pb-3 text-center font-black cursor-pointer hover:text-foreground transition-colors select-none" data-sort="sa">
+                            🗑️ SA (Saca) <i class="fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs" aria-hidden="true"></i>
+                        </th>
+                        <th class="pb-3 text-center font-black cursor-pointer hover:text-foreground transition-colors select-none" data-sort="la">
+                            🧽 LA (Lava) <i class="fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs" aria-hidden="true"></i>
+                        </th>
+                        <th class={`pb-3 text-center font-black ${activeTheme.text} cursor-pointer hover:text-foreground transition-colors select-none`} data-sort="total">
+                            TOTAL GLOBAL <i class="fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs" aria-hidden="true"></i>
                         </th>
                     </>
                 ) : (
                     <>
-                        <th class="pb-3 font-bold">Jugador</th>
-                        {columns.map(col => (
-                            <th class="pb-3 text-center font-bold whitespace-nowrap"><span aria-hidden="true">{col.emoji}</span> {col.label}</th>
-                        ))}
-                        <th class="pb-3 text-center font-bold">Total</th>
+                        <th class="pb-3 font-black">Jugador</th>
+                        <th class="pb-3 text-center font-black">🍽️ PO</th>
+                        <th class="pb-3 text-center font-black">🗑️ SA</th>
+                        <th class="pb-3 text-center font-black">🧽 LA</th>
+                        <th class={`pb-3 text-center font-black ${activeTheme.text}`}>TOTAL</th>
                     </>
                 )}
             </tr>
         </thead>
-        <tbody class="divide-y divide-lutvia-oscuro-16">
+        <tbody class="divide-y divide-foreground/5">
             {stats.map(stat => {
                 const total = stat.scores.LA + stat.scores.SA + stat.scores.PO;
                 const name = stat.display_name || stat.username;
                 return (
-                    <tr class="hover:bg-lutvia-oscuro-05 transition-colors">
+                    <tr class="hover:bg-foreground/[0.02] transition-colors duration-200">
                         <td class="py-3 pr-2" data-val-name={sortable ? name : undefined}>
                             <div class="flex items-center gap-2.5">
                                 <UserAvatar user={{ username: stat.username, display_name: stat.display_name, avatar_url: stat.avatar_url }} size="sm" />
-                                <span class="font-bold text-lutvia-oscuro">{name}</span>
+                                <span class="font-bold text-foreground">{name}</span>
                             </div>
                         </td>
-                        <td class="py-3 text-center tabular-nums font-bold" data-val-po={sortable ? stat.scores.PO : undefined}>
+                        <td class="py-3 text-center font-mono font-bold text-foreground" data-val-po={sortable ? stat.scores.PO : undefined}>
                             {stat.scores.PO}
                         </td>
-                        <td class="py-3 text-center tabular-nums font-bold" data-val-sa={sortable ? stat.scores.SA : undefined}>
+                        <td class="py-3 text-center font-mono font-bold text-foreground" data-val-sa={sortable ? stat.scores.SA : undefined}>
                             {stat.scores.SA}
                         </td>
-                        <td class="py-3 text-center tabular-nums font-bold" data-val-la={sortable ? stat.scores.LA : undefined}>
+                        <td class="py-3 text-center font-mono font-bold text-foreground" data-val-la={sortable ? stat.scores.LA : undefined}>
                             {stat.scores.LA}
                         </td>
-                        <td class="py-3 text-center tabular-nums font-black" data-val-total={sortable ? total : undefined}>
-                            <span class="inline-block min-w-8 bg-lutvia-gris rounded-lutvia-radio-chico px-2 py-0.5">{total}</span>
+                        <td class={`py-3 text-center font-mono font-black ${activeTheme.text} ${activeTheme.bg} rounded-lg px-2`} data-val-total={sortable ? total : undefined}>
+                            {total}
                         </td>
                     </tr>
                 );
@@ -89,22 +99,3 @@ const columns = [
         </tbody>
     </table>
 </div>
-
-<style>
-    /* Cabeceras que ordenan: botones para usarlas con teclado; el ícono activo va en rosa (indicador) */
-    .sort-button {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        white-space: nowrap;
-        text-transform: inherit;
-        letter-spacing: inherit;
-        font-weight: inherit;
-        cursor: pointer;
-        border-radius: var(--lutvia-radio-chico);
-        transition: color var(--lutvia-transicion);
-    }
-    .sort-button:hover {
-        color: var(--lutvia-oscuro);
-    }
-</style>

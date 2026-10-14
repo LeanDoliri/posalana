@@ -12,7 +12,7 @@ export interface Props {
 const { user, size = "md", border = false } = Astro.props;
 
 const sizeClasses = {
-    sm: "w-6 h-6 text-mini",
+    sm: "w-6 h-6 text-xs",
     md: "w-10 h-10 text-sm",
     lg: "w-16 h-16 text-xl",
     xl: "w-32 h-32 text-4xl"
@@ -23,11 +23,10 @@ const name = user.display_name || user.username;
 const initial = name ? name.charAt(0).toUpperCase() : '?';
 ---
 
-<!-- Avatar: matiz cyan al 15 % con la inicial en gris oscuro (Permitido del perfil) -->
-<div class={`${sizeClasses[size]} shrink-0 rounded-lutvia-pildora bg-lutvia-cyan/15 flex items-center justify-center font-bold text-lutvia-oscuro overflow-hidden hover-pulse-glow ${border ? 'border-2 border-lutvia-blanco' : ''}`}>
+<div class={`${sizeClasses[size]} rounded-full bg-secondary/10 flex items-center justify-center font-bold text-foreground overflow-hidden transition-all duration-300 motion-safe:hover:scale-105 hover-pulse-glow ${border ? 'border-2 border-secondary/20 shadow-sm' : ''}`}>
     {hasAvatar ? (
-        <img src={user.avatar_url as string} alt={name} class="w-full h-full object-cover" referrerpolicy="no-referrer" />
+        <img src={user.avatar_url as string} alt={name} class="w-full h-full object-cover transition-transform duration-500 motion-safe:hover:scale-110" referrerpolicy="no-referrer" />
     ) : (
-        <span aria-hidden="true">{initial}</span>
+        initial
     )}
 </div>
