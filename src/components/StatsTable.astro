@@ -20,15 +20,15 @@ const { stats, theme = 'primary', sortable = false } = Astro.props;
 
 const themeClasses = {
   primary: {
-    text: 'text-foreground',
+    text: 'text-primary',
     bg: 'bg-primary/5',
   },
   secondary: {
-    text: 'text-foreground',
+    text: 'text-secondary',
     bg: 'bg-secondary/5',
   },
   accent: {
-    text: 'text-foreground',
+    text: 'text-accent',
     bg: 'bg-accent/5',
   }
 };
@@ -39,23 +39,23 @@ const activeTheme = themeClasses[theme];
 <div class="overflow-x-auto">
     <table class="w-full text-left border-collapse text-sm" id={sortable ? "global-table" : undefined}>
         <thead>
-            <tr class="border-b border-foreground/10 text-lutvia-texto-suave text-xs uppercase tracking-widest font-black">
+            <tr class="border-b border-foreground/10 text-foreground/50 text-[10px] uppercase tracking-widest font-black">
                 {sortable ? (
                     <>
-                        <th class="pb-3 font-black cursor-pointer hover:text-foreground transition-colors select-none" data-sort="name">
-                            Jugador <i class="fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs" aria-hidden="true"></i>
+                        <th class="pb-3 font-black cursor-pointer hover:text-primary transition-colors select-none" data-sort="name">
+                            Jugador <i class="fa-solid fa-sort ml-1 text-foreground/30 text-[10px]"></i>
                         </th>
-                        <th class="pb-3 text-center font-black cursor-pointer hover:text-foreground transition-colors select-none" data-sort="po">
-                            🍽️ PO (Pone) <i class="fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs" aria-hidden="true"></i>
+                        <th class="pb-3 text-center font-black cursor-pointer hover:text-primary transition-colors select-none" data-sort="po">
+                            🍽️ PO (Pone) <i class="fa-solid fa-sort ml-1 text-foreground/30 text-[10px]"></i>
                         </th>
-                        <th class="pb-3 text-center font-black cursor-pointer hover:text-foreground transition-colors select-none" data-sort="sa">
-                            🗑️ SA (Saca) <i class="fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs" aria-hidden="true"></i>
+                        <th class="pb-3 text-center font-black cursor-pointer hover:text-primary transition-colors select-none" data-sort="sa">
+                            🗑️ SA (Saca) <i class="fa-solid fa-sort ml-1 text-foreground/30 text-[10px]"></i>
                         </th>
-                        <th class="pb-3 text-center font-black cursor-pointer hover:text-foreground transition-colors select-none" data-sort="la">
-                            🧽 LA (Lava) <i class="fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs" aria-hidden="true"></i>
+                        <th class="pb-3 text-center font-black cursor-pointer hover:text-primary transition-colors select-none" data-sort="la">
+                            🧽 LA (Lava) <i class="fa-solid fa-sort ml-1 text-foreground/30 text-[10px]"></i>
                         </th>
-                        <th class={`pb-3 text-center font-black ${activeTheme.text} cursor-pointer hover:text-foreground transition-colors select-none`} data-sort="total">
-                            TOTAL GLOBAL <i class="fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs" aria-hidden="true"></i>
+                        <th class={`pb-3 text-center font-black ${activeTheme.text} cursor-pointer hover:text-primary transition-colors select-none`} data-sort="total">
+                            TOTAL GLOBAL <i class="fa-solid fa-sort ml-1 text-foreground/30 text-[10px]"></i>
                         </th>
                     </>
                 ) : (
@@ -81,13 +81,13 @@ const activeTheme = themeClasses[theme];
                                 <span class="font-bold text-foreground">{name}</span>
                             </div>
                         </td>
-                        <td class="py-3 text-center font-mono font-bold text-foreground" data-val-po={sortable ? stat.scores.PO : undefined}>
+                        <td class="py-3 text-center font-mono font-bold text-foreground/80" data-val-po={sortable ? stat.scores.PO : undefined}>
                             {stat.scores.PO}
                         </td>
-                        <td class="py-3 text-center font-mono font-bold text-foreground" data-val-sa={sortable ? stat.scores.SA : undefined}>
+                        <td class="py-3 text-center font-mono font-bold text-foreground/80" data-val-sa={sortable ? stat.scores.SA : undefined}>
                             {stat.scores.SA}
                         </td>
-                        <td class="py-3 text-center font-mono font-bold text-foreground" data-val-la={sortable ? stat.scores.LA : undefined}>
+                        <td class="py-3 text-center font-mono font-bold text-foreground/80" data-val-la={sortable ? stat.scores.LA : undefined}>
                             {stat.scores.LA}
                         </td>
                         <td class={`py-3 text-center font-mono font-black ${activeTheme.text} ${activeTheme.bg} rounded-lg px-2`} data-val-total={sortable ? total : undefined}>

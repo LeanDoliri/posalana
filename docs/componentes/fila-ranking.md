@@ -6,15 +6,15 @@ Una tirada del día en el ranking de la portada: quién tiró, a qué hora, qué
 
 ## Anatomía
 
-- **Bloque** con radio de 16px y un fondo muy suave del color de la tarea (`primary/8`, `secondary/8`, `accent/8`; `foreground/[0.02]` si zafó), borde del mismo color y sombra al pasar el mouse.
-- **Avatar** `lg` con borde.
-- **Nombre** en Black 900, gris oscuro.
-- **Etiquetas** de una línea, `text-xs`:
-  - Tarea: la sílaba (`PO`, `SA`, `LA`) sobre el matiz al 15 % de su color, con texto gris oscuro. `NA` va sobre `foreground/10`, también con texto gris oscuro.
-  - «Vos»: relleno gris oscuro con texto gris (9.43).
-  - Exención: matiz violeta al 10 % con texto gris oscuro.
-- **Hora** en `text-xs`, `lutvia-texto-suave`.
-- **Tarea en texto**: el emoji de la tarea y su nombre en negrita, gris oscuro («🧽 Lava los platos»).
+- **Bloque** con radio de 16px (`rounded-2xl`), fondo al 8 % del color de la tarea (`primary/8`, `secondary/8`, `accent/8`; `foreground/[0.02]` si zafó) y borde del mismo color.
+- **Avatar** `lg` con borde cyan al 20 %.
+- **Nombre** en Black 900, `text-xl`.
+- **Etiquetas**:
+  - «Vos»: relleno gris oscuro con texto gris, 9 px.
+  - Tarea: la sílaba (`PO`, `SA`, `LA`) en relleno pleno de su color con texto gris; `NA` en gris al 10 % con texto gris al 50 %. 10 px, mayúsculas.
+  - Exención: violeta al 10 % con texto violeta, 9 px, ícono `fa-shield-halved`.
+- **Hora** en `font-mono`, gris al 40 %, sobre gris al 5 %.
+- **Tarea en texto**: emoji y nombre en el color de la tarea, en negrita («🧽 Lava los platos»).
 - **Dados** `xl`, con el que decide en el color de la tarea (ver [Dados](dados.md)).
 
 ## Estados
@@ -22,13 +22,9 @@ Una tirada del día en el ranking de la portada: quién tiró, a qué hora, qué
 | Estado | Cómo |
 |---|---|
 | Normal | Fondo al 8 % del color de la tarea |
-| Tu fila | Fondo al 15 %, anillo del color de la tarea, sombra y un 1 % más grande; etiqueta «Vos» |
-| Al pasar el mouse | Se marca el borde y aparece la sombra |
+| Al pasar el mouse | Se marca el borde (45 %) y aparece una sombra |
+| Tu fila | Fondo al 15 %, anillo del color de la tarea, sombra y un 1 % más grande |
 
-## Cambió respecto a producción
+## Sistema de diseño
 
-- La etiqueta de tarea pasa de relleno pleno con texto gris (3.61 sobre rosa, 1.71 sobre cyan, 2.60 sobre violeta) al matiz al 15 % con texto gris oscuro.
-- El nombre de la tarea pasa de texto en color a gris oscuro (el color queda en el fondo, la etiqueta y el dado).
-- Los textos de 8 y 9 px («Vos», exenciones) suben a `text-xs` (.75rem).
-- Hora y texto de la fila que zafó: de `foreground/30` y `/40` a `lutvia-texto-suave`.
-- El 1 % de crecimiento de tu fila solo pasa sin movimiento reducido.
+Colores, tipografía y formas de la paleta. El texto en color, los textos de 9 y 10 px, los fondos al 8 % y el crecimiento de tu fila están en los **Permitidos** del perfil POSALANA.

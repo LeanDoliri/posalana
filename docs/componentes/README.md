@@ -10,12 +10,7 @@ POSALANA usa el sistema de diseño de Lutvia ([LUTVIA-DEV/lutvia-ds](https://git
 
 ## Cómo se aplica el sistema
 
-- `src/styles/global.css` importa `tailwindcss`, `@lutvia/ds/tailwind.css` y `@lutvia/ds/posalana.css`. Los nombres de siempre (`primary`, `secondary`, `accent`, `background`, `foreground`) los define `posalana.css` apuntando a los tokens (rosa, cyan, violeta, gris y gris oscuro). No hay ningún color escrito a mano: lo que lleva transparencia en el CSS usa `color-mix()` sobre un token.
-- El diseño del sitio (tarjetas, radios, sombras, animaciones y hovers) es el de siempre. Lo que cambió es el color del texto, para cumplir la regla de contraste:
-  - Texto principal en `text-foreground`; texto secundario en `text-lutvia-texto-suave` (en lugar de `foreground/40` a `/70`).
-  - Ningún texto en cyan, rosa o violeta, salvo el wordmark y el título del banner de Lomito (Permitidos). Los íconos sí conservan su color.
-  - Sobre rellenos de color (botones cyan, etiquetas), el texto va en gris oscuro.
-  - Nada por debajo de `text-xs` (.75rem).
-  - Enlaces subrayados, con el subrayado rosa al pasar el mouse. Foco con anillo rosa.
-  - Todo lo que se mueve respeta `prefers-reduced-motion`: las animaciones de CSS las apaga `@lutvia/ds`, los hovers que mueven llevan `motion-safe:` y los scripts (confetti, lluvia de lomitos, caras de los dados) se frenan solos.
-- Fuera del CSS (favicon y embeds de Discord), los colores se leen de los tokens con `src/utils/tokens.ts`.
+- **Colores:** `src/styles/global.css` importa `@lutvia/ds/tailwind.css` y `@lutvia/ds/posalana.css`. Los nombres de siempre (`primary`, `secondary`, `accent`, `background`, `foreground`) apuntan a los tokens (rosa, cyan, violeta, gris y gris oscuro); el proyecto no define colores propios. Fuera del CSS (favicon y embeds de Discord), los colores se leen de los tokens con `src/utils/tokens.ts`.
+- **Tipografía:** Montserrat, como pide el núcleo.
+- **Formas:** píldoras para acciones y etiquetas, esquinas redondeadas para bloques.
+- **Todo lo demás** (tarjetas con sombra y radio de 24px, matices y desenfoques decorativos, texto en los colores de la marca, animaciones y hovers del juego) es el diseño propio de POSALANA. El perfil lo admite en su lista de **Permitidos**.

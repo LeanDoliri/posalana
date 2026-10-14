@@ -66,9 +66,9 @@ const currentSeason = getSeasonId(dateStr);
 const schedule = await getRollSchedule(db);
 const windowStatus = getRollWindowStatus(schedule, now.minutes);
 const windowStatusLabel = {
-    before: { text: `Cerrada · abre a las ${schedule.start}`, cls: 'bg-foreground/10 text-lutvia-texto-suave' },
-    open: { text: `Abierta · cierra a las ${schedule.end}`, cls: 'bg-secondary/15 text-foreground' },
-    closed: { text: `Cerrada desde las ${schedule.end}`, cls: 'bg-primary/10 text-foreground' },
+    before: { text: `Cerrada · abre a las ${schedule.start}`, cls: 'bg-foreground/10 text-foreground/60' },
+    open: { text: `Abierta · cierra a las ${schedule.end}`, cls: 'bg-secondary/10 text-secondary' },
+    closed: { text: `Cerrada desde las ${schedule.end}`, cls: 'bg-primary/10 text-primary' },
 }[windowStatus];
 const autoVerdictToday = schedule.autoVerdictLastDate === dateStr;
 const autoVerdictLabel = !schedule.autoVerdictEnabled
@@ -105,50 +105,50 @@ uniqueSeasons.sort((a, b) => {
 	<div class="space-y-10 animate-in fade-in duration-500 ease-out">
 		<header class="text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4 border-b border-foreground/5 pb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-75 ease-out">
 			<div>
-				<h2 class="text-3xl font-black text-foreground tracking-tight"><i class="fa-solid fa-screwdriver-wrench text-primary mr-2" aria-hidden="true"></i> Centro de Control</h2>
-				<p class="text-lutvia-texto-suave mt-1">Gestión avanzada de jugadores y manipulación del destino.</p>
+				<h2 class="text-3xl font-black text-foreground tracking-tight"><i class="fa-solid fa-screwdriver-wrench text-primary mr-2"></i> Centro de Control</h2>
+				<p class="text-foreground/60 mt-1">Gestión avanzada de jugadores y manipulación del destino.</p>
 			</div>
-            <div class="bg-primary/10 px-4 py-2 rounded-full text-sm font-bold text-foreground">
+            <div class="bg-primary/10 px-4 py-2 rounded-full text-sm font-bold text-primary">
                 Modo Administrador
             </div>
 		</header>
 
 		<!-- Global Settings Section -->
-		<section class="bg-lutvia-blanco border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 ease-out hover-card-lift">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 ease-out hover-card-lift">
             <div class="p-6 md:p-8">
-			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-globe text-accent" aria-hidden="true"></i> Configuración Global</h3>
+			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-globe text-accent"></i> Configuración Global</h3>
 			    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <form method="post" action="/api/admin/save-settings" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-bold mb-1 text-foreground">Último Lomito Manual</label>
+                            <label class="block text-sm font-bold mb-1 text-foreground/80">Último Lomito Manual</label>
                             <input type="date" name="last_lomito_date" value={settingsMap.get('last_lomito_date') || ''} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
-                            <p class="text-xs text-lutvia-texto-suave mt-1">Al configurarla, esta fecha se usa para el contador de días.</p>
+                            <p class="text-xs text-foreground/50 mt-1">Al configurarla, esta fecha se usa para el contador de días.</p>
                         </div>
                         <div class="pt-4 border-t border-foreground/10">
                             <div class="flex items-center justify-between gap-2 mb-3">
-                                <label class="block text-sm font-bold text-foreground">Horario de Tirada (GMT-3)</label>
-                                <span class={`text-xs font-black uppercase tracking-wider px-2 py-1 rounded-full ${windowStatusLabel.cls}`}>{windowStatusLabel.text}</span>
+                                <label class="block text-sm font-bold text-foreground/80">Horario de Tirada (GMT-3)</label>
+                                <span class={`text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full ${windowStatusLabel.cls}`}>{windowStatusLabel.text}</span>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <span class="block text-xs font-semibold text-lutvia-texto-suave mb-1">Abre</span>
+                                    <span class="block text-xs font-semibold text-foreground/50 mb-1">Abre</span>
                                     <input type="time" name="roll_window_start" required value={schedule.start} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
                                 </div>
                                 <div>
-                                    <span class="block text-xs font-semibold text-lutvia-texto-suave mb-1">Cierra</span>
+                                    <span class="block text-xs font-semibold text-foreground/50 mb-1">Cierra</span>
                                     <input type="time" name="roll_window_end" required value={schedule.end} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
                                 </div>
                             </div>
-                            <p class="text-xs text-lutvia-texto-suave mt-1">Fuera de este horario nadie puede tirar (salvo <code>lomitotester</code>).</p>
+                            <p class="text-xs text-foreground/50 mt-1">Fuera de este horario nadie puede tirar (salvo <code>lomitotester</code>).</p>
                         </div>
                         <div>
                             <label class="flex items-center gap-3 cursor-pointer">
                                 <input type="checkbox" name="auto_verdict_enabled" value="1" checked={schedule.autoVerdictEnabled} class="w-5 h-5 accent-secondary cursor-pointer" />
-                                <span class="text-sm font-bold text-foreground">Veredicto automático al cierre</span>
+                                <span class="text-sm font-bold text-foreground/80">Veredicto automático al cierre</span>
                             </label>
-                            <p class="text-xs text-lutvia-texto-suave mt-1">Publica el veredicto final en Discord a la hora de cierre. Estado de hoy: <strong class="text-lutvia-texto-suave">{autoVerdictLabel}</strong></p>
+                            <p class="text-xs text-foreground/50 mt-1">Publica el veredicto final en Discord a la hora de cierre. Estado de hoy: <strong class="text-foreground/70">{autoVerdictLabel}</strong></p>
                         </div>
-                        <button class="w-full bg-secondary text-foreground font-bold py-3 rounded-xl hover:opacity-90 transition-opacity cursor-pointer">
+                        <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity cursor-pointer">
                             Guardar Configuración
                         </button>
                     </form>
@@ -156,14 +156,14 @@ uniqueSeasons.sort((a, b) => {
                     <!-- Discord Quick Actions -->
                     <div class="space-y-4 flex flex-col justify-between border-t md:border-t-0 md:border-l border-foreground/10 pt-6 md:pt-0 md:pl-8">
                         <div>
-                            <h4 class="text-sm font-bold uppercase tracking-wider text-lutvia-texto-suave mb-2">Notificaciones de Discord</h4>
-                            <p class="text-xs text-lutvia-texto-suave leading-relaxed mb-4">
+                            <h4 class="text-sm font-bold uppercase tracking-wider text-foreground/70 mb-2">Notificaciones de Discord</h4>
+                            <p class="text-xs text-foreground/50 leading-relaxed mb-4">
                                 El veredicto final sale solo a las {schedule.end}. Usá este botón para publicarlo manualmente antes del cierre o para reenviarlo (por ejemplo, si se anuló una tirada).
                             </p>
                         </div>
                         <div class="space-y-3">
-                            <button id="publish-verdict-btn" class="w-full bg-secondary text-foreground font-bold py-3.5 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-secondary/15">
-                                <i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Publicar Veredicto Final
+                            <button id="publish-verdict-btn" class="w-full bg-secondary text-background font-bold py-3.5 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-secondary/15">
+                                <i class="fa-solid fa-bullhorn"></i> Publicar Veredicto Final
                             </button>
                             <p id="publish-verdict-status" class="text-xs font-semibold text-center hidden"></p>
                         </div>
@@ -173,13 +173,13 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Users Section -->
-		<section class="bg-lutvia-blanco border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out hover-card-lift">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out hover-card-lift">
             <div class="p-6 md:p-8">
-			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-users text-secondary" aria-hidden="true"></i> Padrón de Jugadores</h3>
+			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-users text-secondary"></i> Padrón de Jugadores</h3>
 			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
                         <thead>
-                            <tr class="bg-foreground/5 text-lutvia-texto-suave uppercase tracking-wider text-xs">
+                            <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
                                 <th class="p-4 font-bold">Jugador</th>
                                 <th class="p-4 font-bold">Rol</th>
                                 <th class="p-4 font-bold text-right">Acciones Peligrosas</th>
@@ -193,20 +193,20 @@ uniqueSeasons.sort((a, b) => {
                                             <div class="relative group cursor-pointer" onclick={`document.getElementById('avatar-input-${u.id}').click()`} title="Hacer clic para cambiar foto de perfil">
                                                 <UserAvatar user={u as any} size="md" />
                                                 <div class="absolute inset-0 bg-foreground/45 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <i class="fa-solid fa-camera text-background text-xs" aria-hidden="true"></i>
+                                                    <i class="fa-solid fa-camera text-background text-[10px]"></i>
                                                 </div>
                                             </div>
                                             <input type="file" id={`avatar-input-${u.id}`} data-user-id={u.id} accept="image/*" class="hidden admin-avatar-input" />
                                             {u.avatar_url && !u.avatar_url.includes('api.dicebear.com') && (
-                                                <button class="remove-user-avatar-btn text-lutvia-texto-suave hover:text-primary p-1 rounded-md transition-colors cursor-pointer" data-user-id={u.id} title="Quitar foto de perfil y volver al avatar por defecto">
-                                                    <i class="fa-solid fa-trash-can text-xs" aria-hidden="true"></i>
+                                                <button class="remove-user-avatar-btn text-foreground/30 hover:text-primary p-1 rounded-md transition-colors cursor-pointer" data-user-id={u.id} title="Quitar foto de perfil y volver al avatar por defecto">
+                                                    <i class="fa-solid fa-trash-can text-xs"></i>
                                                 </button>
                                             )}
                                             <span class="font-bold text-foreground">{u.username}</span>
                                         </div>
                                     </td>
                                     <td class="p-4">
-                                        <span class={`px-3 py-1 text-xs uppercase tracking-widest rounded-full font-black ${u.role === 'admin' ? 'bg-primary/10 text-foreground border border-primary/20' : 'bg-secondary/10 text-foreground border border-secondary/20'}`}>
+                                        <span class={`px-3 py-1 text-[10px] uppercase tracking-widest rounded-full font-black ${u.role === 'admin' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-secondary/10 text-secondary border border-secondary/20'}`}>
                                             {u.role}
                                         </span>
                                     </td>
@@ -217,18 +217,18 @@ uniqueSeasons.sort((a, b) => {
                                                     <input type="hidden" name="userId" value={u.id} />
                                                     <input type="hidden" name="role" value={u.role === 'admin' ? 'user' : 'admin'} />
                                                     <button class="px-3 py-1.5 bg-foreground/5 hover:bg-foreground/10 text-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer">
-                                                        <i class="fa-solid fa-rotate mr-1" aria-hidden="true"></i> {u.role === 'admin' ? 'Revocar' : 'Ascender'}
+                                                        <i class="fa-solid fa-rotate mr-1"></i> {u.role === 'admin' ? 'Revocar' : 'Ascender'}
                                                     </button>
                                                 </form>
-                                                <form method="post" action="/api/admin/delete-user" onsubmit={`return confirm('ATENCIÓN: ¿Borrar a ${u.username} y todo su historial? Esta acción es irreversible.')`}>
+                                                <form method="post" action="/api/admin/delete-user" onsubmit={`return confirm('⚠️ ATENCIÓN: ¿Borrar a ${u.username} y todo su historial? Esta acción es irreversible.')`}>
                                                     <input type="hidden" name="userId" value={u.id} />
-                                                    <button class="px-3 py-1.5 bg-primary/10 hover:bg-primary/25 text-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer">
-                                                        <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                                    <button class="px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-background text-xs font-bold rounded-lg transition-colors cursor-pointer">
+                                                        <i class="fa-solid fa-trash-can"></i>
                                                     </button>
                                                 </form>
                                             </div>
                                         ) : (
-                                            <span class="text-lutvia-texto-suave text-xs font-bold uppercase tracking-widest mr-2">Espejo (Vos)</span>
+                                            <span class="text-foreground/40 text-xs font-bold uppercase tracking-widest mr-2">Espejo (Vos)</span>
                                         )}
                                     </td>
                                 </tr>
@@ -240,14 +240,14 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Manual Points Section -->
-		<section class="bg-lutvia-blanco border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 ease-out hover-card-lift">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 ease-out hover-card-lift">
             <div class="p-6 md:p-8">
-			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-accent" aria-hidden="true"></i> Carga Histórica de Puntos</h3>
+			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-accent"></i> Carga Histórica de Puntos</h3>
 			    <div class="grid grid-cols-1 gap-8">
                     <form method="post" action="/api/admin/manual-points" class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
-                                <label class="block text-sm font-bold mb-1 text-foreground">Jugador</label>
+                                <label class="block text-sm font-bold mb-1 text-foreground/80">Jugador</label>
                                 <select name="user_id" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
                                     <option value="">Seleccionar...</option>
                                     {allUsers.map(u => (
@@ -256,7 +256,7 @@ uniqueSeasons.sort((a, b) => {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-bold mb-1 text-foreground">Temporada</label>
+                                <label class="block text-sm font-bold mb-1 text-foreground/80">Temporada</label>
                                 <select name="season_id" id="season-select" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
                                     <option value="">Seleccionar...</option>
                                     {uniqueSeasons.map(s => (
@@ -266,11 +266,11 @@ uniqueSeasons.sort((a, b) => {
                                 </select>
                                 <div id="custom-season-container" class="hidden mt-2">
                                     <input type="text" name="custom_season_id" id="custom-season-input" placeholder="Ej: 2025-invierno" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" />
-                                    <p class="text-xs text-lutvia-texto-suave mt-1">Formato: AAAA-estación (verano, otoño, invierno, primavera)</p>
+                                    <p class="text-[10px] text-foreground/50 mt-1">Formato: AAAA-estación (verano, otoño, invierno, primavera)</p>
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-bold mb-1 text-foreground">Tarea</label>
+                                <label class="block text-sm font-bold mb-1 text-foreground/80">Tarea</label>
                                 <select name="chore_code" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
                                     <option value="">Seleccionar...</option>
                                     <option value="LA">Lavar (LA)</option>
@@ -279,11 +279,11 @@ uniqueSeasons.sort((a, b) => {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-bold mb-1 text-foreground">Puntos Totales</label>
+                                <label class="block text-sm font-bold mb-1 text-foreground/80">Puntos Totales</label>
                                 <input type="number" name="points" min="0" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" placeholder="Ej: 5" required />
                             </div>
                         </div>
-                        <button class="w-full bg-secondary text-foreground font-bold py-3 rounded-xl hover:opacity-90 transition-opacity mt-2 cursor-pointer">
+                        <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity mt-2 cursor-pointer">
                             Cargar Puntos
                         </button>
                     </form>
@@ -292,19 +292,19 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Exemptions Section -->
-		<section class="bg-lutvia-blanco border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 ease-out hover-card-lift">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 ease-out hover-card-lift">
             <div class="p-6 md:p-8 border-b border-foreground/5 mb-6">
-                <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-shield-halved text-secondary" aria-hidden="true"></i> Gestión de Exenciones</h3>
-                <p class="text-xs text-lutvia-texto-suave mt-1">Configurá qué jugadores están exentos de realizar tareas específicas en cada temporada.</p>
+                <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-shield-halved text-secondary"></i> Gestión de Exenciones</h3>
+                <p class="text-xs text-foreground/50 mt-1">Configura qué jugadores están exentos de realizar tareas específicas en cada temporada.</p>
             </div>
             
             <div class="px-6 md:px-8 pb-8 space-y-8">
                 <!-- Add Exemption Form -->
                 <form method="post" action="/api/admin/add-exemption" class="space-y-4 bg-foreground/[0.02] border border-foreground/5 p-5 rounded-2xl">
-                    <h4 class="text-sm font-bold uppercase tracking-wider text-lutvia-texto-suave mb-2">Crear Nueva Exención</h4>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-foreground/70 mb-2">Crear Nueva Exención</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-sm font-bold mb-1 text-foreground">Jugador</label>
+                            <label class="block text-sm font-bold mb-1 text-foreground/80">Jugador</label>
                             <select name="user_id" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
                                 <option value="">Seleccionar...</option>
                                 {allUsers.map(u => (
@@ -313,7 +313,7 @@ uniqueSeasons.sort((a, b) => {
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold mb-1 text-foreground">Temporada</label>
+                            <label class="block text-sm font-bold mb-1 text-foreground/80">Temporada</label>
                             <select name="season_id" id="exemption-season-select" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
                                 <option value="">Seleccionar...</option>
                                 {uniqueSeasons.map(s => (
@@ -323,11 +323,11 @@ uniqueSeasons.sort((a, b) => {
                             </select>
                             <div id="exemption-custom-season-container" class="hidden mt-2">
                                 <input type="text" name="custom_season_id" id="exemption-custom-season-input" placeholder="Ej: 2026-otoño" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" />
-                                <p class="text-xs text-lutvia-texto-suave mt-1">Formato: AAAA-estación (verano, otoño, invierno, primavera)</p>
+                                <p class="text-[10px] text-foreground/50 mt-1">Formato: AAAA-estación (verano, otoño, invierno, primavera)</p>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold mb-1 text-foreground">Tarea Exenta</label>
+                            <label class="block text-sm font-bold mb-1 text-foreground/80">Tarea Exenta</label>
                             <select name="chore_code" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
                                 <option value="">Seleccionar...</option>
                                 <option value="LA">Lavar (LA) 🧽</option>
@@ -336,21 +336,21 @@ uniqueSeasons.sort((a, b) => {
                             </select>
                         </div>
                     </div>
-                    <button class="bg-secondary text-foreground font-bold px-6 py-2.5 rounded-xl hover:opacity-90 transition-opacity mt-2 text-sm shadow-sm cursor-pointer">
+                    <button class="bg-secondary text-background font-bold px-6 py-2.5 rounded-xl hover:opacity-90 transition-opacity mt-2 text-sm shadow-sm cursor-pointer">
                         Asignar Exención
                     </button>
                 </form>
 
                 <!-- List of Exemptions -->
                 <div>
-                    <h4 class="text-sm font-bold uppercase tracking-wider text-lutvia-texto-suave mb-4">Exenciones Registradas</h4>
+                    <h4 class="text-sm font-bold uppercase tracking-wider text-foreground/70 mb-4">Exenciones Registradas</h4>
                     {allExemptions.length === 0 ? (
-                        <p class="text-sm text-lutvia-texto-suave italic py-4">No hay exenciones cargadas en la base de datos.</p>
+                        <p class="text-sm text-foreground/40 italic py-4">No hay exenciones cargadas en la base de datos.</p>
                     ) : (
                         <div class="overflow-x-auto rounded-2xl border border-foreground/5">
                             <table class="w-full text-left border-collapse whitespace-nowrap text-sm">
                                 <thead>
-                                    <tr class="bg-foreground/5 text-lutvia-texto-suave uppercase tracking-wider text-xs">
+                                    <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
                                         <th class="p-4 font-bold">Temporada</th>
                                         <th class="p-4 font-bold">Jugador</th>
                                         <th class="p-4 font-bold">Tarea Exenta</th>
@@ -363,7 +363,7 @@ uniqueSeasons.sort((a, b) => {
                                         const choreLabel = ex.chore_code === 'LA' ? 'Lavar' : ex.chore_code === 'SA' ? 'Sacar' : 'Poner';
                                         return (
                                             <tr class="hover:bg-foreground/[0.02] transition-colors">
-                                                <td class="p-4 font-bold text-lutvia-texto-suave">{formatSeasonName(ex.season_id)}</td>
+                                                <td class="p-4 font-bold text-foreground/70">{formatSeasonName(ex.season_id)}</td>
                                                 <td class="p-4">
                                                     <div class="flex items-center gap-2 font-bold text-foreground">
                                                         <UserAvatar user={{ username: ex.username, display_name: ex.display_name, avatar_url: ex.avatar_url }} size="sm" />
@@ -371,13 +371,13 @@ uniqueSeasons.sort((a, b) => {
                                                     </div>
                                                 </td>
                                                 <td class="p-4">
-                                                    <span class="font-bold text-foreground">{choreEmoji} Exento de {choreLabel} ({ex.chore_code})</span>
+                                                    <span class="font-bold text-secondary">{choreEmoji} Exento de {choreLabel} ({ex.chore_code})</span>
                                                 </td>
                                                 <td class="p-4 text-right">
-                                                    <form method="post" action="/api/admin/remove-exemption" onsubmit={`return confirm('¿Eliminar la exención de ${ex.display_name} para ${formatSeasonName(ex.season_id)}?')`}>
+                                                    <form method="post" action="/api/admin/remove-exemption" onsubmit={`return confirm('⚠️ ¿Eliminar la exención de ${ex.display_name} para ${formatSeasonName(ex.season_id)}?')`}>
                                                         <input type="hidden" name="id" value={ex.id} />
-                                                        <button class="px-3 py-1.5 border border-primary/20 hover:bg-primary/25 text-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer">
-                                                            <i class="fa-solid fa-trash mr-1" aria-hidden="true"></i> Eliminar
+                                                        <button class="px-3 py-1.5 border border-primary/20 hover:bg-primary text-primary hover:text-background text-xs font-bold rounded-lg transition-colors cursor-pointer">
+                                                            <i class="fa-solid fa-trash mr-1"></i> Eliminar
                                                         </button>
                                                     </form>
                                                 </td>
@@ -393,15 +393,15 @@ uniqueSeasons.sort((a, b) => {
 		</section>
 
 		<!-- Rolls Section -->
-		<section class="bg-lutvia-blanco border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[350ms] ease-out hover-card-lift">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[350ms] ease-out hover-card-lift">
             <div class="p-6 md:p-8">
                 <div class="flex items-center justify-between mb-6">
-			        <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-dice text-secondary" aria-hidden="true"></i> Últimas 50 Tiradas</h3>
+			        <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-dice text-secondary"></i> Últimas 50 Tiradas</h3>
                 </div>
 			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
                         <thead>
-                            <tr class="bg-foreground/5 text-lutvia-texto-suave uppercase tracking-wider text-xs">
+                            <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
                                 <th class="p-4 font-bold">Fecha</th>
                                 <th class="p-4 font-bold">Jugador</th>
                                 <th class="p-4 font-bold">Dados</th>
@@ -410,11 +410,11 @@ uniqueSeasons.sort((a, b) => {
                         </thead>
                         <tbody class="divide-y divide-foreground/5">
                             {recentRolls.length === 0 && (
-                                <tr><td colspan="4" class="p-8 text-center text-lutvia-texto-suave font-bold">La historia está en blanco.</td></tr>
+                                <tr><td colspan="4" class="p-8 text-center text-foreground/40 font-bold">La historia está en blanco.</td></tr>
                             )}
                             {recentRolls.map((r) => (
                                 <tr class="hover:bg-foreground/[0.02] transition-colors">
-                                    <td class="p-4 text-sm font-mono text-lutvia-texto-suave">{formatDate(r.date as string)}</td>
+                                    <td class="p-4 text-sm font-mono text-foreground/60">{formatDate(r.date as string)}</td>
                                     <td class="p-4">
                                         <div class="flex items-center gap-2 font-bold text-foreground">
                                             <UserAvatar user={{ username: r.username as string, display_name: r.display_name as string, avatar_url: r.avatar_url as string }} size="sm" />
@@ -425,10 +425,10 @@ uniqueSeasons.sort((a, b) => {
                                         <DiceDisplay die1={r.die1 as number} die2={r.die2 as number} die3={r.die3 as number} die4={r.die4 as number} size="md" />
                                     </td>
                                     <td class="p-4 text-right">
-                                        <form method="post" action="/api/admin/delete-roll" onsubmit={`return confirm('¿Alterar el destino y anular la tirada de ${r.username}?')`}>
+                                        <form method="post" action="/api/admin/delete-roll" onsubmit={`return confirm('⚠️ ¿Alterar el destino y anular la tirada de ${r.username}?')`}>
                                             <input type="hidden" name="rollId" value={r.id} />
-                                            <button class="px-3 py-1.5 border border-primary/20 text-foreground hover:bg-primary/25 text-xs font-bold rounded-lg transition-colors cursor-pointer">
-                                                <i class="fa-solid fa-ban mr-1" aria-hidden="true"></i> Anular
+                                            <button class="px-3 py-1.5 border border-primary/20 text-primary hover:bg-primary hover:text-background text-xs font-bold rounded-lg transition-colors cursor-pointer">
+                                                <i class="fa-solid fa-ban mr-1"></i> Anular
                                             </button>
                                         </form>
                                     </td>
@@ -440,25 +440,25 @@ uniqueSeasons.sort((a, b) => {
             </div>
 		</section>
 		<!-- Password Resets Section -->
-		<section class="bg-lutvia-blanco border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[400ms] ease-out hover-card-lift">
+		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[400ms] ease-out hover-card-lift">
             <div class="p-6 md:p-8">
-                <h3 class="text-xl font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-key text-accent" aria-hidden="true"></i> Cambios de Contraseña</h3>
-                <p class="text-xs text-lutvia-texto-suave mb-6">Registro de restablecimientos de contraseña hechos desde /reset. Cualquiera puede resetear libremente; acá queda constancia por las dudas.</p>
+                <h3 class="text-xl font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-key text-accent"></i> Cambios de Contraseña</h3>
+                <p class="text-xs text-foreground/50 mb-6">Registro de restablecimientos de contraseña hechos desde /reset. Cualquiera puede resetear libremente; acá queda constancia por las dudas.</p>
 			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
                         <thead>
-                            <tr class="bg-foreground/5 text-lutvia-texto-suave uppercase tracking-wider text-xs">
+                            <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
                                 <th class="p-4 font-bold">Fecha y Hora</th>
                                 <th class="p-4 font-bold">Usuario</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-foreground/5">
                             {recentResets.length === 0 && (
-                                <tr><td colspan="2" class="p-8 text-center text-lutvia-texto-suave font-bold">Nadie cambió su contraseña todavía.</td></tr>
+                                <tr><td colspan="2" class="p-8 text-center text-foreground/40 font-bold">Nadie cambió su contraseña todavía.</td></tr>
                             )}
                             {recentResets.map((r: any) => (
                                 <tr class="hover:bg-foreground/[0.02] transition-colors">
-                                    <td class="p-4 text-sm font-mono text-lutvia-texto-suave">{formatResetDate(r.created_at)}</td>
+                                    <td class="p-4 text-sm font-mono text-foreground/60">{formatResetDate(r.created_at)}</td>
                                     <td class="p-4 font-bold text-foreground">{r.username}</td>
                                 </tr>
                             ))}
@@ -513,7 +513,7 @@ uniqueSeasons.sort((a, b) => {
 					if (!userId) return;
 
 					if (!file.type.startsWith('image/')) {
-						alert("Elegí una imagen válida.");
+						alert("Por favor selecciona una imagen válida.");
 						return;
 					}
 
@@ -576,7 +576,7 @@ uniqueSeasons.sort((a, b) => {
 				}
 				if (publishVerdictStatus) {
 					publishVerdictStatus.textContent = 'Enviando veredicto...';
-					publishVerdictStatus.className = 'text-xs font-semibold text-center text-lutvia-texto-suave block';
+					publishVerdictStatus.className = 'text-xs font-semibold text-center text-foreground/50 block';
 				}
 
 				try {
@@ -588,18 +588,18 @@ uniqueSeasons.sort((a, b) => {
 					if (res.ok && data.success) {
 						if (publishVerdictStatus) {
 							publishVerdictStatus.textContent = '✅ ¡Veredicto publicado exitosamente en Discord!';
-							publishVerdictStatus.className = 'text-xs font-semibold text-center text-foreground block';
+							publishVerdictStatus.className = 'text-xs font-semibold text-center text-secondary block';
 						}
 					} else {
 						if (publishVerdictStatus) {
 							publishVerdictStatus.textContent = `❌ Error: ${data.error || 'No se pudo publicar'}`;
-							publishVerdictStatus.className = 'text-xs font-semibold text-center text-foreground block';
+							publishVerdictStatus.className = 'text-xs font-semibold text-center text-primary block';
 						}
 					}
 				} catch (err: any) {
 					if (publishVerdictStatus) {
 						publishVerdictStatus.textContent = `❌ Error: ${err.message || 'Error de conexión'}`;
-						publishVerdictStatus.className = 'text-xs font-semibold text-center text-foreground block';
+						publishVerdictStatus.className = 'text-xs font-semibold text-center text-primary block';
 					}
 				} finally {
 					if (publishVerdictBtn instanceof HTMLButtonElement) {

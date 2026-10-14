@@ -9,7 +9,7 @@ if (!user) {
 ---
 
 <Layout>
-	<div class="max-w-md mx-auto bg-lutvia-blanco border border-foreground/10 p-8 rounded-3xl shadow-xl mt-10 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out hover-card-lift">
+	<div class="max-w-md mx-auto bg-white border border-foreground/10 p-8 rounded-3xl shadow-xl mt-10 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out hover-card-lift">
 		<h2 class="text-2xl font-bold mb-6 text-center text-foreground">Mi Perfil</h2>
 		
 		<div class="flex flex-col items-center space-y-6">
@@ -24,22 +24,22 @@ if (!user) {
 					class="absolute inset-0 bg-foreground/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
 					onclick="document.getElementById('avatarInput').click()"
 				>
-					<i class="fa-solid fa-camera text-background text-2xl" aria-hidden="true"></i>
+					<i class="fa-solid fa-camera text-background text-2xl"></i>
 				</div>
 			</div>
 			
 			{user.avatar_url && !user.avatar_url.includes('api.dicebear.com') && (
-				<button id="removeAvatarBtn" class="text-xs text-foreground underline underline-offset-2 hover:decoration-primary hover:decoration-2 font-bold mt-1 cursor-pointer">
-					<i class="fa-solid fa-trash-can mr-1" aria-hidden="true"></i> Eliminar Foto
+				<button id="removeAvatarBtn" class="text-xs text-primary hover:underline font-bold mt-1 cursor-pointer">
+					<i class="fa-solid fa-trash-can mr-1"></i> Eliminar Foto
 				</button>
 			)}
 			
 			<div class="text-center w-full">
-				<p class="text-sm text-lutvia-texto-suave mb-2">{user.role === 'admin' ? 'Administrador' : 'Jugador'} | @{user.username}</p>
+				<p class="text-sm text-foreground/60 mb-2">{user.role === 'admin' ? 'Administrador' : 'Jugador'} | @{user.username}</p>
                 <div class="flex flex-col gap-2 w-full">
-                    <label class="text-sm font-bold text-foreground text-left">Tu Nombre Real</label>
-                    <input type="text" id="nameInput" value={user.display_name} class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" />
-                    <button id="saveNameBtn" class="bg-secondary/20 text-foreground hover:bg-secondary hover:text-foreground font-bold py-2 rounded-xl transition-colors w-full mt-2 cursor-pointer">
+                    <label class="text-sm font-bold text-foreground/80 text-left">Tu Nombre Real</label>
+                    <input type="text" id="nameInput" value={user.display_name} class="w-full bg-foreground/5 border border-foreground/10 text-foreground rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all" />
+                    <button id="saveNameBtn" class="bg-secondary/20 text-secondary hover:bg-secondary hover:text-background font-bold py-2 rounded-xl transition-colors w-full mt-2 cursor-pointer">
                         Guardar Nombre
                     </button>
                 </div>
@@ -47,10 +47,10 @@ if (!user) {
 
 			<input type="file" id="avatarInput" accept="image/*" class="hidden" />
 			
-			<div id="loadingMessage" class="hidden text-foreground font-semibold text-sm">
-				<i class="fa-solid fa-spinner fa-spin mr-2" aria-hidden="true"></i> Actualizando...
+			<div id="loadingMessage" class="hidden text-secondary font-semibold text-sm">
+				<i class="fa-solid fa-spinner fa-spin mr-2"></i> Actualizando...
 			</div>
-			<div id="errorMessage" class="hidden text-foreground font-semibold text-sm"></div>
+			<div id="errorMessage" class="hidden text-primary font-semibold text-sm"></div>
 		</div>
 	</div>
 

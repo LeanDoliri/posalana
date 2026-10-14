@@ -159,33 +159,33 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
         <header class="mb-10 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-75 ease-out">
             <div>
                 <h2 class="text-3xl md:text-4xl font-black tracking-tight text-foreground">Archivos POSALANA</h2>
-                <p class="text-lutvia-texto-suave mt-2">El registro inmutable de la suerte pasada.</p>
+                <p class="text-foreground/60 mt-2">El registro inmutable de la suerte pasada.</p>
             </div>
-            <div class="bg-lutvia-blanco border border-foreground/10 px-4 py-2 rounded-full text-sm font-bold text-lutvia-texto-suave shadow-sm">
-                <i class="fa-solid fa-database mr-2" aria-hidden="true"></i> {dates.length} días registrados
+            <div class="bg-white border border-foreground/10 px-4 py-2 rounded-full text-sm font-bold text-foreground/70 shadow-sm">
+                <i class="fa-solid fa-database mr-2"></i> {dates.length} días registrados
             </div>
         </header>
 
         <!-- Resumen de Temporadas -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out">
             <!-- Temporada Actual -->
-            <div class="bg-lutvia-blanco border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
+            <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
                 <div class="absolute -top-12 -right-12 w-36 h-36 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-all duration-500 pointer-events-none"></div>
                 
                 <div class="flex flex-col items-start gap-3 mb-6 relative z-10">
                     <h3 class="text-xl font-black flex items-center gap-2.5 text-foreground">
-                        <i class="fa-solid fa-calendar-days text-secondary" aria-hidden="true"></i>
+                        <i class="fa-solid fa-calendar-days text-secondary"></i>
                         Temporada Actual
                     </h3>
-                    <span class="bg-secondary/10 border border-secondary/20 text-foreground font-black text-sm px-4 py-2 rounded-full">
+                    <span class="bg-secondary/10 border border-secondary/20 text-secondary font-black text-sm px-4 py-2 rounded-full">
                         {formatSeasonName(currentSeasonId)}
                     </span>
                 </div>
 
                 <div class="relative z-10">
-                    <p class="text-xs text-lutvia-texto-suave font-semibold -mt-3 mb-4">{currentSeasonRange.start} — {currentSeasonRange.end}</p>
+                    <p class="text-xs text-foreground/50 font-semibold -mt-3 mb-4">{currentSeasonRange.start} — {currentSeasonRange.end}</p>
                     {sortedCurrentStats.length === 0 ? (
-                        <p class="text-sm text-lutvia-texto-suave py-8 italic text-center">Sin datos registrados en esta temporada.</p>
+                        <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en esta temporada.</p>
                     ) : (
                         <StatsTable stats={sortedCurrentStats} theme="secondary" />
                     )}
@@ -193,8 +193,8 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
 
                 {currentSeasonExemptions.length > 0 && (
                     <div class="mt-6 pt-6 border-t border-foreground/10 relative z-10">
-                        <h4 class="text-xs font-black uppercase tracking-wider text-lutvia-texto-suave mb-3 flex items-center gap-1.5">
-                            <i class="fa-solid fa-shield-halved text-secondary" aria-hidden="true"></i> Exenciones de la Temporada
+                        <h4 class="text-xs font-black uppercase tracking-wider text-foreground/60 mb-3 flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved text-secondary"></i> Exenciones de la Temporada
                         </h4>
                         <div class="flex flex-wrap gap-2">
                             {currentSeasonExemptions.map(ex => {
@@ -204,8 +204,8 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                     <div class="flex items-center gap-2 bg-secondary/5 border border-secondary/20 px-3 py-1.5 rounded-full text-xs">
                                         <UserAvatar user={{ username: ex.username, display_name: ex.display_name, avatar_url: ex.avatar_url }} size="sm" />
                                         <span class="font-bold text-foreground">{ex.display_name}</span>
-                                        <span class="text-lutvia-texto-suave">•</span>
-                                        <span class="text-foreground font-bold font-mono">{choreEmoji} Exento de {choreLabel}</span>
+                                        <span class="text-foreground/50">•</span>
+                                        <span class="text-secondary font-bold font-mono">{choreEmoji} Exento de {choreLabel}</span>
                                     </div>
                                 );
                             })}
@@ -215,12 +215,12 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
             </div>
 
             <!-- Temporadas Anteriores (con selector) -->
-            <div class="bg-lutvia-blanco border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
+            <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group hover-card-lift">
                 <div class="absolute -top-12 -right-12 w-36 h-36 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-all duration-500 pointer-events-none"></div>
 
                 <div class="flex flex-col items-start gap-3 mb-6 relative z-20">
                     <h3 class="text-xl font-black flex items-center gap-2.5 text-foreground">
-                        <i class="fa-solid fa-clock-rotate-left text-accent" aria-hidden="true"></i>
+                        <i class="fa-solid fa-clock-rotate-left text-accent"></i>
                         Temporadas Anteriores
                     </h3>
                     <div id="past-season-dropdown" class="relative">
@@ -230,27 +230,27 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                             aria-haspopup="listbox"
                             aria-expanded="false"
                             aria-controls="past-season-list"
-                            class="flex items-center gap-2 bg-accent/10 border border-accent/20 text-foreground font-black text-sm pl-4 pr-3.5 py-2 rounded-full cursor-pointer hover:bg-accent/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors"
+                            class="flex items-center gap-2 bg-accent/10 border border-accent/20 text-accent font-black text-sm pl-4 pr-3.5 py-2 rounded-full cursor-pointer hover:bg-accent/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 transition-colors"
                         >
                             <span id="past-season-label">{pastSeasons[0]?.name}</span>
-                            <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" aria-hidden="true" data-chevron></i>
+                            <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" data-chevron></i>
                         </button>
                         <ul
                             id="past-season-list"
                             role="listbox"
                             aria-label="Elegir temporada"
                             tabindex="-1"
-                            class="hidden absolute left-0 top-full mt-2 min-w-full w-max max-h-64 overflow-y-auto bg-lutvia-blanco border border-foreground/10 rounded-2xl shadow-xl p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150 origin-top-left focus:outline-none"
+                            class="hidden absolute left-0 top-full mt-2 min-w-full w-max max-h-64 overflow-y-auto bg-white border border-foreground/10 rounded-2xl shadow-xl p-1.5 z-30 animate-in fade-in zoom-in-95 duration-150 origin-top-left focus:outline-none"
                         >
                             {pastSeasons.map((season, i) => (
                                 <li
                                     role="option"
                                     data-season-option={season.id}
                                     aria-selected={i === 0 ? 'true' : 'false'}
-                                    class="flex items-center justify-between gap-4 px-3.5 py-2 rounded-xl text-sm font-bold text-lutvia-texto-suave cursor-pointer hover:bg-accent/10 hover:text-foreground aria-selected:bg-accent/10 aria-selected:text-foreground data-[active=true]:bg-accent/10 data-[active=true]:text-accent transition-colors"
+                                    class="flex items-center justify-between gap-4 px-3.5 py-2 rounded-xl text-sm font-bold text-foreground/70 cursor-pointer hover:bg-accent/10 hover:text-accent aria-selected:bg-accent/10 aria-selected:text-accent data-[active=true]:bg-accent/10 data-[active=true]:text-accent transition-colors"
                                 >
                                     <span>{season.name}</span>
-                                    <i class="fa-solid fa-check text-xs opacity-0" aria-hidden="true" data-check></i>
+                                    <i class="fa-solid fa-check text-xs opacity-0" data-check></i>
                                 </li>
                             ))}
                         </ul>
@@ -259,17 +259,17 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
 
                 {pastSeasons.map((season, i) => (
                     <div data-past-season={season.id} class:list={["relative z-10", { hidden: i !== 0 }]}>
-                        <p class="text-xs text-lutvia-texto-suave font-semibold -mt-3 mb-4">{season.range.start} — {season.range.end}</p>
+                        <p class="text-xs text-foreground/50 font-semibold -mt-3 mb-4">{season.range.start} — {season.range.end}</p>
                         {season.stats.length === 0 ? (
-                            <p class="text-sm text-lutvia-texto-suave py-8 italic text-center">Sin datos registrados en esta temporada.</p>
+                            <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en esta temporada.</p>
                         ) : (
                             <StatsTable stats={season.stats} theme="accent" />
                         )}
 
                         {season.exemptions.length > 0 && (
                             <div class="mt-6 pt-6 border-t border-foreground/10">
-                                <h4 class="text-xs font-black uppercase tracking-wider text-lutvia-texto-suave mb-3 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-shield-halved text-accent" aria-hidden="true"></i> Exenciones de la Temporada
+                                <h4 class="text-xs font-black uppercase tracking-wider text-foreground/60 mb-3 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-shield-halved text-accent"></i> Exenciones de la Temporada
                                 </h4>
                                 <div class="flex flex-wrap gap-2">
                                     {season.exemptions.map(ex => {
@@ -279,8 +279,8 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                             <div class="flex items-center gap-2 bg-accent/5 border border-accent/20 px-3 py-1.5 rounded-full text-xs">
                                                 <UserAvatar user={{ username: ex.username, display_name: ex.display_name, avatar_url: ex.avatar_url }} size="sm" />
                                                 <span class="font-bold text-foreground">{ex.display_name}</span>
-                                                <span class="text-lutvia-texto-suave">•</span>
-                                                <span class="text-foreground font-bold font-mono">{choreEmoji} Exento de {choreLabel}</span>
+                                                <span class="text-foreground/50">•</span>
+                                                <span class="text-accent font-bold font-mono">{choreEmoji} Exento de {choreLabel}</span>
                                             </div>
                                         );
                                     })}
@@ -293,16 +293,16 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
         </section>
 
         <!-- Tabla Global del Año -->
-        <div class="bg-lutvia-blanco border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 ease-out hover-card-lift">
+        <div class="bg-white border border-foreground/10 p-6 md:p-8 rounded-3xl shadow-lg relative overflow-hidden group animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 ease-out hover-card-lift">
             <div class="absolute -top-12 -right-12 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-500 pointer-events-none"></div>
             
             <h3 class="text-xl font-black mb-6 flex items-center gap-2.5 text-foreground relative z-10">
-                <i class="fa-solid fa-earth-americas text-primary" aria-hidden="true"></i>
-                Tabla Global del Año: <span class="text-foreground">{currentYear}</span>
+                <i class="fa-solid fa-earth-americas text-primary"></i>
+                Tabla Global del Año: <span class="text-primary">{currentYear}</span>
             </h3>
             
             {sortedYearStats.length === 0 ? (
-                <p class="text-sm text-lutvia-texto-suave py-8 italic text-center">Sin datos registrados en este año.</p>
+                <p class="text-sm text-foreground/50 py-8 italic text-center">Sin datos registrados en este año.</p>
             ) : (
                 <StatsTable stats={sortedYearStats} theme="primary" sortable={true} />
             )}
@@ -310,23 +310,23 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
 
         {dates.length === 0 ? (
             <div class="py-20 text-center border-2 border-dashed border-foreground/10 rounded-3xl">
-                <div class="text-5xl mb-4 text-lutvia-texto-suave"><i class="fa-solid fa-folder-open" aria-hidden="true"></i></div>
-                <p class="text-lutvia-texto-suave font-medium text-lg">Los archivos están vacíos.</p>
+                <div class="text-5xl mb-4 text-foreground/20"><i class="fa-solid fa-folder-open"></i></div>
+                <p class="text-foreground/60 font-medium text-lg">Los archivos están vacíos.</p>
             </div>
         ) : (
             <div id="historial-seccion" class="space-y-8 scroll-mt-24 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 ease-out">
                 <!-- Selector de Semanas (Paginación) -->
-                <div class="flex flex-col sm:flex-row items-center justify-between bg-lutvia-blanco border border-foreground/10 p-4 rounded-3xl gap-4">
+                <div class="flex flex-col sm:flex-row items-center justify-between bg-white border border-foreground/10 p-4 rounded-3xl gap-4">
                     <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-week text-secondary text-lg" aria-hidden="true"></i>
+                        <i class="fa-solid fa-calendar-week text-secondary text-lg"></i>
                         <span id="week-range-label" class="font-black text-foreground text-sm tracking-tight">{formatWeekRange(selectedWeek)}</span>
                     </div>
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                        <a id="prev-week-btn" href={prevWeekMonday ? `?week=${prevWeekMonday}#historial-seccion` : '#'} class={`flex items-center gap-2 bg-lutvia-blanco border border-foreground/10 text-foreground hover:bg-foreground/5 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm motion-safe:active:scale-95 ${!prevWeekMonday ? 'pointer-events-none opacity-30 cursor-not-allowed' : ''}`}>
-                            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Semana Anterior
+                        <a id="prev-week-btn" href={prevWeekMonday ? `?week=${prevWeekMonday}#historial-seccion` : '#'} class={`flex items-center gap-2 bg-white border border-foreground/10 text-foreground hover:bg-foreground/5 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm active:scale-95 ${!prevWeekMonday ? 'pointer-events-none opacity-30 cursor-not-allowed' : ''}`}>
+                            <i class="fa-solid fa-arrow-left"></i> Semana Anterior
                         </a>
-                        <a id="next-week-btn" href={nextWeekMonday ? `?week=${nextWeekMonday}#historial-seccion` : '#'} class={`flex items-center gap-2 bg-lutvia-blanco border border-foreground/10 text-foreground hover:bg-foreground/5 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm motion-safe:active:scale-95 ${!nextWeekMonday ? 'pointer-events-none opacity-30 cursor-not-allowed' : ''}`}>
-                            Semana Siguiente <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        <a id="next-week-btn" href={nextWeekMonday ? `?week=${nextWeekMonday}#historial-seccion` : '#'} class={`flex items-center gap-2 bg-white border border-foreground/10 text-foreground hover:bg-foreground/5 px-4 py-2 rounded-full text-xs font-bold transition-all shadow-sm active:scale-95 ${!nextWeekMonday ? 'pointer-events-none opacity-30 cursor-not-allowed' : ''}`}>
+                            Semana Siguiente <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -346,8 +346,8 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                         
                                         {/* Date Header */}
                                         <div class="flex items-center gap-4 mb-6 relative z-10">
-                                            <div class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-secondary text-foreground flex items-center justify-center font-black shadow-lg">
-                                                <i class="fa-solid fa-calendar-day" aria-hidden="true"></i>
+                                            <div class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-secondary text-background flex items-center justify-center font-black shadow-lg">
+                                                <i class="fa-solid fa-calendar-day"></i>
                                             </div>
                                             <h3 class="text-xl md:text-2xl font-black text-foreground">{formatDate(data.date)}</h3>
                                         </div>
@@ -356,7 +356,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                         {data.lomitoActivated && (
                                             <div class="pl-6 md:pl-10 mb-4 relative z-10">
                                                 <div class="bg-accent/10 border border-accent/20 px-4 py-2 rounded-xl inline-block">
-                                                    <span class="text-foreground font-bold text-sm">🥪 Cláusula Lomito activada por {data.lomitoPlayers.join(" y ")}</span>
+                                                    <span class="text-accent font-bold text-sm">🥪 Cláusula Lomito activada por {data.lomitoPlayers.join(" y ")}</span>
                                                 </div>
                                             </div>
                                         )}
@@ -368,7 +368,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                                 const isSafe = chore.code === "NA";
                                                 const userExemptions = (data.exemptions || []).filter(e => String(e.user_id) === String(roll.user_id));
                                                 return (
-                                                    <div class={`group flex flex-row items-center justify-between p-4 rounded-2xl border transition-all duration-300 hover:shadow-md motion-safe:hover:-translate-y-0.5 ${isSafe ? 'bg-lutvia-blanco border-foreground/10 hover:border-secondary/30' : 'bg-lutvia-blanco border-primary/20 hover:border-primary/40'}`}>
+                                                    <div class={`group flex flex-row items-center justify-between p-4 rounded-2xl border transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 ${isSafe ? 'bg-white border-foreground/10 hover:border-secondary/30' : 'bg-white border-primary/20 hover:border-primary/40'}`}>
                                                         
                                                         {/* User */}
                                                         <div class="flex flex-wrap items-center gap-2.5">
@@ -378,8 +378,8 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                                                 const targetChore = chores.find(c => c.code === ex.chore_code);
                                                                 const choreLabel = targetChore ? targetChore.label.split(' ')[0] : ex.chore_code;
                                                                 return (
-                                                                    <span class="inline-flex items-center gap-1 text-xs font-black tracking-wider uppercase bg-accent/10 text-foreground border border-accent/20 px-1.5 py-0.5 rounded-md" title={`Exento de: ${targetChore ? targetChore.label : ex.chore_code}`}>
-                                                                        <i class="fa-solid fa-shield-halved text-xs" aria-hidden="true"></i> {choreLabel}
+                                                                    <span class="inline-flex items-center gap-1 text-[8px] font-black tracking-wider uppercase bg-accent/10 text-accent border border-accent/20 px-1.5 py-0.5 rounded-md" title={`Exento de: ${targetChore ? targetChore.label : ex.chore_code}`}>
+                                                                        <i class="fa-solid fa-shield-halved text-[7px]"></i> {choreLabel}
                                                                     </span>
                                                                 )
                                                             })}
@@ -390,7 +390,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
                                                             <div class="hidden sm:flex items-center opacity-70 group-hover:opacity-100 transition-opacity">
                                                                 <DiceDisplay die1={roll.die1 as number} die2={roll.die2 as number} die3={roll.die3 as number} die4={roll.die4 as number} size="sm" isSafe={isSafe} />
                                                             </div>
-                                                            <div class={`px-3 py-1 rounded-lg text-xs font-black tracking-widest ${isSafe ? 'bg-secondary/15 text-foreground' : 'bg-primary/15 text-foreground'}`}>
+                                                            <div class={`px-3 py-1 rounded-lg text-xs font-black tracking-widest ${isSafe ? 'bg-secondary text-background' : 'bg-primary text-background shadow-[0_0_10px_rgba(234,42,88,0.3)]'}`}>
                                                                 {chore.code}
                                                             </div>
                                                         </div>
@@ -538,7 +538,7 @@ const currentSeasonExemptions = await getExemptionsForSeason(db, currentSeasonId
 								? 'fa-solid fa-sort-up ml-1 text-primary'
 								: 'fa-solid fa-sort-down ml-1 text-primary';
 						} else {
-							icon.className = 'fa-solid fa-sort ml-1 text-lutvia-texto-suave text-xs';
+							icon.className = 'fa-solid fa-sort ml-1 text-foreground/30 text-[10px]';
 						}
 					}
 				});

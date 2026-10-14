@@ -2,9 +2,8 @@
 @import "@lutvia/ds/tailwind.css";
 @import "@lutvia/ds/posalana.css";
 
-/* Sistema de diseño de Lutvia (LUTVIA-DEV/lutvia-ds), perfil POSALANA.
- * primary, secondary, accent, background y foreground los define posalana.css apuntando a los tokens
- * (rosa, cyan, violeta, gris y gris oscuro): acá no se escribe ningún color a mano. */
+/* Los colores de la marca (primary, secondary, accent, background, foreground) vienen del
+ * sistema de diseño de Lutvia: posalana.css los define sobre los tokens --lutvia-*. */
 
 @theme {
   --font-sans: 'Montserrat', sans-serif;
@@ -43,18 +42,18 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0px color-mix(in srgb, var(--lutvia-cyan) 40%, transparent); }
-    50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--lutvia-cyan) 0%, transparent); }
+    0%, 100% { box-shadow: 0 0 0 0px rgba(0, 204, 204, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(0, 204, 204, 0); }
   }
 
   @keyframes pulse-glow-primary {
-    0%, 100% { box-shadow: 0 0 0 0px color-mix(in srgb, var(--lutvia-rosa) 40%, transparent); }
-    50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--lutvia-rosa) 0%, transparent); }
+    0%, 100% { box-shadow: 0 0 0 0px rgba(234, 42, 88, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(234, 42, 88, 0); }
   }
 
   @keyframes pulse-glow-accent {
-    0%, 100% { box-shadow: 0 0 0 0px color-mix(in srgb, var(--lutvia-violeta) 40%, transparent); }
-    50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--lutvia-violeta) 0%, transparent); }
+    0%, 100% { box-shadow: 0 0 0 0px rgba(204, 102, 255, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(204, 102, 255, 0); }
   }
 
   @keyframes shake-roll {
@@ -76,39 +75,13 @@
   body {
     @apply bg-background text-foreground font-sans;
   }
-
-  /* Foco visible del núcleo: anillo rosa de 2 px separado 2 px */
-  :focus-visible {
-    outline: 2px solid var(--lutvia-rosa);
-    outline-offset: 2px;
-  }
-}
-
-/* Brillo cyan del botón principal (Permitido del perfil): 30 % en reposo, 50 % al pasar el mouse */
-@utility brillo-cyan {
-  box-shadow: 0 8px 30px color-mix(in srgb, var(--lutvia-cyan) 30%, transparent);
-}
-
-@utility brillo-cyan-fuerte {
-  box-shadow: 0 8px 40px color-mix(in srgb, var(--lutvia-cyan) 50%, transparent);
-}
-
-@utility brillo-cyan-suave {
-  box-shadow: 0 4px 15px color-mix(in srgb, var(--lutvia-cyan) 30%, transparent);
-}
-
-/* Patrón de puntos violeta del banner de Lomito (antes un SVG con el hex escrito a mano) */
-@utility patron-lomito {
-  background-image: radial-gradient(color-mix(in srgb, var(--lutvia-violeta) 10%, transparent) 2px, transparent 2px);
-  background-size: 20px 20px;
-  background-position: -8px -8px;
 }
 
 /* utilidades de animación que simulan tailwindcss-animate */
 @utility animate-in {
   animation-name: enter;
   animation-duration: 300ms;
-  animation-fill-mode: backwards;
+  animation-fill-mode: both;
   --tw-enter-opacity: 1;
   --tw-enter-translate-x: 0;
   --tw-enter-translate-y: 0;
@@ -184,11 +157,9 @@
 @utility hover-card-lift {
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   &:hover {
-    @media (prefers-reduced-motion: no-preference) {
-      transform: translateY(-5px);
-    }
-    box-shadow: 0 20px 25px -5px color-mix(in srgb, var(--lutvia-oscuro) 8%, transparent), 0 10px 10px -5px color-mix(in srgb, var(--lutvia-oscuro) 4%, transparent);
-    border-color: color-mix(in srgb, var(--lutvia-cyan) 40%, transparent);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 204, 204, 0.4);
   }
 }
 
@@ -217,8 +188,8 @@ html.is-navigating {
   height: 3px;
   width: 0%;
   z-index: 9999;
-  background: linear-gradient(90deg, var(--lutvia-rosa), var(--lutvia-violeta), var(--lutvia-cyan));
-  box-shadow: 0 0 12px color-mix(in srgb, var(--lutvia-violeta) 60%, transparent), 0 0 4px color-mix(in srgb, var(--lutvia-rosa) 40%, transparent);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent), var(--color-secondary));
+  box-shadow: 0 0 12px rgba(204, 102, 255, 0.6), 0 0 4px rgba(234, 42, 88, 0.4);
   border-radius: 0 9999px 9999px 0;
   opacity: 0;
   pointer-events: none;
@@ -234,7 +205,7 @@ html.is-navigating {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--lutvia-blanco) 70%, transparent), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
   animation: loader-shimmer 1.2s ease-in-out infinite;
 }
 
@@ -247,14 +218,14 @@ html.is-navigating {
   align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
-  background: var(--lutvia-blanco);
-  border: 1px solid var(--lutvia-oscuro-16);
+  background: white;
+  border: 1px solid rgba(60, 60, 59, 0.1);
   border-radius: 9999px;
-  box-shadow: 0 20px 25px -5px color-mix(in srgb, var(--lutvia-oscuro) 10%, transparent), 0 10px 10px -5px color-mix(in srgb, var(--lutvia-oscuro) 4%, transparent);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   font-family: var(--font-sans);
   font-size: 0.8125rem;
   font-weight: 700;
-  color: var(--lutvia-texto-suave);
+  color: rgba(60, 60, 59, 0.7);
   opacity: 0;
   transform: translateX(-50%) translateY(0.75rem);
   pointer-events: none;
@@ -270,4 +241,4 @@ html.is-navigating {
   display: inline-block;
   font-size: 1rem;
   animation: loader-dice-spin 1s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
+}
