@@ -190,7 +190,7 @@ html.is-navigating {
   z-index: 9999;
   background: linear-gradient(90deg, var(--color-primary), var(--color-accent), var(--color-secondary));
   box-shadow: 0 0 12px rgba(204, 102, 255, 0.6), 0 0 4px rgba(234, 42, 88, 0.4);
-  border-radius: 0 9999px 9999px 0;
+  border-radius: 0 var(--lutvia-pildora) var(--lutvia-pildora) 0;
   opacity: 0;
   pointer-events: none;
   overflow: hidden;
@@ -220,7 +220,7 @@ html.is-navigating {
   padding: 0.625rem 1.25rem;
   background: white;
   border: 1px solid rgba(60, 60, 59, 0.1);
-  border-radius: 9999px;
+  border-radius: var(--lutvia-pildora);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   font-family: var(--font-sans);
   font-size: 0.8125rem;
