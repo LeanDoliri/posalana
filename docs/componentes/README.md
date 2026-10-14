@@ -12,5 +12,6 @@ POSALANA usa el sistema de diseño de Lutvia ([LUTVIA-DEV/lutvia-ds](https://git
 
 - **Colores:** `src/styles/global.css` importa `@lutvia/ds/tailwind.css` y `@lutvia/ds/posalana.css`. Los nombres de siempre (`primary`, `secondary`, `accent`, `background`, `foreground`) apuntan a los tokens (rosa, cyan, violeta, gris y gris oscuro); el proyecto no define colores propios. Fuera del CSS (favicon y embeds de Discord), los colores se leen de los tokens con `src/utils/tokens.ts`.
 - **Tipografía:** Montserrat, como pide el núcleo.
-- **Formas:** píldoras para acciones y etiquetas, esquinas redondeadas para bloques.
-- **Todo lo demás** (tarjetas con sombra y radio de 24px, matices y desenfoques decorativos, texto en los colores de la marca, animaciones y hovers del juego) es el diseño propio de POSALANA. El perfil lo admite en su lista de **Permitidos**.
+- **Radios:** `lutvia-pildora` para acciones, etiquetas y círculos; `lutvia-radio-chico` (10px) para filas, campos, botones y bloques chicos; `lutvia-radio` (14px) para contenedores. Las tarjetas van en 24px (`rounded-3xl`, Permitido).
+- **Cifras:** Montserrat con `tabular-nums` (nada de `font-mono`).
+- **Todo lo demás** (tarjetas con sombra, matices y desenfoques decorativos, texto en los colores de la marca, animaciones y hovers del juego) es el diseño propio de POSALANA. El perfil lo admite en su lista de **Permitidos**.
