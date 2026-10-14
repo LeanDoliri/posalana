@@ -26,13 +26,13 @@ POSALANA sigue las reglas mínimas de la marca de [LUTVIA-DEV/lutvia-ds](https:/
 | Emojis | Uno por tarea (🍽️ 🗑️ 🧽 🎉; en la portada, 🍴 y 🧹 para Pone y Saca), 🥪 y 🍟 para Lomito, y los de los avisos (⏰ 🎲 😢 ✅ ❌ ⚠️) |
 | Caracteres como íconos | «?» en el puesto vacante del podio, «•» como separador y «∞» en el contador de Lomito |
 
-## Pendiente: contraste
+## Excepciones de contraste
 
-La regla de contraste del sistema (WCAG AA: 4.5:1 en texto normal y 3:1 en texto grande e indicadores) no tiene excepciones. Hoy POSALANA no la cumple en estos usos:
+La regla de contraste del sistema (WCAG AA: 4.5:1 en texto normal y 3:1 en texto grande e indicadores) rige en todo POSALANA, salvo estos usos, que son parte de la identidad del juego y quedan como **excepción propia del proyecto** (decisión del 2026-10-14). Una pieza nueva no suma excepciones: usa estas mismas o cumple la regla.
 
-| Uso | Contraste |
-|---|---|
-| Texto en colores vivos sobre blanco: eyebrows, enlaces, nombre de la tarea, totales, palabras destacadas, chip de Lomito, badge de Admin | Cyan 2.00 · violeta 3.04 · rosa 4.22 |
-| Texto gris (`background`) sobre relleno cyan, rosa o violeta: botones (incluido «Tirar los dados»), etiquetas de tarea, círculo de la fecha | 1.71 · 2.60 · 3.61 |
-| Texto e íconos en gris oscuro por opacidad (`foreground/20` a `/60`) | 1.43 a 3.45 (`/70` ya da 4.51) |
-| Dado que decide en cyan sobre blanco | 2.00 |
+| Uso | Contraste | Condición |
+|---|---|---|
+| Texto en colores vivos sobre blanco: eyebrows, enlaces, nombre de la tarea, totales, palabras destacadas, chip de Lomito, badge de Admin, títulos y textos de Lomito | Cyan 2.00 · violeta 3.04 · rosa 4.22 | Siempre un color de la paleta; el texto largo de lectura va en `foreground` |
+| Texto gris (`background`) sobre relleno cyan, rosa o violeta: botones (incluido «Tirar los dados»), etiquetas de tarea, círculo de la fecha, burbuja del veredicto | 1.71 · 2.60 · 3.61 | Solo en botones, etiquetas e íconos de una línea |
+| Texto e íconos en gris oscuro por opacidad (`foreground/20` a `/60`): texto secundario, ayudas, dados que no deciden, íconos de los campos | 1.43 a 3.45 (`/70` ya da 4.51) | El texto corrido de lectura va en `/60` o más |
+| Dado que decide en cyan sobre blanco (te salvás, Saca o sin estado) | 2.00 | El valor y la tarea también se ven en el resto de la fila |

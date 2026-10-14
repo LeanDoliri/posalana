@@ -27,4 +27,4 @@ Una tirada del día en el ranking de la portada: quién tiró, a qué hora, qué
 
 ## Sistema de diseño
 
-Colores de la paleta, Montserrat y los radios de POSALANA. Los fondos al 8 %, los textos de 9 y 10 px y el crecimiento de tu fila son decisiones de POSALANA; el texto en color y el gris claro sobre relleno de color están en el pendiente de contraste de [`diseno.md`](../diseno.md).
+Colores de la paleta, Montserrat y los radios de POSALANA. Los fondos al 8 %, los textos de 9 y 10 px y el crecimiento de tu fila son decisiones de POSALANA; el texto en color y el gris claro sobre relleno de color son excepciones de contraste de [`diseno.md`](../diseno.md).

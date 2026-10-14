@@ -20,4 +20,4 @@ El aviso festivo que aparece en la portada cuando dos jugadores sacan exactament
 
 ## Sistema de diseño
 
-Colores de la paleta y Montserrat. El patrón, la sombra de color, el rebote y el confetti son decisiones de POSALANA (con movimiento reducido, `global.css` apaga el rebote). El título violeta en 24 px cumple el 3:1 de texto grande; la línea de los jugadores en violeta al 90 % está en el pendiente de contraste de [`diseno.md`](../diseno.md).
+Colores de la paleta y Montserrat. El patrón, la sombra de color, el rebote y el confetti son decisiones de POSALANA (con movimiento reducido, `global.css` apaga el rebote). El título violeta en 24 px cumple el 3:1 de texto grande; la línea de los jugadores en violeta al 90 % es una excepción de contraste de [`diseno.md`](../diseno.md).
