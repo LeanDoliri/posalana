@@ -1,3 +1,5 @@
+import { colorLutviaEntero } from "./tokens.js";
+
 const BOT_AVATAR_URL = "https://posalana.vercel.app/bot-avatar.png";
 
 export async function sendDiscordRoll(
@@ -22,7 +24,7 @@ export async function sendDiscordRoll(
         embeds = [{
             title: "🥪 ¡Se rompió la matrix de la suerte! 🥪",
             description: `¡La profecía se ha cumplido! **${lomitoPlayers.join(" y ")}** han sacado exactamente la misma tirada:\n👉 **${diceStr}**\n\n¡Hoy se festeja almorzando unos **LOMITOS CON PAPAS** patrocinados por **LUTVIA**! 🍟🤤🥪`,
-            color: 13400063, // Soft purple color (Hex: #CC66FF)
+            color: colorLutviaEntero("violeta"),
             footer: {
                 text: "POSALANA • Cláusula Lomito 🥪"
             },
@@ -52,7 +54,7 @@ export async function sendDiscordRoll(
         embeds = [{
             title: "🎲 ¡El destino en juego! Nueva tirada",
             description: `**${displayName}** arrojó los dados de la suerte y obtuvo:\n👉 **${diceStr}**\n\n${commentary}\n\n🔗 ¿Y vos? ¿Zafás o lavás? Medí tu suerte en la [App de POSALANA](https://posalana.vercel.app/)`,
-            color: 52428, // Cyan color (Hex: #00CCCC)
+            color: colorLutviaEntero("cyan"),
             footer: {
                 text: "POSALANA • Suerte del Día 🎲"
             },
@@ -103,7 +105,7 @@ export async function sendDiscordVerdict(
     const embed = {
         title: `📜 EL DECRETO DIARIO - ${dateStr}${automatic ? " · ⏰ MESA CERRADA" : ""}`,
         description: `🚨 **¡ATENCIÓN JUGADORES!** El destino ha hablado y las sentencias de hoy son definitivas e inapelables.\n\n## 🎲 ${playersCount} ${playersCount === 1 ? "jugador tiró" : "jugadores tiraron"} hoy\n\nAquí tienen la distribución oficial de tareas de la mesa para hoy:\n\n🍽️ **PO:** **${poneStr}**\n🗑️ **SA:** **${sacaStr}**\n🧽 **LA:** **${lavaStr}**\n🎉 **NA:** **${zafaronStr !== "Ninguno" ? zafaronStr : "Ninguno"}**\n🛡️ **EXENTOS HOY:** **${exentosStr !== "Ninguno" ? exentosStr : "Ninguno"}**\n\n👉 *¿Querés apelar con tus estadísticas?* Entrá a la [App de POSALANA](https://posalana.vercel.app/)`,
-        color: 15346264, // Primary pink color (Hex: #EA2A58)
+        color: colorLutviaEntero("rosa"),
         footer: {
             text: automatic
                 ? "POSALANA • Veredicto automático al cierre de la tirada ⏰"

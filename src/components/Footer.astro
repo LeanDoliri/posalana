@@ -2,93 +2,31 @@
 const currentYear = new Date().getFullYear();
 ---
 
-<footer
-  class="bg-white text-foreground/70 border-t border-foreground/10 mt-auto relative overflow-hidden py-16"
->
-  <!-- Glowing gradient background accents in light mode -->
-  <div
-    class="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none"
-  >
-  </div>
-  <div
-    class="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-[100px] pointer-events-none"
-  >
-  </div>
-
-  <div class="max-w-5xl mx-auto px-6 relative z-10 w-full space-y-12">
-    <!-- Middle Section: Giant Banner Text & Quote -->
-    <div
-      class="relative overflow-hidden group/giant flex flex-col items-center justify-center"
-    >
-      <h2
-        class="text-6xl sm:text-8xl md:text-9xl font-black tracking-tighter select-none pointer-events-none opacity-10 bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent transition-all duration-700 group-hover/giant:opacity-30 group-hover/giant:scale-[1.02] text-center uppercase"
-      >
-        POSALANA
-      </h2>
-      <p
-        class="text-sm font-semibold tracking-wide text-foreground/30 uppercase mt-4 text-center select-none pointer-events-none"
-      >
-        Pone • Saca • Lava • Nada
+<footer class="bg-lutvia-blanco border-t border-lutvia-oscuro-16 mt-auto py-16">
+  <div class="max-w-5xl mx-auto px-6 w-full space-y-12">
+    <!-- Wordmark por sílabas (Permitido del perfil: solo como logo, en tamaño de título) -->
+    <div class="flex flex-col items-center justify-center">
+      <p class="text-5xl sm:text-7xl md:text-8xl font-black tracking-tighter select-none text-center" aria-label="POSALANA">
+        <span class="text-lutvia-rosa" aria-hidden="true">PO</span><span class="text-lutvia-cyan" aria-hidden="true">SA</span><span class="text-lutvia-violeta" aria-hidden="true">LA</span><span class="text-lutvia-oscuro" aria-hidden="true">NA</span>
+      </p>
+      <p class="rotulo mt-4 text-center">
+        Pone · Saca · Lava · Nada
       </p>
     </div>
 
-    <!-- Bottom Section: Credits & GitHub Link -->
-    <div
-      class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-foreground/5 text-xs text-foreground/40"
-    >
-      <div
-        class="flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-center sm:text-left"
-      >
-        <p>&copy; {currentYear} POSALANA. Todos los derechos reservados.</p>
-      </div>
+    <!-- Créditos y repositorio -->
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-lutvia-oscuro-16 text-xs text-lutvia-texto-suave">
+      <p class="text-center sm:text-left">&copy; {currentYear} POSALANA. Todos los derechos reservados.</p>
       <a
         href="https://github.com/LeanDoliri/posalana"
         target="_blank"
         rel="noopener noreferrer"
-        class="w-10 h-10 rounded-full bg-foreground/5 border border-foreground/10 flex items-center justify-center text-foreground/60 hover:text-primary hover:bg-primary/5 hover:border-primary/20 hover:-translate-y-1 transition-all duration-300 shadow-md cursor-pointer"
-        aria-label="GitHub Repository"
+        class="boton-icono"
+        aria-label="Ver el código en GitHub"
+        title="Ver el código en GitHub"
       >
-        <i class="fa-brands fa-github text-lg"></i>
+        <i class="fa-brands fa-github" aria-hidden="true"></i>
       </a>
     </div>
   </div>
 </footer>
-
-<style>
-  /* Reuse the logo hover logic for footer logo */
-  .logo-container {
-    perspective: 1000px;
-  }
-
-  .logo-syllable {
-    display: inline-block;
-    transform-style: preserve-3d;
-    backface-visibility: visible;
-  }
-
-  .logo-container:hover .logo-syllable {
-    animation: roll-die-footer 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
-  }
-
-  .logo-container:hover .syllable-1 {
-    animation-delay: 0s;
-  }
-  .logo-container:hover .syllable-2 {
-    animation-delay: 0.15s;
-  }
-  .logo-container:hover .syllable-3 {
-    animation-delay: 0.3s;
-  }
-  .logo-container:hover .syllable-4 {
-    animation-delay: 0.45s;
-  }
-
-  @keyframes roll-die-footer {
-    0% {
-      transform: rotateX(0deg);
-    }
-    100% {
-      transform: rotateX(360deg);
-    }
-  }
-</style>

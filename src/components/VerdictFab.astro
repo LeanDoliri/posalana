@@ -4,39 +4,39 @@
 ---
 
 <div id="verdict-fab" class="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-30 flex flex-col items-end gap-3">
-    <!-- Panel de confirmación -->
+    <!-- Panel de confirmación: blanco con borde oscuro, sin sombra (puede quedar sobre una tarjeta blanca) -->
     <div
         id="verdict-fab-panel"
-        class="hidden w-72 bg-white border border-foreground/10 rounded-3xl shadow-2xl p-5 origin-bottom-right animate-in fade-in zoom-in-95 duration-200"
+        class="hidden w-72 bg-lutvia-blanco border-2 border-lutvia-oscuro rounded-lutvia-radio p-5 animate-in fade-in zoom-in-95"
         role="dialog"
         aria-labelledby="verdict-fab-title"
     >
-        <p id="verdict-fab-title" class="font-black text-foreground flex items-center gap-2">
-            <i class="fa-solid fa-scroll text-secondary"></i> Veredicto Final
+        <p id="verdict-fab-title" class="font-black text-lutvia-oscuro flex items-center gap-2">
+            <i class="fa-solid fa-scroll" aria-hidden="true"></i> Veredicto final
         </p>
-        <p class="text-xs text-foreground/60 leading-relaxed mt-1.5">
+        <p class="text-xs text-lutvia-texto-suave leading-relaxed mt-1.5">
             Publica en Discord quién pone, saca y lava hoy, con la cantidad de jugadores que tiraron.
         </p>
-        <p id="verdict-fab-status" class="hidden text-xs font-semibold mt-3"></p>
+        <p id="verdict-fab-status" class="hidden text-xs font-semibold mt-3" role="status"></p>
         <div class="flex gap-2 mt-4">
             <button
                 type="button"
                 data-verdict-close
-                class="flex-1 text-sm font-bold text-foreground/60 bg-foreground/5 hover:bg-foreground/10 py-2.5 rounded-xl transition-colors cursor-pointer"
+                class="boton boton-secundario flex-1 text-sm px-3"
             >
                 Cancelar
             </button>
             <button
                 type="button"
                 id="verdict-fab-publish"
-                class="flex-1 text-sm font-bold text-background bg-secondary hover:opacity-90 disabled:opacity-50 disabled:cursor-wait py-2.5 rounded-xl transition-opacity flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-secondary/20"
+                class="boton boton-principal flex-1 text-sm px-3"
             >
-                <i class="fa-solid fa-paper-plane"></i> Publicar
+                <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Publicar
             </button>
         </div>
     </div>
 
-    <!-- Burbuja -->
+    <!-- Burbuja: botón de ícono (círculo oscuro con ícono blanco; amarillo al pasar el mouse) -->
     <button
         type="button"
         id="verdict-fab-toggle"
@@ -44,10 +44,9 @@
         aria-expanded="false"
         aria-controls="verdict-fab-panel"
         title="Publicar veredicto final"
-        class="relative w-14 h-14 md:w-16 md:h-16 rounded-full bg-secondary text-background text-xl md:text-2xl shadow-xl shadow-secondary/30 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center cursor-pointer"
+        class="boton-icono w-14 h-14 md:w-16 md:h-16 text-xl md:text-2xl"
     >
-        <span class="absolute inset-0 rounded-full bg-secondary animate-ping opacity-20 pointer-events-none"></span>
-        <i class="fa-solid fa-bullhorn relative"></i>
+        <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
     </button>
 </div>
 
@@ -75,12 +74,15 @@
             }
         };
 
+        // El mensaje va siempre en gris oscuro; el ícono marca el resultado (el rosa, solo en el ícono de error)
         const setStatus = (text: string, tone: 'muted' | 'ok' | 'error') => {
             const { status } = getEls();
             if (!status) return;
-            const color = tone === 'ok' ? 'text-emerald-500' : tone === 'error' ? 'text-primary' : 'text-foreground/50';
-            status.className = `block text-xs font-semibold mt-3 ${color}`;
-            status.textContent = text;
+            const icon = tone === 'ok' ? 'fa-circle-check' : tone === 'error' ? 'fa-triangle-exclamation text-lutvia-rosa' : 'fa-spinner fa-spin';
+            const color = tone === 'muted' ? 'text-lutvia-texto-suave' : 'text-lutvia-oscuro';
+            status.className = `flex items-start gap-1.5 text-xs font-semibold mt-3 ${color}`;
+            status.innerHTML = `<i class="fa-solid ${icon} mt-0.5" aria-hidden="true"></i>`;
+            status.append(document.createTextNode(text));
         };
 
         const publishVerdict = async () => {
@@ -92,12 +94,12 @@
                 const res = await fetch('/api/admin/publish-verdict', { method: 'POST' });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    setStatus('✅ ¡Veredicto publicado en Discord!', 'ok');
+                    setStatus('¡Veredicto publicado en Discord!', 'ok');
                 } else {
-                    setStatus(`❌ Error: ${data.error || 'No se pudo publicar'}`, 'error');
+                    setStatus(`Error: ${data.error || 'No se pudo publicar'}`, 'error');
                 }
             } catch (err: any) {
-                setStatus(`❌ Error: ${err.message || 'Error de conexión'}`, 'error');
+                setStatus(`Error: ${err.message || 'Error de conexión'}`, 'error');
             } finally {
                 if (publish) publish.disabled = false;
             }

@@ -6,6 +6,7 @@ import DiceDisplay from "../components/DiceDisplay.astro";
 import { getSeasonId, getPreviousSeasons, formatSeasonName } from "../utils/season.js";
 import { getArgentinaNow, getRollSchedule, getRollWindowStatus } from "../utils/schedule.js";
 import { formatDate } from "../utils/date.js";
+import { chores, choreStyles } from "../utils/chores.js";
 
 const { user } = Astro.locals;
 
@@ -66,9 +67,9 @@ const currentSeason = getSeasonId(dateStr);
 const schedule = await getRollSchedule(db);
 const windowStatus = getRollWindowStatus(schedule, now.minutes);
 const windowStatusLabel = {
-    before: { text: `Cerrada · abre a las ${schedule.start}`, cls: 'bg-foreground/10 text-foreground/60' },
-    open: { text: `Abierta · cierra a las ${schedule.end}`, cls: 'bg-emerald-500/10 text-emerald-600' },
-    closed: { text: `Cerrada desde las ${schedule.end}`, cls: 'bg-primary/10 text-primary' },
+    before: { text: `Cerrada · abre a las ${schedule.start}`, cls: 'bg-lutvia-gris' },
+    open: { text: `Abierta · cierra a las ${schedule.end}`, cls: 'bg-lutvia-cyan' },
+    closed: { text: `Cerrada desde las ${schedule.end}`, cls: 'bg-lutvia-rosa/15' },
 }[windowStatus];
 const autoVerdictToday = schedule.autoVerdictLastDate === dateStr;
 const autoVerdictLabel = !schedule.autoVerdictEnabled
@@ -102,111 +103,113 @@ uniqueSeasons.sort((a, b) => {
 ---
 
 <Layout>
-	<div class="space-y-10 animate-in fade-in duration-500 ease-out">
-		<header class="text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4 border-b border-foreground/5 pb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-75 ease-out">
+	<div class="space-y-10 animate-in fade-in">
+		<header class="text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4 border-b border-lutvia-oscuro-16 pb-8 animate-in fade-in slide-in-from-bottom-4">
 			<div>
-				<h2 class="text-3xl font-black text-foreground tracking-tight"><i class="fa-solid fa-screwdriver-wrench text-primary mr-2"></i> Centro de Control</h2>
-				<p class="text-foreground/60 mt-1">Gestión avanzada de jugadores y manipulación del destino.</p>
+				<h2 class="text-3xl font-black text-lutvia-oscuro tracking-tight"><i class="fa-solid fa-screwdriver-wrench text-lutvia-rosa mr-2" aria-hidden="true"></i> Centro de control</h2>
+				<p class="text-lutvia-texto-suave mt-1">Gestión avanzada de jugadores y manipulación del destino.</p>
 			</div>
-            <div class="bg-primary/10 px-4 py-2 rounded-full text-sm font-bold text-primary">
-                Modo Administrador
-            </div>
+            <span class="etiqueta bg-lutvia-rosa/15 text-sm px-4 py-2">
+                Modo administrador
+            </span>
 		</header>
 
-		<!-- Global Settings Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 ease-out hover-card-lift">
+		<!-- Configuración global -->
+		<section class="bg-lutvia-blanco p-1 rounded-3xl shadow-xl animate-in fade-in slide-in-from-bottom-4 hover-card-lift">
             <div class="p-6 md:p-8">
-			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-globe text-accent"></i> Configuración Global</h3>
+			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-globe text-lutvia-violeta" aria-hidden="true"></i> Configuración global</h3>
 			    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <form method="post" action="/api/admin/save-settings" class="space-y-4">
                         <div>
-                            <label class="block text-sm font-bold mb-1 text-foreground/80">Último Lomito Manual</label>
-                            <input type="date" name="last_lomito_date" value={settingsMap.get('last_lomito_date') || ''} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
-                            <p class="text-xs text-foreground/50 mt-1">Al configurarla, esta fecha se usa para el contador de días.</p>
+                            <label for="last-lomito-date" class="block text-sm font-bold mb-1">Último Lomito manual</label>
+                            <input type="date" id="last-lomito-date" name="last_lomito_date" value={settingsMap.get('last_lomito_date') || ''} class="campo" aria-describedby="last-lomito-help" />
+                            <p id="last-lomito-help" class="text-chico text-lutvia-texto-suave mt-1">Al configurarla, esta fecha se usa para el contador de días.</p>
                         </div>
-                        <div class="pt-4 border-t border-foreground/10">
+                        <div class="pt-4 border-t border-lutvia-oscuro-16" role="group" aria-labelledby="roll-window-label">
                             <div class="flex items-center justify-between gap-2 mb-3">
-                                <label class="block text-sm font-bold text-foreground/80">Horario de Tirada (GMT-3)</label>
-                                <span class={`text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full ${windowStatusLabel.cls}`}>{windowStatusLabel.text}</span>
+                                <p id="roll-window-label" class="block text-sm font-bold">Horario de tirada (GMT-3)</p>
+                                <span class={`etiqueta uppercase tracking-wider ${windowStatusLabel.cls}`}>{windowStatusLabel.text}</span>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <span class="block text-xs font-semibold text-foreground/50 mb-1">Abre</span>
-                                    <input type="time" name="roll_window_start" required value={schedule.start} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
+                                    <label for="roll-window-start" class="block text-xs font-bold mb-1">Abre</label>
+                                    <input type="time" id="roll-window-start" name="roll_window_start" required value={schedule.start} class="campo" />
                                 </div>
                                 <div>
-                                    <span class="block text-xs font-semibold text-foreground/50 mb-1">Cierra</span>
-                                    <input type="time" name="roll_window_end" required value={schedule.end} class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" />
+                                    <label for="roll-window-end" class="block text-xs font-bold mb-1">Cierra</label>
+                                    <input type="time" id="roll-window-end" name="roll_window_end" required value={schedule.end} class="campo" />
                                 </div>
                             </div>
-                            <p class="text-xs text-foreground/50 mt-1">Fuera de este horario nadie puede tirar (salvo <code>lomitotester</code>).</p>
+                            <p class="text-chico text-lutvia-texto-suave mt-1">Fuera de este horario nadie puede tirar (salvo <code>lomitotester</code>).</p>
                         </div>
                         <div>
                             <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" name="auto_verdict_enabled" value="1" checked={schedule.autoVerdictEnabled} class="w-5 h-5 accent-secondary cursor-pointer" />
-                                <span class="text-sm font-bold text-foreground/80">Veredicto automático al cierre</span>
+                                <input type="checkbox" name="auto_verdict_enabled" value="1" checked={schedule.autoVerdictEnabled} class="w-5 h-5 accent-lutvia-oscuro cursor-pointer" />
+                                <span class="text-sm font-bold">Veredicto automático al cierre</span>
                             </label>
-                            <p class="text-xs text-foreground/50 mt-1">Publica el veredicto final en Discord a la hora de cierre. Estado de hoy: <strong class="text-foreground/70">{autoVerdictLabel}</strong></p>
+                            <p class="text-chico text-lutvia-texto-suave mt-1">Publica el veredicto final en Discord a la hora de cierre. Estado de hoy: <strong class="text-lutvia-oscuro">{autoVerdictLabel}</strong></p>
                         </div>
-                        <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity cursor-pointer">
-                            Guardar Configuración
+                        <button class="boton boton-secundario w-full">
+                            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Guardar configuración
                         </button>
                     </form>
 
-                    <!-- Discord Quick Actions -->
-                    <div class="space-y-4 flex flex-col justify-between border-t md:border-t-0 md:border-l border-foreground/10 pt-6 md:pt-0 md:pl-8">
+                    <!-- Acciones rápidas de Discord -->
+                    <div class="space-y-4 flex flex-col justify-between border-t md:border-t-0 md:border-l border-lutvia-oscuro-16 pt-6 md:pt-0 md:pl-8">
                         <div>
-                            <h4 class="text-sm font-bold uppercase tracking-wider text-foreground/70 mb-2">Notificaciones de Discord</h4>
-                            <p class="text-xs text-foreground/50 leading-relaxed mb-4">
+                            <h4 class="rotulo mb-2">Notificaciones de Discord</h4>
+                            <p class="text-xs text-lutvia-texto-suave leading-relaxed mb-4">
                                 El veredicto final sale solo a las {schedule.end}. Usá este botón para publicarlo manualmente antes del cierre o para reenviarlo (por ejemplo, si se anuló una tirada).
                             </p>
                         </div>
                         <div class="space-y-3">
-                            <button id="publish-verdict-btn" class="w-full bg-secondary text-background font-bold py-3.5 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-secondary/15">
-                                <i class="fa-solid fa-bullhorn"></i> Publicar Veredicto Final
+                            <!-- El único botón principal de la pantalla -->
+                            <button id="publish-verdict-btn" class="boton boton-principal w-full py-3.5">
+                                <i class="fa-solid fa-bullhorn" aria-hidden="true"></i> Publicar veredicto final
                             </button>
-                            <p id="publish-verdict-status" class="text-xs font-semibold text-center hidden"></p>
+                            <p id="publish-verdict-status" class="text-xs font-semibold justify-center hidden" role="status"></p>
                         </div>
                     </div>
                 </div>
             </div>
 		</section>
 
-		<!-- Users Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out hover-card-lift">
+		<!-- Padrón de jugadores -->
+		<section class="bg-lutvia-blanco p-1 rounded-3xl shadow-xl animate-in fade-in slide-in-from-bottom-4 hover-card-lift">
             <div class="p-6 md:p-8">
-			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-users text-secondary"></i> Padrón de Jugadores</h3>
-			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
+			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-users" aria-hidden="true"></i> Padrón de jugadores</h3>
+			    <div class="overflow-x-auto rounded-lutvia-radio-chico border border-lutvia-oscuro-16">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
                         <thead>
-                            <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
+                            <tr class="bg-lutvia-gris rotulo">
                                 <th class="p-4 font-bold">Jugador</th>
                                 <th class="p-4 font-bold">Rol</th>
-                                <th class="p-4 font-bold text-right">Acciones Peligrosas</th>
+                                <th class="p-4 font-bold text-right">Acciones peligrosas</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-foreground/5">
+                        <tbody class="divide-y divide-lutvia-oscuro-16">
                             {allUsers.map((u) => (
-                                <tr class="hover:bg-foreground/[0.02] transition-colors">
+                                <tr class="hover:bg-lutvia-oscuro-05 transition-colors">
                                     <td class="p-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="relative group cursor-pointer" onclick={`document.getElementById('avatar-input-${u.id}').click()`} title="Hacer clic para cambiar foto de perfil">
+                                            <!-- Cambiar foto: botón real con un ícono de cámara siempre visible -->
+                                            <button type="button" class="relative cursor-pointer rounded-lutvia-pildora" data-avatar-trigger={`avatar-input-${u.id}`} aria-label={`Cambiar la foto de ${u.username}`} title="Cambiar foto de perfil">
                                                 <UserAvatar user={u as any} size="md" />
-                                                <div class="absolute inset-0 bg-foreground/45 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <i class="fa-solid fa-camera text-background text-[10px]"></i>
-                                                </div>
-                                            </div>
+                                                <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-lutvia-pildora bg-lutvia-oscuro text-lutvia-blanco flex items-center justify-center text-mini" aria-hidden="true">
+                                                    <i class="fa-solid fa-camera"></i>
+                                                </span>
+                                            </button>
                                             <input type="file" id={`avatar-input-${u.id}`} data-user-id={u.id} accept="image/*" class="hidden admin-avatar-input" />
                                             {u.avatar_url && !u.avatar_url.includes('api.dicebear.com') && (
-                                                <button class="remove-user-avatar-btn text-foreground/30 hover:text-primary p-1 rounded-md transition-colors cursor-pointer" data-user-id={u.id} title="Quitar foto de perfil y volver al avatar por defecto">
-                                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                                <button class="remove-user-avatar-btn boton-icono w-7 h-7 text-xs" data-user-id={u.id} aria-label={`Quitar la foto de ${u.username}`} title="Quitar foto de perfil y volver al avatar por defecto">
+                                                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
                                                 </button>
                                             )}
-                                            <span class="font-bold text-foreground">{u.username}</span>
+                                            <span class="font-bold text-lutvia-oscuro">{u.username}</span>
                                         </div>
                                     </td>
                                     <td class="p-4">
-                                        <span class={`px-3 py-1 text-[10px] uppercase tracking-widest rounded-full font-black ${u.role === 'admin' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-secondary/10 text-secondary border border-secondary/20'}`}>
+                                        <span class={`etiqueta uppercase tracking-widest ${u.role === 'admin' ? 'bg-lutvia-rosa/15' : 'bg-lutvia-gris'}`}>
                                             {u.role}
                                         </span>
                                     </td>
@@ -216,19 +219,19 @@ uniqueSeasons.sort((a, b) => {
                                                 <form method="post" action="/api/admin/toggle-role">
                                                     <input type="hidden" name="userId" value={u.id} />
                                                     <input type="hidden" name="role" value={u.role === 'admin' ? 'user' : 'admin'} />
-                                                    <button class="px-3 py-1.5 bg-foreground/5 hover:bg-foreground/10 text-foreground text-xs font-bold rounded-lg transition-colors cursor-pointer">
-                                                        <i class="fa-solid fa-rotate mr-1"></i> {u.role === 'admin' ? 'Revocar' : 'Ascender'}
+                                                    <button class="boton boton-secundario text-xs px-3 py-1.5">
+                                                        <i class="fa-solid fa-rotate" aria-hidden="true"></i> {u.role === 'admin' ? 'Revocar' : 'Ascender'}
                                                     </button>
                                                 </form>
-                                                <form method="post" action="/api/admin/delete-user" onsubmit={`return confirm('⚠️ ATENCIÓN: ¿Borrar a ${u.username} y todo su historial? Esta acción es irreversible.')`}>
+                                                <form method="post" action="/api/admin/delete-user" onsubmit={`return confirm('ATENCIÓN: ¿Borrar a ${u.username} y todo su historial? Esta acción no se puede deshacer.')`}>
                                                     <input type="hidden" name="userId" value={u.id} />
-                                                    <button class="px-3 py-1.5 bg-primary/10 hover:bg-primary text-primary hover:text-background text-xs font-bold rounded-lg transition-colors cursor-pointer">
-                                                        <i class="fa-solid fa-trash-can"></i>
+                                                    <button class="boton boton-secundario boton-peligro text-xs px-3 py-1.5" aria-label={`Borrar a ${u.username}`} title={`Borrar a ${u.username}`}>
+                                                        <i class="fa-solid fa-trash-can" aria-hidden="true"></i> Borrar
                                                     </button>
                                                 </form>
                                             </div>
                                         ) : (
-                                            <span class="text-foreground/40 text-xs font-bold uppercase tracking-widest mr-2">Espejo (Vos)</span>
+                                            <span class="rotulo mr-2">Espejo (vos)</span>
                                         )}
                                     </td>
                                 </tr>
@@ -239,145 +242,147 @@ uniqueSeasons.sort((a, b) => {
             </div>
 		</section>
 
-		<!-- Manual Points Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 ease-out hover-card-lift">
+		<!-- Carga histórica de puntos -->
+		<section class="bg-lutvia-blanco p-1 rounded-3xl shadow-xl mt-8 mb-8 animate-in fade-in slide-in-from-bottom-4 hover-card-lift">
             <div class="p-6 md:p-8">
-			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-accent"></i> Carga Histórica de Puntos</h3>
-			    <div class="grid grid-cols-1 gap-8">
-                    <form method="post" action="/api/admin/manual-points" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <div>
-                                <label class="block text-sm font-bold mb-1 text-foreground/80">Jugador</label>
-                                <select name="user_id" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
-                                    <option value="">Seleccionar...</option>
-                                    {allUsers.map(u => (
-                                        <option value={u.id}>{u.display_name || u.username}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold mb-1 text-foreground/80">Temporada</label>
-                                <select name="season_id" id="season-select" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
-                                    <option value="">Seleccionar...</option>
-                                    {uniqueSeasons.map(s => (
-                                        <option value={s}>{formatSeasonName(s)}</option>
-                                    ))}
-                                    <option value="custom">Otra temporada (escribir)...</option>
-                                </select>
-                                <div id="custom-season-container" class="hidden mt-2">
-                                    <input type="text" name="custom_season_id" id="custom-season-input" placeholder="Ej: 2025-invierno" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" />
-                                    <p class="text-[10px] text-foreground/50 mt-1">Formato: AAAA-estación (verano, otoño, invierno, primavera)</p>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold mb-1 text-foreground/80">Tarea</label>
-                                <select name="chore_code" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" required>
-                                    <option value="">Seleccionar...</option>
-                                    <option value="LA">Lavar (LA)</option>
-                                    <option value="SA">Sacar (SA)</option>
-                                    <option value="PO">Poner (PO)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold mb-1 text-foreground/80">Puntos Totales</label>
-                                <input type="number" name="points" min="0" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground" placeholder="Ej: 5" required />
-                            </div>
-                        </div>
-                        <button class="w-full bg-accent text-background font-bold py-3 rounded-xl hover:opacity-90 transition-opacity mt-2 cursor-pointer">
-                            Cargar Puntos
-                        </button>
-                    </form>
-                </div>
-            </div>
-		</section>
-
-		<!-- Exemptions Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg mt-8 mb-8 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 ease-out hover-card-lift">
-            <div class="p-6 md:p-8 border-b border-foreground/5 mb-6">
-                <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-shield-halved text-secondary"></i> Gestión de Exenciones</h3>
-                <p class="text-xs text-foreground/50 mt-1">Configura qué jugadores están exentos de realizar tareas específicas en cada temporada.</p>
-            </div>
-            
-            <div class="px-6 md:px-8 pb-8 space-y-8">
-                <!-- Add Exemption Form -->
-                <form method="post" action="/api/admin/add-exemption" class="space-y-4 bg-foreground/[0.02] border border-foreground/5 p-5 rounded-2xl">
-                    <h4 class="text-sm font-bold uppercase tracking-wider text-foreground/70 mb-2">Crear Nueva Exención</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+			    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-lutvia-violeta" aria-hidden="true"></i> Carga histórica de puntos</h3>
+                <form method="post" action="/api/admin/manual-points" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
-                            <label class="block text-sm font-bold mb-1 text-foreground/80">Jugador</label>
-                            <select name="user_id" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
-                                <option value="">Seleccionar...</option>
+                            <label for="points-user" class="block text-sm font-bold mb-1">Jugador</label>
+                            <select id="points-user" name="user_id" class="campo" required>
+                                <option value="">Elegí un jugador</option>
                                 {allUsers.map(u => (
                                     <option value={u.id}>{u.display_name || u.username}</option>
                                 ))}
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold mb-1 text-foreground/80">Temporada</label>
-                            <select name="season_id" id="exemption-season-select" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
-                                <option value="">Seleccionar...</option>
+                            <label for="season-select" class="block text-sm font-bold mb-1">Temporada</label>
+                            <select name="season_id" id="season-select" class="campo" required>
+                                <option value="">Elegí una temporada</option>
                                 {uniqueSeasons.map(s => (
                                     <option value={s}>{formatSeasonName(s)}</option>
                                 ))}
-                                <option value="custom">Otra temporada (escribir)...</option>
+                                <option value="custom">Otra temporada (escribila)</option>
                             </select>
-                            <div id="exemption-custom-season-container" class="hidden mt-2">
-                                <input type="text" name="custom_season_id" id="exemption-custom-season-input" placeholder="Ej: 2026-otoño" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" />
-                                <p class="text-[10px] text-foreground/50 mt-1">Formato: AAAA-estación (verano, otoño, invierno, primavera)</p>
+                            <div id="custom-season-container" class="hidden mt-2">
+                                <label for="custom-season-input" class="sr-only">Otra temporada</label>
+                                <input type="text" name="custom_season_id" id="custom-season-input" placeholder="Ej: 2025-invierno" class="campo text-sm" aria-describedby="custom-season-help" />
+                                <p id="custom-season-help" class="text-chico text-lutvia-texto-suave mt-1">Formato: AAAA-estación (verano, otoño, invierno, primavera)</p>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold mb-1 text-foreground/80">Tarea Exenta</label>
-                            <select name="chore_code" class="w-full bg-foreground/5 border border-foreground/10 rounded-xl p-3 text-foreground text-sm" required>
-                                <option value="">Seleccionar...</option>
-                                <option value="LA">Lavar (LA) 🧽</option>
-                                <option value="SA">Sacar (SA) 🗑️</option>
-                                <option value="PO">Poner (PO) 🍽️</option>
+                            <label for="points-chore" class="block text-sm font-bold mb-1">Tarea</label>
+                            <select id="points-chore" name="chore_code" class="campo" required>
+                                <option value="">Elegí una tarea</option>
+                                <option value="LA">Lavar (LA)</option>
+                                <option value="SA">Sacar (SA)</option>
+                                <option value="PO">Poner (PO)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="points-total" class="block text-sm font-bold mb-1">Puntos totales</label>
+                            <input type="number" id="points-total" name="points" min="0" class="campo" placeholder="Ej: 5" required />
+                        </div>
+                    </div>
+                    <button class="boton boton-secundario w-full mt-2">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Cargar puntos
+                    </button>
+                </form>
+            </div>
+		</section>
+
+		<!-- Gestión de exenciones -->
+		<section class="bg-lutvia-blanco p-1 rounded-3xl shadow-xl mt-8 mb-8 animate-in fade-in slide-in-from-bottom-4 hover-card-lift">
+            <div class="p-6 md:p-8 border-b border-lutvia-oscuro-16 mb-6">
+                <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Gestión de exenciones</h3>
+                <p class="text-xs text-lutvia-texto-suave mt-1">Configurá qué jugadores están exentos de realizar tareas específicas en cada temporada.</p>
+            </div>
+
+            <div class="px-6 md:px-8 pb-8 space-y-8">
+                <!-- Nueva exención: bloque gris dentro de la tarjeta blanca -->
+                <form method="post" action="/api/admin/add-exemption" class="space-y-4 bg-lutvia-gris p-5 rounded-lutvia-radio">
+                    <h4 class="rotulo mb-2">Crear nueva exención</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="exemption-user" class="block text-sm font-bold mb-1">Jugador</label>
+                            <select id="exemption-user" name="user_id" class="campo text-sm" required>
+                                <option value="">Elegí un jugador</option>
+                                {allUsers.map(u => (
+                                    <option value={u.id}>{u.display_name || u.username}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="exemption-season-select" class="block text-sm font-bold mb-1">Temporada</label>
+                            <select name="season_id" id="exemption-season-select" class="campo text-sm" required>
+                                <option value="">Elegí una temporada</option>
+                                {uniqueSeasons.map(s => (
+                                    <option value={s}>{formatSeasonName(s)}</option>
+                                ))}
+                                <option value="custom">Otra temporada (escribila)</option>
+                            </select>
+                            <div id="exemption-custom-season-container" class="hidden mt-2">
+                                <label for="exemption-custom-season-input" class="sr-only">Otra temporada</label>
+                                <input type="text" name="custom_season_id" id="exemption-custom-season-input" placeholder="Ej: 2026-otoño" class="campo text-sm" aria-describedby="exemption-custom-season-help" />
+                                <p id="exemption-custom-season-help" class="text-chico text-lutvia-texto-suave mt-1">Formato: AAAA-estación (verano, otoño, invierno, primavera)</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="exemption-chore" class="block text-sm font-bold mb-1">Tarea exenta</label>
+                            <select id="exemption-chore" name="chore_code" class="campo text-sm" required>
+                                <option value="">Elegí una tarea</option>
+                                <option value="LA">Lavar (LA)</option>
+                                <option value="SA">Sacar (SA)</option>
+                                <option value="PO">Poner (PO)</option>
                             </select>
                         </div>
                     </div>
-                    <button class="bg-secondary text-background font-bold px-6 py-2.5 rounded-xl hover:opacity-90 transition-opacity mt-2 text-sm shadow-sm cursor-pointer">
-                        Asignar Exención
+                    <button class="boton boton-secundario mt-2 text-sm">
+                        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Asignar exención
                     </button>
                 </form>
 
-                <!-- List of Exemptions -->
+                <!-- Exenciones registradas -->
                 <div>
-                    <h4 class="text-sm font-bold uppercase tracking-wider text-foreground/70 mb-4">Exenciones Registradas</h4>
+                    <h4 class="rotulo mb-4">Exenciones registradas</h4>
                     {allExemptions.length === 0 ? (
-                        <p class="text-sm text-foreground/40 italic py-4">No hay exenciones cargadas en la base de datos.</p>
+                        <p class="text-sm text-lutvia-texto-suave italic py-4">No hay exenciones cargadas en la base de datos.</p>
                     ) : (
-                        <div class="overflow-x-auto rounded-2xl border border-foreground/5">
+                        <div class="overflow-x-auto rounded-lutvia-radio-chico border border-lutvia-oscuro-16">
                             <table class="w-full text-left border-collapse whitespace-nowrap text-sm">
                                 <thead>
-                                    <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
+                                    <tr class="bg-lutvia-gris rotulo">
                                         <th class="p-4 font-bold">Temporada</th>
                                         <th class="p-4 font-bold">Jugador</th>
-                                        <th class="p-4 font-bold">Tarea Exenta</th>
+                                        <th class="p-4 font-bold">Tarea exenta</th>
                                         <th class="p-4 font-bold text-right">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-foreground/5">
+                                <tbody class="divide-y divide-lutvia-oscuro-16">
                                     {allExemptions.map((ex: any) => {
-                                        const choreEmoji = ex.chore_code === 'LA' ? '🧽' : ex.chore_code === 'SA' ? '🗑️' : '🍽️';
-                                        const choreLabel = ex.chore_code === 'LA' ? 'Lavar' : ex.chore_code === 'SA' ? 'Sacar' : 'Poner';
+                                        const exChore = chores.find(c => c.code === ex.chore_code);
+                                        const choreLabel = ex.chore_code === 'LA' ? 'lavar' : ex.chore_code === 'SA' ? 'sacar' : 'poner';
                                         return (
-                                            <tr class="hover:bg-foreground/[0.02] transition-colors">
-                                                <td class="p-4 font-bold text-foreground/70">{formatSeasonName(ex.season_id)}</td>
+                                            <tr class="hover:bg-lutvia-oscuro-05 transition-colors">
+                                                <td class="p-4 font-bold">{formatSeasonName(ex.season_id)}</td>
                                                 <td class="p-4">
-                                                    <div class="flex items-center gap-2 font-bold text-foreground">
+                                                    <div class="flex items-center gap-2 font-bold text-lutvia-oscuro">
                                                         <UserAvatar user={{ username: ex.username, display_name: ex.display_name, avatar_url: ex.avatar_url }} size="sm" />
                                                         {ex.display_name}
                                                     </div>
                                                 </td>
                                                 <td class="p-4">
-                                                    <span class="font-bold text-secondary">{choreEmoji} Exento de {choreLabel} ({ex.chore_code})</span>
+                                                    <span class={`etiqueta ${choreStyles[ex.chore_code]?.etiqueta ?? 'bg-lutvia-gris'}`}>
+                                                        <span aria-hidden="true">{exChore?.emoji}</span> Exento de {choreLabel} ({ex.chore_code})
+                                                    </span>
                                                 </td>
                                                 <td class="p-4 text-right">
-                                                    <form method="post" action="/api/admin/remove-exemption" onsubmit={`return confirm('⚠️ ¿Eliminar la exención de ${ex.display_name} para ${formatSeasonName(ex.season_id)}?')`}>
+                                                    <form method="post" action="/api/admin/remove-exemption" onsubmit={`return confirm('¿Eliminar la exención de ${ex.display_name} para ${formatSeasonName(ex.season_id)}?')`}>
                                                         <input type="hidden" name="id" value={ex.id} />
-                                                        <button class="px-3 py-1.5 border border-primary/20 hover:bg-primary text-primary hover:text-background text-xs font-bold rounded-lg transition-colors cursor-pointer">
-                                                            <i class="fa-solid fa-trash mr-1"></i> Eliminar
+                                                        <button class="boton boton-secundario boton-peligro text-xs px-3 py-1.5">
+                                                            <i class="fa-solid fa-trash" aria-hidden="true"></i> Eliminar
                                                         </button>
                                                     </form>
                                                 </td>
@@ -392,31 +397,31 @@ uniqueSeasons.sort((a, b) => {
             </div>
 		</section>
 
-		<!-- Rolls Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[350ms] ease-out hover-card-lift">
+		<!-- Últimas 50 tiradas -->
+		<section class="bg-lutvia-blanco p-1 rounded-3xl shadow-xl animate-in fade-in slide-in-from-bottom-4 hover-card-lift">
             <div class="p-6 md:p-8">
                 <div class="flex items-center justify-between mb-6">
-			        <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-dice text-secondary"></i> Últimas 50 Tiradas</h3>
+			        <h3 class="text-xl font-bold flex items-center gap-2"><i class="fa-solid fa-dice" aria-hidden="true"></i> Últimas 50 tiradas</h3>
                 </div>
-			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
+			    <div class="overflow-x-auto rounded-lutvia-radio-chico border border-lutvia-oscuro-16">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
                         <thead>
-                            <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
+                            <tr class="bg-lutvia-gris rotulo">
                                 <th class="p-4 font-bold">Fecha</th>
                                 <th class="p-4 font-bold">Jugador</th>
                                 <th class="p-4 font-bold">Dados</th>
                                 <th class="p-4 font-bold text-right">Justicia</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-foreground/5">
+                        <tbody class="divide-y divide-lutvia-oscuro-16">
                             {recentRolls.length === 0 && (
-                                <tr><td colspan="4" class="p-8 text-center text-foreground/40 font-bold">La historia está en blanco.</td></tr>
+                                <tr><td colspan="4" class="p-8 text-center text-lutvia-texto-suave font-bold">La historia está en blanco.</td></tr>
                             )}
                             {recentRolls.map((r) => (
-                                <tr class="hover:bg-foreground/[0.02] transition-colors">
-                                    <td class="p-4 text-sm font-mono text-foreground/60">{formatDate(r.date as string)}</td>
+                                <tr class="hover:bg-lutvia-oscuro-05 transition-colors">
+                                    <td class="p-4 text-sm tabular-nums text-lutvia-texto-suave">{formatDate(r.date as string)}</td>
                                     <td class="p-4">
-                                        <div class="flex items-center gap-2 font-bold text-foreground">
+                                        <div class="flex items-center gap-2 font-bold text-lutvia-oscuro">
                                             <UserAvatar user={{ username: r.username as string, display_name: r.display_name as string, avatar_url: r.avatar_url as string }} size="sm" />
                                             {r.display_name}
                                         </div>
@@ -425,10 +430,10 @@ uniqueSeasons.sort((a, b) => {
                                         <DiceDisplay die1={r.die1 as number} die2={r.die2 as number} die3={r.die3 as number} die4={r.die4 as number} size="md" />
                                     </td>
                                     <td class="p-4 text-right">
-                                        <form method="post" action="/api/admin/delete-roll" onsubmit={`return confirm('⚠️ ¿Alterar el destino y anular la tirada de ${r.username}?')`}>
+                                        <form method="post" action="/api/admin/delete-roll" onsubmit={`return confirm('¿Alterar el destino y anular la tirada de ${r.username}?')`}>
                                             <input type="hidden" name="rollId" value={r.id} />
-                                            <button class="px-3 py-1.5 border border-primary/20 text-primary hover:bg-primary hover:text-background text-xs font-bold rounded-lg transition-colors cursor-pointer">
-                                                <i class="fa-solid fa-ban mr-1"></i> Anular
+                                            <button class="boton boton-secundario boton-peligro text-xs px-3 py-1.5">
+                                                <i class="fa-solid fa-ban" aria-hidden="true"></i> Anular
                                             </button>
                                         </form>
                                     </td>
@@ -439,27 +444,28 @@ uniqueSeasons.sort((a, b) => {
                 </div>
             </div>
 		</section>
-		<!-- Password Resets Section -->
-		<section class="bg-white border border-foreground/10 p-1 rounded-3xl shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 delay-[400ms] ease-out hover-card-lift">
+
+		<!-- Cambios de contraseña -->
+		<section class="bg-lutvia-blanco p-1 rounded-3xl shadow-xl animate-in fade-in slide-in-from-bottom-4 hover-card-lift">
             <div class="p-6 md:p-8">
-                <h3 class="text-xl font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-key text-accent"></i> Cambios de Contraseña</h3>
-                <p class="text-xs text-foreground/50 mb-6">Registro de restablecimientos de contraseña hechos desde /reset. Cualquiera puede resetear libremente; acá queda constancia por las dudas.</p>
-			    <div class="overflow-x-auto rounded-2xl border border-foreground/5">
+                <h3 class="text-xl font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-key text-lutvia-violeta" aria-hidden="true"></i> Cambios de contraseña</h3>
+                <p class="text-xs text-lutvia-texto-suave mb-6">Registro de restablecimientos de contraseña hechos desde /reset. Cualquiera puede resetear libremente; acá queda constancia por las dudas.</p>
+			    <div class="overflow-x-auto rounded-lutvia-radio-chico border border-lutvia-oscuro-16">
                     <table class="w-full text-left border-collapse whitespace-nowrap">
                         <thead>
-                            <tr class="bg-foreground/5 text-foreground/70 uppercase tracking-wider text-xs">
-                                <th class="p-4 font-bold">Fecha y Hora</th>
+                            <tr class="bg-lutvia-gris rotulo">
+                                <th class="p-4 font-bold">Fecha y hora</th>
                                 <th class="p-4 font-bold">Usuario</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-foreground/5">
+                        <tbody class="divide-y divide-lutvia-oscuro-16">
                             {recentResets.length === 0 && (
-                                <tr><td colspan="2" class="p-8 text-center text-foreground/40 font-bold">Nadie cambió su contraseña todavía.</td></tr>
+                                <tr><td colspan="2" class="p-8 text-center text-lutvia-texto-suave font-bold">Nadie cambió su contraseña todavía.</td></tr>
                             )}
                             {recentResets.map((r: any) => (
-                                <tr class="hover:bg-foreground/[0.02] transition-colors">
-                                    <td class="p-4 text-sm font-mono text-foreground/60">{formatResetDate(r.created_at)}</td>
-                                    <td class="p-4 font-bold text-foreground">{r.username}</td>
+                                <tr class="hover:bg-lutvia-oscuro-05 transition-colors">
+                                    <td class="p-4 text-sm tabular-nums text-lutvia-texto-suave">{formatResetDate(r.created_at)}</td>
+                                    <td class="p-4 font-bold text-lutvia-oscuro">{r.username}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -501,6 +507,13 @@ uniqueSeasons.sort((a, b) => {
 				}
 			});
 
+			// El botón del avatar abre el selector de archivo de ese jugador
+			document.querySelectorAll<HTMLElement>('[data-avatar-trigger]').forEach(trigger => {
+				trigger.addEventListener('click', () => {
+					document.getElementById(trigger.dataset.avatarTrigger || '')?.click();
+				});
+			});
+
 			// Admin user avatar quick update handler
 			const adminAvatarInputs = document.querySelectorAll('.admin-avatar-input');
 			adminAvatarInputs.forEach(inputEl => {
@@ -513,7 +526,7 @@ uniqueSeasons.sort((a, b) => {
 					if (!userId) return;
 
 					if (!file.type.startsWith('image/')) {
-						alert("Por favor selecciona una imagen válida.");
+						alert("Elegí una imagen válida.");
 						return;
 					}
 
@@ -566,18 +579,25 @@ uniqueSeasons.sort((a, b) => {
 			const publishVerdictBtn = document.getElementById('publish-verdict-btn');
 			const publishVerdictStatus = document.getElementById('publish-verdict-status');
 
+			// El mensaje va en gris oscuro; el ícono marca el resultado (el rosa, solo en el ícono de error)
+			const setPublishStatus = (text: string, tone: 'muted' | 'ok' | 'error') => {
+				if (!publishVerdictStatus) return;
+				const icon = tone === 'ok' ? 'fa-circle-check' : tone === 'error' ? 'fa-triangle-exclamation text-lutvia-rosa' : 'fa-spinner fa-spin';
+				const color = tone === 'muted' ? 'text-lutvia-texto-suave' : 'text-lutvia-oscuro';
+				publishVerdictStatus.className = `flex items-center justify-center gap-1.5 text-xs font-semibold text-center ${color}`;
+				publishVerdictStatus.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i>`;
+				publishVerdictStatus.append(document.createTextNode(text));
+			};
+
 			publishVerdictBtn?.addEventListener('click', async () => {
-				if (!confirm('¿Confirmar publicación del Veredicto Final en Discord?')) {
+				if (!confirm('¿Confirmás la publicación del veredicto final en Discord?')) {
 					return;
 				}
 
 				if (publishVerdictBtn instanceof HTMLButtonElement) {
 					publishVerdictBtn.disabled = true;
 				}
-				if (publishVerdictStatus) {
-					publishVerdictStatus.textContent = 'Enviando veredicto...';
-					publishVerdictStatus.className = 'text-xs font-semibold text-center text-foreground/50 block';
-				}
+				setPublishStatus('Enviando veredicto...', 'muted');
 
 				try {
 					const res = await fetch('/api/admin/publish-verdict', {
@@ -586,21 +606,12 @@ uniqueSeasons.sort((a, b) => {
 					const data = await res.json();
 
 					if (res.ok && data.success) {
-						if (publishVerdictStatus) {
-							publishVerdictStatus.textContent = '✅ ¡Veredicto publicado exitosamente en Discord!';
-							publishVerdictStatus.className = 'text-xs font-semibold text-center text-emerald-500 block';
-						}
+						setPublishStatus('¡Veredicto publicado en Discord!', 'ok');
 					} else {
-						if (publishVerdictStatus) {
-							publishVerdictStatus.textContent = `❌ Error: ${data.error || 'No se pudo publicar'}`;
-							publishVerdictStatus.className = 'text-xs font-semibold text-center text-primary block';
-						}
+						setPublishStatus(`Error: ${data.error || 'No se pudo publicar'}`, 'error');
 					}
 				} catch (err: any) {
-					if (publishVerdictStatus) {
-						publishVerdictStatus.textContent = `❌ Error: ${err.message || 'Error de conexión'}`;
-						publishVerdictStatus.className = 'text-xs font-semibold text-center text-primary block';
-					}
+					setPublishStatus(`Error: ${err.message || 'Error de conexión'}`, 'error');
 				} finally {
 					if (publishVerdictBtn instanceof HTMLButtonElement) {
 						publishVerdictBtn.disabled = false;

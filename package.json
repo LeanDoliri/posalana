@@ -15,6 +15,7 @@
     "@astrojs/vercel": "^10.0.8",
     "@libsql/client": "^0.17.3",
     "@lucia-auth/adapter-sqlite": "^3.0.2",
+    "@lutvia/ds": "github:LUTVIA-DEV/lutvia-ds#8d68057",
     "@tailwindcss/vite": "^4.3.1",
     "astro": "^6.4.6",
     "bcryptjs": "^3.0.3",

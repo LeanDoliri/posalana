@@ -1,42 +1,36 @@
 @import "tailwindcss";
+@import "@lutvia/ds/tailwind.css";
+@import "@lutvia/ds/posalana.css";
+
+/* Sistema de diseño de Lutvia (LUTVIA-DEV/lutvia-ds), perfil POSALANA.
+ * Los colores, radios y tamaños salen de los tokens --lutvia-*: acá no se escribe ningún color suelto.
+ * primary/secondary/accent/background/foreground los define posalana.css como alias de los tokens;
+ * el código nuevo usa directamente las clases lutvia-* (bg-lutvia-cyan, text-lutvia-oscuro…). */
+
+/* Sin puntero: lo que aparece al pasar el mouse queda siempre visible */
+@custom-variant sin-hover (@media (hover: none));
+
+@theme inline {
+  /* Tamaños de texto del núcleo: text-mini (.75rem) es el más chico del sistema */
+  --text-mini: var(--lutvia-texto-mini);
+  --text-chico: var(--lutvia-texto-chico);
+}
 
 @theme {
-  --font-sans: 'Montserrat', sans-serif;
+  /* Una sola transición para todo el producto: la de lutvia-transicion (.15s ease) */
+  --default-transition-duration: .15s;
+  --default-transition-timing-function: ease;
 
-  /* Paleta de Colores de la Marca */
-  --color-primary: #EA2A58;
-  --color-secondary: #00CCCC;
-  --color-accent: #CC66FF;
-  
-  /* Colores Base */
-  --color-background: #EDEDED;
-  --color-foreground: #3C3C3B;
-
-  /* Keyframes de Animaciones */
+  /* Animaciones del juego (Permitido del perfil): una duración por tipo */
   @keyframes enter {
     from {
       opacity: var(--tw-enter-opacity, 1);
-      transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0) scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), 1) rotate(var(--tw-enter-rotate, 0deg));
+      transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0) scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), 1);
     }
     to {
       opacity: 1;
-      transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0deg);
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
     }
-  }
-
-  @keyframes shimmer {
-    100% {
-      transform: translateX(100%);
-    }
-  }
-
-  @keyframes dice-roll {
-    0% { transform: rotate(0deg) scale(0.8); filter: blur(2px); }
-    20% { transform: rotate(72deg) scale(1.15) translateY(-12px); filter: blur(3px); }
-    40% { transform: rotate(144deg) scale(0.85) translateY(6px); filter: blur(3px); }
-    60% { transform: rotate(216deg) scale(1.08) translateY(-6px); filter: blur(2px); }
-    80% { transform: rotate(288deg) scale(0.95) translateY(2px); filter: blur(1px); }
-    100% { transform: rotate(360deg) scale(1); filter: blur(0); }
   }
 
   @keyframes float {
@@ -45,18 +39,8 @@
   }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0px rgba(0, 204, 204, 0.4); }
-    50% { box-shadow: 0 0 0 10px rgba(0, 204, 204, 0); }
-  }
-
-  @keyframes pulse-glow-primary {
-    0%, 100% { box-shadow: 0 0 0 0px rgba(234, 42, 88, 0.4); }
-    50% { box-shadow: 0 0 0 10px rgba(234, 42, 88, 0); }
-  }
-
-  @keyframes pulse-glow-accent {
-    0%, 100% { box-shadow: 0 0 0 0px rgba(204, 102, 255, 0.4); }
-    50% { box-shadow: 0 0 0 10px rgba(204, 102, 255, 0); }
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--lutvia-cyan) 40%, transparent); }
+    50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--lutvia-cyan) 0%, transparent); }
   }
 
   @keyframes shake-roll {
@@ -72,24 +56,41 @@
     90% { transform: translate(-10px, 5px) rotate(-10deg); }
     100% { transform: translate(0, 0) rotate(0deg); }
   }
+
+  @keyframes dice-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 }
 
 @layer base {
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-lutvia-gris text-lutvia-oscuro font-sans;
+  }
+
+  /* Foco visible del núcleo: anillo rosa de 2 px separado 2 px, en todo lo enfocable */
+  :focus-visible {
+    outline: 2px solid var(--lutvia-rosa);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--lutvia-amarillo);
+    color: var(--lutvia-oscuro);
   }
 }
 
-/* utilidades de animación que simulan tailwindcss-animate */
+/* ===== Animaciones del juego ===== */
+/* Con prefers-reduced-motion las apaga la regla global de @lutvia/ds/lutvia.css. */
+
+/* Entrada (aparecer): 300 ms. Con "backwards" no queda ningún transform al terminar:
+ * si quedara, los position: fixed de adentro (diálogos, pantalla de la tirada) se cortarían. */
 @utility animate-in {
-  animation-name: enter;
-  animation-duration: 300ms;
-  animation-fill-mode: both;
+  animation: enter 300ms ease-out backwards;
   --tw-enter-opacity: 1;
   --tw-enter-translate-x: 0;
   --tw-enter-translate-y: 0;
   --tw-enter-scale: 1;
-  --tw-enter-rotate: 0deg;
 }
 
 @utility fade-in {
@@ -104,114 +105,214 @@
   --tw-enter-translate-y: 1rem;
 }
 
-@utility slide-in-from-bottom-8 {
-  --tw-enter-translate-y: 2rem;
-}
-
-@utility slide-in-from-left-4 {
-  --tw-enter-translate-x: -1rem;
-}
-
-@utility slide-in-from-right-4 {
-  --tw-enter-translate-x: 1rem;
-}
-
-@utility scale-in-95 {
-  --tw-enter-scale: 0.95;
-}
-
 @utility zoom-in-95 {
   --tw-enter-scale: 0.95;
 }
 
+/* Flotación: 3 s */
 @utility animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
-@utility animate-dice-roll {
-  animation: dice-roll 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+/* Sacudida de dados: .6 s */
+@utility animate-shake-roll {
+  animation: shake-roll 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
 }
 
+/* Pulso: 2 s (avatares al pasar el mouse) */
 @utility hover-pulse-glow {
-  transition: box-shadow 0.3s ease;
   &:hover {
     animation: pulse-glow 2s infinite;
   }
 }
 
-@utility hover-pulse-glow-primary {
-  transition: box-shadow 0.3s ease;
-  &:hover {
-    animation: pulse-glow-primary 2s infinite;
-  }
-}
-
-@utility hover-pulse-glow-accent {
-  transition: box-shadow 0.3s ease;
-  &:hover {
-    animation: pulse-glow-accent 2s infinite;
-  }
-}
-
-@utility animate-shake-roll {
-  animation: shake-roll 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
-}
-
+/* Tarjeta principal: sube 5 px al pasar el mouse (Permitido del perfil). Quieta con movimiento reducido */
 @utility hover-card-lift {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border-color: rgba(0, 204, 204, 0.4);
+  transition: transform var(--lutvia-transicion);
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    &:hover {
+      transform: translateY(-5px);
+    }
   }
 }
 
-/* ===== Indicador de carga de navegación (page transitions) ===== */
-@keyframes loader-shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+/* Degradé de marca con los cuatro colores vivos (sin texto encima) */
+@utility degrade-lutvia {
+  background-image: linear-gradient(90deg, var(--lutvia-cyan), var(--lutvia-violeta), var(--lutvia-rosa), var(--lutvia-amarillo));
 }
 
-@keyframes loader-dice-spin {
-  0% { transform: rotate(0deg) scale(1); }
-  25% { transform: rotate(90deg) scale(1.15); }
-  50% { transform: rotate(180deg) scale(1); }
-  75% { transform: rotate(270deg) scale(1.15); }
-  100% { transform: rotate(360deg) scale(1); }
+/* ===== Patrones del núcleo ===== */
+
+/* Enlace: gris oscuro con subrayado; al pasar el mouse, subrayado rosa de 2 px */
+@utility enlace {
+  color: var(--lutvia-oscuro);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--lutvia-transicion);
+  &:hover {
+    text-decoration-color: var(--lutvia-rosa);
+    text-decoration-thickness: 2px;
+  }
 }
 
+/* Botón: píldora de una línea, ícono antes del texto */
+@utility boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  border-radius: var(--lutvia-pildora);
+  border: 1px solid transparent;
+  padding: 0.625rem 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: background-color var(--lutvia-transicion), color var(--lutvia-transicion), border-color var(--lutvia-transicion), box-shadow var(--lutvia-transicion), transform var(--lutvia-transicion);
+  &:disabled, &[aria-disabled="true"] {
+    background-color: var(--lutvia-gris);
+    border-color: var(--lutvia-gris);
+    color: var(--lutvia-texto-suave);
+    box-shadow: none;
+    transform: none;
+    cursor: not-allowed;
+  }
+  &[aria-disabled="true"] {
+    pointer-events: none;
+  }
+}
+
+/* Principal (uno por pantalla): cyan con texto oscuro (5.53) y brillo cyan.
+ * Al pasar el mouse sube 4 px y el brillo pasa del 30 al 50 % (Permitido del perfil). */
+@utility boton-principal {
+  background-color: var(--lutvia-cyan);
+  border-color: var(--lutvia-cyan);
+  color: var(--lutvia-oscuro);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--lutvia-cyan) 30%, transparent);
+  &:hover:not(:disabled, [aria-disabled="true"]) {
+    box-shadow: 0 8px 40px color-mix(in srgb, var(--lutvia-cyan) 50%, transparent);
+    @media (prefers-reduced-motion: no-preference) {
+      transform: translateY(-4px);
+    }
+  }
+}
+
+/* Secundario: borde y texto oscuro; al pasar el mouse, relleno cyan con texto oscuro */
+@utility boton-secundario {
+  background-color: transparent;
+  border-color: var(--lutvia-oscuro);
+  color: var(--lutvia-oscuro);
+  &:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: var(--lutvia-cyan);
+    border-color: var(--lutvia-cyan);
+  }
+}
+
+/* Secundario para acciones que no se deshacen: el ícono va en rosa (indicador, 4.22) y pasa a oscuro sobre el cyan */
+@utility boton-peligro {
+  & i {
+    color: var(--lutvia-rosa);
+  }
+  &:hover:not(:disabled, [aria-disabled="true"]) i {
+    color: var(--lutvia-oscuro);
+  }
+}
+
+/* De ícono: círculo oscuro con ícono blanco (11.04); al pasar el mouse, amarillo con ícono oscuro (7.30).
+ * Siempre con aria-label y title. */
+@utility boton-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--lutvia-boton-icono);
+  height: var(--lutvia-boton-icono);
+  border-radius: var(--lutvia-pildora);
+  background-color: var(--lutvia-oscuro);
+  color: var(--lutvia-blanco);
+  cursor: pointer;
+  transition: background-color var(--lutvia-transicion), color var(--lutvia-transicion);
+  &:hover:not(:disabled) {
+    background-color: var(--lutvia-amarillo);
+    color: var(--lutvia-oscuro);
+  }
+}
+
+/* Etiqueta: píldora chica de una línea, texto-mini en negrita y texto oscuro.
+ * El fondo lo pone quien la usa: bg-lutvia-gris (neutra), bg-lutvia-cyan / bg-lutvia-amarillo (estado)
+ * o el matiz al 15 % de la sílaba (etiqueta de tarea). */
+@utility etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: var(--lutvia-pildora);
+  padding: 0.125rem 0.625rem;
+  font-size: var(--lutvia-texto-mini);
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--lutvia-oscuro);
+}
+
+/* Rótulo de sección: texto-mini en negrita, mayúsculas, 0.06em, texto suave */
+@utility rotulo {
+  font-size: var(--lutvia-texto-mini);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--lutvia-texto-suave);
+}
+
+/* Campo: blanco, borde oscuro-16, radio chico; foco con borde rosa y el anillo global */
+@utility campo {
+  width: 100%;
+  background-color: var(--lutvia-blanco);
+  color: var(--lutvia-oscuro);
+  border: 1px solid var(--lutvia-oscuro-16);
+  border-radius: var(--lutvia-radio-chico);
+  padding: 0.75rem 1rem;
+  transition: border-color var(--lutvia-transicion);
+  &::placeholder {
+    color: var(--lutvia-texto-suave);
+  }
+  &:focus {
+    border-color: var(--lutvia-rosa);
+  }
+  &:disabled {
+    background-color: var(--lutvia-gris);
+    color: var(--lutvia-texto-suave);
+  }
+}
+
+/* ===== Indicador de carga entre páginas ===== */
 html.is-navigating {
   cursor: progress;
 }
 
+/* Barra de 3 px con el degradé de los cuatro colores vivos */
 #page-loader {
   position: fixed;
   top: 0;
   left: 0;
-  height: 3px;
+  height: var(--lutvia-carga-barra);
   width: 0%;
   z-index: 9999;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent), var(--color-secondary));
-  box-shadow: 0 0 12px rgba(204, 102, 255, 0.6), 0 0 4px rgba(234, 42, 88, 0.4);
-  border-radius: 0 9999px 9999px 0;
+  background: linear-gradient(90deg, var(--lutvia-cyan), var(--lutvia-violeta), var(--lutvia-rosa), var(--lutvia-amarillo));
+  border-radius: 0 var(--lutvia-pildora) var(--lutvia-pildora) 0;
   opacity: 0;
   pointer-events: none;
-  overflow: hidden;
-  transition: width 0.25s ease-out, opacity 0.3s ease;
+  transition: width var(--lutvia-transicion), opacity var(--lutvia-transicion);
 }
 
 #page-loader.is-active {
   opacity: 1;
 }
 
-#page-loader::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
-  animation: loader-shimmer 1.2s ease-in-out infinite;
-}
-
+/* Píldora oscura con texto blanco (11.04): se distingue de cualquier fondo sin sombra */
 #page-loader-pill {
   position: fixed;
   bottom: 1.5rem;
@@ -220,28 +321,25 @@ html.is-navigating {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
   padding: 0.625rem 1.25rem;
-  background: white;
-  border: 1px solid rgba(60, 60, 59, 0.1);
-  border-radius: 9999px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background: var(--lutvia-oscuro);
+  color: var(--lutvia-blanco);
+  border-radius: var(--lutvia-pildora);
   font-family: var(--font-sans);
-  font-size: 0.8125rem;
+  font-size: var(--lutvia-texto-chico);
   font-weight: 700;
-  color: rgba(60, 60, 59, 0.7);
   opacity: 0;
-  transform: translateX(-50%) translateY(0.75rem);
+  transform: translateX(-50%);
   pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity var(--lutvia-transicion);
 }
 
 #page-loader-pill.is-visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
 }
 
-#page-loader-pill .loader-dice {
-  display: inline-block;
-  font-size: 1rem;
-  animation: loader-dice-spin 1s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
+/* El dado gira solo mientras la píldora está a la vista (giro de dados: 1 s) */
+#page-loader-pill.is-visible .fa-dice {
+  animation: dice-spin 1s linear infinite;
+}

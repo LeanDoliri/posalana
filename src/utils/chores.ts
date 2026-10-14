@@ -72,3 +72,14 @@ export function assignDailyChores(dailyRolls: any[], exemptions: any[]) {
 
     return { rollChoreMap, lomitoActivated, lomitoPlayers, sortedRolls };
 }
+
+// Cómo se ve cada tarea con el sistema de diseño de Lutvia (perfil POSALANA).
+// - etiqueta: el matiz al 15 % del color de su sílaba, siempre con texto lutvia-oscuro.
+// - dado: el dado que decide va en el color de su sílaba (el estado también se dice en texto).
+// - barra: acento gráfico (borde) del color de la sílaba.
+export const choreStyles: Record<string, { etiqueta: string; dado: string; barra: string }> = {
+    PO: { etiqueta: "bg-lutvia-rosa/15", dado: "text-lutvia-rosa", barra: "border-lutvia-rosa" },
+    SA: { etiqueta: "bg-lutvia-cyan/15", dado: "text-lutvia-cyan", barra: "border-lutvia-cyan" },
+    LA: { etiqueta: "bg-lutvia-violeta/15", dado: "text-lutvia-violeta", barra: "border-lutvia-violeta" },
+    NA: { etiqueta: "bg-lutvia-gris", dado: "text-lutvia-texto-suave", barra: "border-lutvia-oscuro-16" },
+};

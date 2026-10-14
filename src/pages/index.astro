@@ -7,6 +7,7 @@ import DiceDisplay from '../components/DiceDisplay.astro';
 import ScheduleNotice from '../components/ScheduleNotice.astro';
 import { formatDate } from '../utils/date.js';
 import { getArgentinaNow, getRollSchedule, getRollWindowStatus, SCHEDULE_NOTICE_UNTIL } from '../utils/schedule.js';
+import { assignDailyChores, chores, safeChore, choreStyles } from '../utils/chores.js';
 
 if (!Astro.locals.user) {
 	return Astro.redirect('/login');
@@ -33,7 +34,7 @@ const myRoll = hasRolled ? userRollRes.rows[0] : null;
 // Get all rolls for today, ordered by rules
 const allRollsRes = await db.execute({
     sql: `
-        SELECT r.*, u.username, u.display_name, u.avatar_url 
+        SELECT r.*, u.username, u.display_name, u.avatar_url
         FROM roll r
         JOIN user u ON r.user_id = u.id
         WHERE r.date = ?
@@ -42,15 +43,6 @@ const allRollsRes = await db.execute({
     args: [dateStr]
 });
 const allRolls = allRollsRes.rows;
-
-const chores = [
-    { label: "Lava los platos", code: "LA", emoji: "🧽" },
-    { label: "Saca la mesa", code: "SA", emoji: "🧹" },
-    { label: "Pone la mesa", code: "PO", emoji: "🍴" }
-];
-const safeChore = { label: "Nada", code: "NA", emoji: "🎉" };
-
-import { assignDailyChores } from '../utils/chores.js';
 
 // Fetch exemptions
 const seasonId = getSeasonId(dateStr);
@@ -62,320 +54,207 @@ const assignedLA = sortedRolls.find(r => rollChoreMap.get(r.id)?.code === 'LA');
 const assignedSA = sortedRolls.find(r => rollChoreMap.get(r.id)?.code === 'SA');
 const assignedPO = sortedRolls.find(r => rollChoreMap.get(r.id)?.code === 'PO');
 const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'NA');
+
+const myChore = myRoll ? (rollChoreMap.get(myRoll.id) || safeChore) : null;
+
+// Columnas del podio: PO a la izquierda, SA al centro y LA a la derecha
+const podium = [
+    { roll: assignedPO, code: 'PO', label: 'Pone la mesa', block: 'PONE', float: 'animate-float' },
+    { roll: assignedSA, code: 'SA', label: 'Saca la mesa', block: 'SACA', float: 'animate-float' },
+    { roll: assignedLA, code: 'LA', label: 'Lava los platos', block: 'LAVA', float: 'animate-float' },
+];
 ---
 <Layout>
-    <div class="space-y-10 animate-in fade-in duration-500 ease-out">
-        
-        <!-- Podium Section -->
+    <div class="space-y-10 animate-in fade-in">
+
+        <!-- Podio -->
         <div id="podium-container">
             {allRolls.length >= 3 && (
-                <section class="bg-white border border-foreground/10 p-4 sm:p-6 md:p-8 rounded-3xl shadow-xl overflow-hidden relative group animate-in fade-in slide-in-from-bottom-4 duration-500 delay-75 ease-out hover-card-lift">
-            <!-- Decorative background blurs -->
-            <div class="absolute -top-12 -left-12 w-36 h-36 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-all duration-500 pointer-events-none"></div>
-            <div class="absolute -bottom-12 -right-12 w-36 h-36 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-all duration-500 pointer-events-none"></div>
+                <section class="bg-lutvia-blanco p-4 sm:p-6 md:p-8 rounded-3xl shadow-xl animate-in fade-in slide-in-from-bottom-4 hover-card-lift">
+                    <div class="text-center mb-6">
+                        <h3 class="text-2xl font-black text-lutvia-oscuro tracking-tight flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-scroll text-lutvia-violeta" aria-hidden="true"></i> Veredicto de tareas
+                        </h3>
+                        <p class="text-xs text-lutvia-texto-suave mt-1 font-medium">El podio de la mala suerte: los designados para la lavación, sacación y ponición de mesa de hoy.</p>
+                    </div>
 
-            <div class="text-center mb-6">
-                <h3 class="text-2xl font-black text-foreground tracking-tight flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-scroll text-accent"></i> Veredicto de Tareas
-                </h3>
-                <p class="text-xs text-foreground/50 mt-1 font-medium">El podio de la mala suerte: los designados para la lavación, sacación y ponición de mesa de hoy.</p>
-                      <!-- Podium Layout -->
-            <div class="flex items-end justify-center gap-2 sm:gap-6 pt-8 pb-4 max-w-2xl mx-auto">
-                
-                <!-- Left Column: PO (Pone la mesa) -->
-                <div class="flex flex-col items-center flex-1 animate-float delay-100">
-                    {assignedPO ? (
-                        <div class="flex flex-col items-center mb-3 text-center animate-in fade-in slide-in-from-bottom-2 duration-500 w-full">
-                            <div class="relative group cursor-pointer">
-                                <UserAvatar user={{ username: assignedPO.username, display_name: assignedPO.display_name, avatar_url: assignedPO.avatar_url }} size="lg" border={true} />
-                            </div>
+                    <div class="flex items-end justify-center gap-2 sm:gap-6 pt-8 pb-4 max-w-2xl mx-auto">
+                        {podium.map(({ roll, code, label, block, float }) => {
+                            const chore = chores.find(c => c.code === code)!;
+                            return (
+                                <div class={`flex flex-col items-center flex-1 ${float}`}>
+                                    {roll ? (
+                                        <div class="flex flex-col items-center mb-3 text-center animate-in fade-in slide-in-from-bottom-2 w-full">
+                                            <UserAvatar user={{ username: roll.username as string, display_name: roll.display_name as string, avatar_url: roll.avatar_url as string }} size="lg" />
+                                            <div class="mt-2 flex justify-center">
+                                                <DiceDisplay die1={roll.die1 as number} die2={roll.die2 as number} die3={roll.die3 as number} die4={roll.die4 as number} size="sm" color={choreStyles[code].dado} />
+                                            </div>
+                                            <span class="font-black text-lutvia-oscuro text-xs sm:text-sm mt-2 block text-center leading-tight px-1">{roll.display_name}</span>
+                                        </div>
+                                    ) : (
+                                        <div class="flex flex-col items-center mb-3 text-center w-full">
+                                            <div class="w-16 h-16 rounded-lutvia-pildora border-2 border-dashed border-lutvia-texto-suave flex items-center justify-center text-lutvia-texto-suave text-lg">
+                                                <i class="fa-solid fa-question" aria-hidden="true"></i>
+                                            </div>
+                                            <span class="font-bold text-lutvia-texto-suave text-xs sm:text-sm mt-2 block">Vacante</span>
+                                            <span class={`etiqueta mt-1 ${choreStyles[code].etiqueta}`}>
+                                                <span aria-hidden="true">{chore.emoji}</span> {label}
+                                            </span>
+                                        </div>
+                                    )}
+                                    <!-- Escalón del podio: relleno gris con el acento de color de la sílaba arriba -->
+                                    <div class={`w-full bg-lutvia-gris border-t-4 ${choreStyles[code].barra} rounded-t-lutvia-radio-chico h-16 sm:h-20 flex items-center justify-center`}>
+                                        <span class="text-xs sm:text-sm font-black text-lutvia-oscuro select-none tracking-wider">{block}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
 
-                            <!-- Dice Roll -->
-                            <div class="mt-2 flex justify-center">
-                                <DiceDisplay die1={assignedPO.die1 as number} die2={assignedPO.die2 as number} die3={assignedPO.die3 as number} die4={assignedPO.die4 as number} size="sm" color="text-primary" />
-                            </div>
-
-                            <span class="font-black text-foreground text-xs sm:text-sm mt-2 block text-center leading-tight px-1">{assignedPO.display_name}</span>
-                        </div>
-                    ) : (
-                        <div class="flex flex-col items-center mb-3 text-center opacity-40 w-full">
-                            <div class="w-16 h-16 rounded-full border-2 border-dashed border-foreground/30 flex items-center justify-center text-foreground/40 font-bold text-lg">?</div>
-                            <span class="font-bold text-foreground/50 text-xs sm:text-sm mt-2 block">Vacante</span>
-                            <span class="text-[9px] font-bold text-foreground/40 bg-foreground/5 px-2 py-0.5 rounded-full mt-1 whitespace-nowrap">
-                                Pone la mesa
+                    {savedPlayers.length > 0 && (
+                        <div class="mt-6 pt-4 border-t border-lutvia-oscuro-16 flex flex-col items-center justify-center gap-3">
+                            <p class="text-xs font-semibold text-lutvia-texto-suave text-center">
+                                El resto de los participantes que tiraron hoy zafaron de las tareas.
+                            </p>
+                            <span class={`etiqueta uppercase tracking-wider ${choreStyles.NA.etiqueta}`}>
+                                <span aria-hidden="true">{safeChore.emoji}</span> Nada
                             </span>
                         </div>
                     )}
-                    <div class="w-full bg-gradient-to-t from-primary/5 to-primary/25 border-t-2 border-primary/45 rounded-t-2xl h-16 sm:h-20 flex items-center justify-center shadow-inner">
-                        <span class="text-xs sm:text-sm font-black text-primary/70 select-none tracking-wider">PONE</span>
-                    </div>
-                </div>
-
-                <!-- Center Column: SA (Saca la mesa) -->
-                <div class="flex flex-col items-center flex-1 animate-float">
-                    {assignedSA ? (
-                        <div class="flex flex-col items-center mb-3 text-center animate-in fade-in slide-in-from-bottom-2 duration-500 w-full">
-                            <div class="relative group cursor-pointer">
-                                <UserAvatar user={{ username: assignedSA.username, display_name: assignedSA.display_name, avatar_url: assignedSA.avatar_url }} size="lg" border={true} />
-                            </div>
-                            
-                            <!-- Dice Roll -->
-                            <div class="mt-2 flex justify-center">
-                                <DiceDisplay die1={assignedSA.die1 as number} die2={assignedSA.die2 as number} die3={assignedSA.die3 as number} die4={assignedSA.die4 as number} size="sm" color="text-secondary" />
-                            </div>
-
-                            <span class="font-black text-foreground text-xs sm:text-sm mt-2 block text-center leading-tight px-1">{assignedSA.display_name}</span>
-                        </div>
-                    ) : (
-                        <div class="flex flex-col items-center mb-3 text-center opacity-40 w-full">
-                            <div class="w-16 h-16 rounded-full border-2 border-dashed border-foreground/30 flex items-center justify-center text-foreground/40 font-bold text-lg">?</div>
-                            <span class="font-bold text-foreground/50 text-xs sm:text-sm mt-2 block">Vacante</span>
-                            <span class="text-[9px] font-bold text-foreground/40 bg-foreground/5 px-2 py-0.5 rounded-full mt-1 whitespace-nowrap">
-                                Saca la mesa
-                            </span>
-                        </div>
-                    )}
-                    <div class="w-full bg-gradient-to-t from-secondary/5 to-secondary/25 border-t-2 border-secondary/40 rounded-t-2xl h-16 sm:h-20 flex items-center justify-center shadow-inner">
-                        <span class="text-xs sm:text-sm font-black text-secondary/70 select-none tracking-wider">SACA</span>
-                    </div>
-                </div>
-
-                <!-- Right Column: LA (Lava los platos) -->
-                <div class="flex flex-col items-center flex-1 animate-float delay-200">
-                    {assignedLA ? (
-                        <div class="flex flex-col items-center mb-3 text-center animate-in fade-in slide-in-from-bottom-3 duration-500 w-full">
-                            <div class="relative group cursor-pointer">
-                                <UserAvatar user={{ username: assignedLA.username, display_name: assignedLA.display_name, avatar_url: assignedLA.avatar_url }} size="lg" border={true} />
-                            </div>
-
-                            <!-- Dice Roll -->
-                            <div class="mt-2 flex justify-center">
-                                <DiceDisplay die1={assignedLA.die1 as number} die2={assignedLA.die2 as number} die3={assignedLA.die3 as number} die4={assignedLA.die4 as number} size="sm" color="text-accent" />
-                            </div>
-
-                            <span class="font-black text-foreground text-xs sm:text-sm mt-2 block text-center leading-tight px-1">{assignedLA.display_name}</span>
-                        </div>
-                    ) : (
-                        <div class="flex flex-col items-center mb-3 text-center opacity-40 w-full">
-                            <div class="w-16 h-16 rounded-full border-2 border-dashed border-foreground/30 flex items-center justify-center text-foreground/40 font-bold text-lg">?</div>
-                            <span class="font-bold text-foreground/50 text-xs sm:text-sm mt-2 block">Vacante</span>
-                            <span class="text-[9px] font-bold text-foreground/40 bg-foreground/5 px-2 py-0.5 rounded-full mt-1 whitespace-nowrap">
-                                Lava platos
-                            </span>
-                        </div>
-                    )}
-                    <div class="w-full bg-gradient-to-t from-accent/5 to-accent/25 border-t-2 border-accent/40 rounded-t-2xl h-16 sm:h-20 flex items-center justify-center shadow-inner">
-                        <span class="text-xs sm:text-sm font-black text-accent/70 select-none tracking-wider">LAVA</span>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Saved Players Indicator -->
-            {savedPlayers.length > 0 && (
-                <div class="mt-6 pt-4 border-t border-foreground/5 flex flex-col items-center justify-center gap-3">
-                    <p class="text-xs font-semibold text-foreground/50 text-center sm:text-left">
-                        El resto de los participantes que tiraron hoy zafaron de las tareas.
-                    </p>
-                    <p class="bg-foreground text-background px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-sm select-none">
-                        NADA
-                    </p>
-                </div>
-            )}
                 </section>
             )}
         </div>
 
-        <!-- Hero Section -->
+        <!-- Tarjeta de la tirada (PosalanaTarjetaTirada) -->
         <div id="hero-container">
-        {hasRolled && myRoll ? (
-            <section class="relative bg-white border border-foreground/10 p-4 md:p-6 rounded-3xl shadow-xl overflow-hidden flex flex-col sm:flex-row items-center justify-between animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out hover-card-lift">
-                <div class="text-center sm:text-left mb-4 sm:mb-0">
-                    <p class="text-secondary font-bold tracking-widest uppercase text-[10px] mb-1">Tirada del {formatDate(dateStr)}</p>
-                    <p class="text-sm text-foreground/80 font-medium">Ya cumpliste con tu destino de hoy.</p>
+        {hasRolled && myRoll && myChore ? (
+            <section class="bg-lutvia-blanco p-4 md:p-6 rounded-3xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 hover-card-lift">
+                <div class="text-center sm:text-left">
+                    <p class="rotulo mb-1">Tirada del {formatDate(dateStr)}</p>
+                    <p class="text-sm text-lutvia-oscuro font-medium">Ya cumpliste con tu destino de hoy.</p>
+                    <p class="mt-2">
+                        <span class={`etiqueta ${choreStyles[myChore.code].etiqueta}`}>
+                            <span aria-hidden="true">{myChore.emoji}</span> {myChore.code} · {myChore.label}
+                        </span>
+                    </p>
                 </div>
-                <div class="flex items-center gap-3 bg-secondary/5 border border-secondary/20 px-4 py-2 rounded-xl shadow-inner">
-                    <p class="text-xs text-secondary font-bold uppercase tracking-wider mr-2 hidden md:block">Tu Suerte:</p>
-                    <DiceDisplay die1={myRoll.die1 as number} die2={myRoll.die2 as number} die3={myRoll.die3 as number} die4={myRoll.die4 as number} size="lg" />
+                <div class="flex items-center gap-3 bg-lutvia-gris px-4 py-2 rounded-lutvia-radio">
+                    <p class="rotulo mr-2 hidden md:block">Tu suerte</p>
+                    <DiceDisplay die1={myRoll.die1 as number} die2={myRoll.die2 as number} die3={myRoll.die3 as number} die4={myRoll.die4 as number} size="lg" color={choreStyles[myChore.code].dado} />
                 </div>
             </section>
         ) : (
-            <section class="relative bg-white border border-foreground/10 p-8 md:p-12 rounded-3xl shadow-xl overflow-hidden text-center group animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 ease-out hover-card-lift">
-                <!-- Decorative Background Element -->
-                <div class="absolute -top-24 -right-24 w-64 h-64 bg-secondary/10 rounded-full blur-3xl group-hover:bg-secondary/20 transition-all duration-700 pointer-events-none"></div>
-                <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-accent/10 rounded-full blur-3xl group-hover:bg-accent/20 transition-all duration-700 pointer-events-none"></div>
+            <section class="bg-lutvia-blanco p-8 md:p-12 rounded-3xl shadow-xl text-center animate-in fade-in slide-in-from-bottom-4 hover-card-lift">
+                <p class="rotulo mb-2">Tirada oficial</p>
+                <h2 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-lutvia-oscuro text-balance tabular-nums">{formatDate(dateStr)}</h2>
+                {canRoll ? (
+                <>
+                <p class="text-lutvia-texto-suave mb-3 max-w-md mx-auto text-pretty">El destino no está escrito, se decide con los dados. ¿Zafás o lavás?</p>
+                <p class="etiqueta bg-lutvia-cyan/15 mb-8">
+                    <i class="fa-regular fa-clock" aria-hidden="true"></i> La tirada cierra a las {schedule.end}
+                </p>
 
-                <div class="relative z-10">
-                    <p class="text-secondary font-bold tracking-widest uppercase text-xs mb-2">Tirada Oficial</p>
-                    <h2 class="text-4xl md:text-5xl font-black mb-2 tracking-tight text-foreground text-balance">{formatDate(dateStr)}</h2>
-                    {canRoll ? (
-                    <>
-                    <p class="text-foreground/60 mb-3 max-w-md mx-auto text-pretty">El destino no está escrito, se decide con los dados. ¿Zafás o lavás?</p>
-                    <p class="inline-flex items-center gap-2 text-xs font-bold text-secondary bg-secondary/10 px-3 py-1 rounded-full mb-8">
-                        <i class="fa-regular fa-clock"></i> La tirada cierra a las {schedule.end}
-                    </p>
-
-                    <form method="post" action="/api/roll" id="roll-form">
-                        <button type="submit" id="roll-button" class="relative overflow-hidden bg-secondary text-background px-10 py-5 rounded-full text-xl font-bold shadow-[0_8px_30px_rgba(0,204,204,0.3)] hover:shadow-[0_8px_40px_rgba(0,204,204,0.5)] hover:-translate-y-1 active:translate-y-0 active:shadow-[0_4px_15px_rgba(0,204,204,0.3)] transition-all duration-300 cursor-pointer group">
-                            <span class="relative z-10 flex items-center justify-center gap-3" id="roll-button-content">
-                                <i class="fa-solid fa-dice text-2xl group-hover:rotate-180 transition-transform duration-500" id="roll-icon"></i>
-                                <span id="roll-text">TIRAR LOS DADOS</span>
-                            </span>
-                            <!-- Hover gradient overlay -->
-                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-background/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-                        </button>
-                    </form>
-                    </>
-                    ) : windowStatus === 'before' ? (
-                    <>
-                        <p class="text-foreground/60 mb-8 max-w-md mx-auto text-pretty">Los dados todavía están guardados. Paciencia, que el destino tiene horario.</p>
-                        <div class="inline-flex flex-col items-center gap-1 bg-foreground/5 border border-foreground/10 px-8 py-5 rounded-3xl">
-                            <span class="text-xs font-bold uppercase tracking-widest text-foreground/50"><i class="fa-solid fa-lock mr-1"></i> La tirada abre a las</span>
-                            <span class="text-4xl font-black text-foreground">{schedule.start}</span>
-                            <span class="text-xs text-foreground/50 font-medium">y cierra a las {schedule.end}</span>
-                        </div>
-                    </>
-                    ) : (
-                    <>
-                        <p class="text-foreground/60 mb-8 max-w-md mx-auto text-pretty">La mesa está cerrada y el veredicto final ya es definitivo. Si no tiraste, hoy no jugás.</p>
-                        <div class="inline-flex flex-col items-center gap-1 bg-primary/5 border border-primary/20 px-8 py-5 rounded-3xl">
-                            <span class="text-xs font-bold uppercase tracking-widest text-primary"><i class="fa-solid fa-door-closed mr-1"></i> Tirada cerrada a las {schedule.end}</span>
-                            <span class="text-sm text-foreground/60 font-medium">Volvé mañana de {schedule.start} a {schedule.end}</span>
-                        </div>
-                    </>
-                    )}
-                </div>
+                <form method="post" action="/api/roll" id="roll-form">
+                    <!-- Botón de tirar (PosalanaBotonTirar): el único principal de la pantalla -->
+                    <button type="submit" id="roll-button" class="boton boton-principal group px-10 py-5 text-xl uppercase">
+                        <i class="fa-solid fa-dice text-2xl motion-safe:group-hover:rotate-180 transition-transform" id="roll-icon" aria-hidden="true"></i>
+                        <span id="roll-text">Tirar los dados</span>
+                    </button>
+                </form>
+                </>
+                ) : windowStatus === 'before' ? (
+                <>
+                    <p class="text-lutvia-texto-suave mb-8 max-w-md mx-auto text-pretty">Los dados todavía están guardados. Paciencia, que el destino tiene horario.</p>
+                    <div class="inline-flex flex-col items-center gap-1 bg-lutvia-gris px-8 py-5 rounded-lutvia-radio">
+                        <span class="rotulo"><i class="fa-solid fa-lock mr-1" aria-hidden="true"></i> La tirada abre a las</span>
+                        <span class="text-4xl font-black text-lutvia-oscuro tabular-nums">{schedule.start}</span>
+                        <span class="text-xs text-lutvia-texto-suave font-medium">y cierra a las {schedule.end}</span>
+                    </div>
+                </>
+                ) : (
+                <>
+                    <p class="text-lutvia-texto-suave mb-8 max-w-md mx-auto text-pretty">La mesa está cerrada y el veredicto final ya es definitivo. Si no tiraste, hoy no jugás.</p>
+                    <div class="inline-flex flex-col items-center gap-1 bg-lutvia-gris px-8 py-5 rounded-lutvia-radio">
+                        <span class="rotulo"><i class="fa-solid fa-door-closed mr-1 text-lutvia-rosa" aria-hidden="true"></i> Tirada cerrada a las {schedule.end}</span>
+                        <span class="text-sm text-lutvia-oscuro font-medium">Volvé mañana de {schedule.start} a {schedule.end}</span>
+                    </div>
+                </>
+                )}
             </section>
         )}
         </div>
 
-        <!-- Cláusula Lomito -->
+        <!-- Banner de la Cláusula Lomito -->
         <div id="lomito-container">
             {lomitoActivated && (
-                <>
-                    <section class="bg-white border-2 border-accent/60 p-8 rounded-3xl shadow-lg shadow-accent/10 text-center relative overflow-hidden animate-in zoom-in-95 duration-500">
-                        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNDQzY2RkYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+PC9zdmc+')] opacity-50"></div>
-                        <div class="relative z-10">
-                            <p class="text-5xl mb-4 animate-bounce">🥪🎉🥪</p>
-                            <h3 class="text-2xl md:text-3xl font-black text-accent mb-2 tracking-tight text-balance">¡CLÁUSULA LOMITO ACTIVADA!</h3>
-                            <p class="text-accent/90 text-lg md:text-xl font-semibold mb-1 text-pretty">{lomitoPlayers.join(" y ")} rompieron la matrix.</p>
-                            <p class="text-foreground/70 font-medium text-pretty">Sus dados son idénticos. ¡Hoy se almuerzan lomitos con papas!</p>
-                        </div>
-                    </section>
-                    <script is:inline src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-                    <script is:inline>
-                        // Lanza confetti durante 5 segundos
-                        const duration = 5 * 1000;
-                        const animationEnd = Date.now() + duration;
-                        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
-
-                        function randomInRange(min, max) {
-                            return Math.random() * (max - min) + min;
-                        }
-
-                        const interval = setInterval(function() {
-                            const timeLeft = animationEnd - Date.now();
-
-                            if (timeLeft <= 0) {
-                                return clearInterval(interval);
-                            }
-
-                            const particleCount = 50 * (timeLeft / duration);
-                            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-                            confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-                        }, 250);
-                    </script>
-                </>
+                <section class="bg-lutvia-blanco border-2 border-lutvia-violeta p-8 rounded-3xl shadow-xl text-center animate-in zoom-in-95" aria-live="polite">
+                    <!-- Título en violeta: Permitido del perfil, solo este título y en Black 900 de 24 px o más -->
+                    <h3 class="text-2xl md:text-3xl font-black text-lutvia-violeta mb-2 tracking-tight text-balance">
+                        <span aria-hidden="true">🥪</span> ¡Cláusula Lomito activada!
+                    </h3>
+                    <p class="text-lutvia-oscuro text-lg md:text-xl font-semibold mb-1 text-pretty">{lomitoPlayers.join(" y ")} rompieron la matrix.</p>
+                    <p class="text-lutvia-texto-suave font-medium text-pretty">Sus dados son idénticos. ¡Hoy se almuerzan lomitos con papas!</p>
+                </section>
             )}
         </div>
 
-        <!-- Ranking Section -->
-        <section id="ranking-container" class="bg-white border border-foreground/10 p-4 sm:p-6 md:p-10 rounded-3xl shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 ease-out hover-card-lift">
-            <div class="flex items-center justify-between mb-8 pb-4 border-b border-foreground/5">
-                <h3 class="text-2xl font-black tracking-tight text-foreground flex items-center gap-3 text-balance">
-                    <i class="fa-solid fa-trophy text-secondary"></i> Ranking POSALANA
+        <!-- Ranking del día -->
+        <section id="ranking-container" class="bg-lutvia-blanco p-4 sm:p-6 md:p-10 rounded-3xl shadow-xl animate-in fade-in slide-in-from-bottom-4 hover-card-lift">
+            <div class="flex items-center justify-between mb-8 pb-4 border-b border-lutvia-oscuro-16">
+                <h3 class="text-2xl font-black tracking-tight text-lutvia-oscuro flex items-center gap-3 text-balance">
+                    <i class="fa-solid fa-trophy" aria-hidden="true"></i> Ranking POSALANA
                 </h3>
             </div>
-            
+
             {allRolls.length === 0 ? (
-                <div class="py-16 text-center border-2 border-dashed border-foreground/10 rounded-2xl">
-                    <div class="text-4xl mb-4 text-foreground/20"><i class="fa-solid fa-ghost"></i></div>
-                    <p class="text-foreground/50 font-medium text-lg">Nadie se ha atrevido a tirar todavía.</p>
+                <div class="py-16 text-center border-2 border-dashed border-lutvia-oscuro-16 rounded-lutvia-radio">
+                    <div class="text-4xl mb-4 text-lutvia-texto-suave"><i class="fa-solid fa-ghost" aria-hidden="true"></i></div>
+                    <p class="text-lutvia-texto-suave font-medium text-lg">Nadie se animó a tirar todavía.</p>
                 </div>
             ) : (
                 <div class="grid grid-cols-1 gap-4">
-                    {sortedRolls.map((roll, index) => {
+                    {sortedRolls.map((roll) => {
                         const chore = rollChoreMap.get(roll.id) || safeChore;
-                        const code = chore.code as 'PO' | 'SA' | 'LA' | 'NA';
-                        const isSafe = code === "NA";
+                        const code = (chore.code in choreStyles ? chore.code : 'NA') as 'PO' | 'SA' | 'LA' | 'NA';
+                        const style = choreStyles[code];
                         const isMe = String(roll.user_id) === String(user.id);
                         const userExemptions = exemptions.filter(e => String(e.user_id) === String(roll.user_id));
-                        
-                        const colorConfig = {
-                            PO: {
-                                bg: isMe ? 'bg-primary/15 border-primary/45 ring-1 ring-primary/30 shadow-md scale-[1.01]' : 'bg-primary/8 border-primary/15 hover:border-primary/45',
-                                badge: 'bg-primary text-background',
-                                text: 'text-primary font-bold',
-                                diceColor: 'text-primary'
-                            },
-                            SA: {
-                                bg: isMe ? 'bg-secondary/15 border-secondary/45 ring-1 ring-secondary/30 shadow-md scale-[1.01]' : 'bg-secondary/8 border-secondary/15 hover:border-secondary/45',
-                                badge: 'bg-secondary text-background',
-                                text: 'text-secondary font-bold',
-                                diceColor: 'text-secondary'
-                            },
-                            LA: {
-                                bg: isMe ? 'bg-accent/15 border-accent/45 ring-1 ring-accent/30 shadow-md scale-[1.01]' : 'bg-accent/8 border-accent/15 hover:border-accent/45',
-                                badge: 'bg-accent text-background',
-                                text: 'text-accent font-bold',
-                                diceColor: 'text-accent'
-                            },
-                            NA: {
-                                bg: isMe ? 'bg-foreground/5 border-foreground/20 ring-1 ring-foreground/10 shadow-sm' : 'bg-foreground/[0.02] border-foreground/5 hover:border-foreground/15',
-                                badge: 'bg-foreground/10 text-foreground/50 border border-foreground/5',
-                                text: 'text-foreground/40 font-medium',
-                                diceColor: 'text-foreground/30'
-                            }
-                        };
-                        
-                        const config = colorConfig[code] || colorConfig.NA;
-                        
+
                         return (
-                            <div class={`group flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-2xl border transition-all duration-300 hover:shadow-md ${config.bg}`}>
-                                
-                                <!-- User Info & Time -->
-                                <div class="flex items-center gap-4 mb-4 sm:mb-0 w-full sm:w-auto">
+                            <!-- Fila del ranking: relleno gris, radio chico; la tuya lleva un borde oscuro y la etiqueta "Vos" -->
+                            <div class={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-lutvia-radio-chico bg-lutvia-gris ${isMe ? 'ring-2 ring-lutvia-oscuro' : ''}`}>
+                                <div class="flex items-center gap-4 w-full sm:w-auto">
                                     <UserAvatar user={roll as any} size="lg" border={true} />
-                                    <div class="flex-grow">
+                                    <div class="flex-grow min-w-0">
                                         <div class="flex flex-wrap items-center gap-2">
-                                            <p class="font-black text-foreground text-xl leading-tight">{roll.display_name}</p>
+                                            <p class="font-black text-lutvia-oscuro text-xl leading-tight">{roll.display_name}</p>
                                             {isMe && (
-                                                <span class="inline-flex items-center gap-1 text-[9px] font-black tracking-wider uppercase bg-foreground text-background px-2 py-0.5 rounded-full select-none">
-                                                    <i class="fa-solid fa-circle-user text-[8px]"></i> Vos
+                                                <span class="etiqueta bg-lutvia-blanco uppercase tracking-wider">
+                                                    <i class="fa-solid fa-circle-user" aria-hidden="true"></i> Vos
                                                 </span>
                                             )}
-                                            <span class={`inline-block text-[10px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full ${config.badge}`}>
+                                            <span class={`etiqueta uppercase tracking-widest ${code === 'NA' ? 'bg-lutvia-blanco' : style.etiqueta}`}>
                                                 {chore.code}
                                             </span>
                                             {userExemptions.map(ex => {
                                                 const targetChore = chores.find(c => c.code === ex.chore_code);
                                                 const choreLabel = targetChore ? targetChore.label.split(' ')[0] : ex.chore_code;
                                                 return (
-                                                    <span class="inline-flex items-center gap-1 text-[9px] font-black tracking-wider uppercase bg-accent/10 text-accent border border-accent/20 px-2 py-0.5 rounded-md" title={`Exento de: ${targetChore ? targetChore.label : ex.chore_code}`}>
-                                                        <i class="fa-solid fa-shield-halved text-[8px]"></i> Exento {choreLabel}
+                                                    <span class="etiqueta bg-lutvia-violeta/15 uppercase tracking-wider" title={`Exento de: ${targetChore ? targetChore.label : ex.chore_code}`}>
+                                                        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Exento {choreLabel}
                                                     </span>
                                                 )
                                             })}
                                         </div>
-                                        {roll.time && <span class="text-xs font-mono text-foreground/40 bg-foreground/5 px-2 py-0.5 rounded-md"><i class="fa-regular fa-clock"></i> {roll.time}</span>}
-                                        <div class={`font-bold mt-1 text-sm ${config.text} whitespace-nowrap`}>
-                                            {chore.emoji} {chore.label}
+                                        {roll.time && <span class="inline-flex items-center gap-1 mt-1 text-xs text-lutvia-texto-suave tabular-nums"><i class="fa-regular fa-clock" aria-hidden="true"></i> {roll.time}</span>}
+                                        <div class="font-bold mt-1 text-sm text-lutvia-oscuro whitespace-nowrap">
+                                            <span aria-hidden="true">{chore.emoji}</span> {chore.label}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="flex items-center justify-center sm:justify-end bg-white/50 sm:bg-transparent p-4 sm:p-0 rounded-xl w-full sm:w-auto mt-2 sm:mt-0">
-                                    <DiceDisplay die1={roll.die1 as number} die2={roll.die2 as number} die3={roll.die3 as number} die4={roll.die4 as number} size="xl" color={config.diceColor} />
+                                <div class="flex items-center justify-center sm:justify-end w-full sm:w-auto">
+                                    <DiceDisplay die1={roll.die1 as number} die2={roll.die2 as number} die3={roll.die3 as number} die4={roll.die4 as number} size="xl" color={style.dado} />
                                 </div>
                             </div>
                         )
@@ -384,17 +263,19 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
             )}
         </section>
 
-        <!-- Client-side Polling Script & Roll Animation -->
+        <!-- Polling y animación de la tirada -->
         <script is:inline>
             (function() {
                 const POLL_INTERVAL = 8000;
                 let intervalId = null;
 
+                const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
                 async function checkUpdates() {
                     try {
                         const response = await fetch(window.location.href, { cache: 'no-cache' });
                         if (!response.ok) return;
-                        
+
                         const text = await response.text();
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(text, "text/html");
@@ -428,7 +309,7 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
                         if (newLomito && oldLomito && newLomito.innerHTML !== oldLomito.innerHTML) {
                             const hadLomito = oldLomito.querySelector("section") !== null;
                             const hasLomito = newLomito.querySelector("section") !== null;
-                            
+
                             oldLomito.innerHTML = newLomito.innerHTML;
 
                             // Trigger confetti if Lomito just got activated
@@ -442,6 +323,7 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
                 }
 
                 function triggerConfetti() {
+                    if (prefersReducedMotion()) return;
                     if (typeof window.confetti === "function") {
                         runConfetti();
                     } else {
@@ -452,10 +334,13 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
                     }
                 }
 
+                // Confetti con los cuatro colores vivos, leídos de los tokens
                 function runConfetti() {
+                    const styles = getComputedStyle(document.documentElement);
+                    const colors = ['rosa', 'cyan', 'amarillo', 'violeta'].map(c => styles.getPropertyValue(`--lutvia-${c}`).trim());
                     const duration = 5 * 1000;
                     const animationEnd = Date.now() + duration;
-                    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+                    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100, colors, disableForReducedMotion: true };
 
                     function randomInRange(min, max) {
                         return Math.random() * (max - min) + min;
@@ -503,39 +388,40 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
                     if (rollForm && rollButton && rollOverlay) {
                         rollForm.addEventListener('submit', (e) => {
                             e.preventDefault();
-                            
+
                             // Show full-screen overlay
                             rollOverlay.classList.remove('hidden');
                             rollOverlay.classList.add('flex');
-                            
-                            // Disable button
+
+                            // Ya tirado: el botón pasa al estado deshabilitado del sistema
                             rollButton.disabled = true;
-                            rollButton.classList.add('opacity-50', 'cursor-not-allowed');
-                            
-                            // Animate overlay dice faces
-                            const diceIcons = rollOverlay.querySelectorAll('.flex i');
-                            const diceWords = ['one', 'two', 'three', 'four', 'five', 'six'];
-                            
-                            const faceChangeInterval = setInterval(() => {
-                                diceIcons.forEach(icon => {
-                                    diceWords.forEach(word => icon.classList.remove(`fa-dice-${word}`));
-                                    const randomVal = Math.floor(Math.random() * 6);
-                                    icon.classList.add(`fa-dice-${diceWords[randomVal]}`);
-                                });
-                            }, 60);
+
+                            // Las caras cambian solas mientras ruedan; con movimiento reducido quedan quietas
+                            let faceChangeInterval = null;
+                            if (!prefersReducedMotion()) {
+                                const diceIcons = rollOverlay.querySelectorAll('[data-overlay-die]');
+                                const diceWords = ['one', 'two', 'three', 'four', 'five', 'six'];
+                                faceChangeInterval = setInterval(() => {
+                                    diceIcons.forEach(icon => {
+                                        diceWords.forEach(word => icon.classList.remove(`fa-dice-${word}`));
+                                        const randomVal = Math.floor(Math.random() * 6);
+                                        icon.classList.add(`fa-dice-${diceWords[randomVal]}`);
+                                    });
+                                }, 60);
+                            }
 
                             // Change status texts for suspense
                             setTimeout(() => {
                                 if (overlayStatusText) overlayStatusText.textContent = 'Calculando trayectorias...';
                             }, 500);
-                            
+
                             setTimeout(() => {
                                 if (overlayStatusText) overlayStatusText.textContent = 'Escribiendo el destino...';
                             }, 1000);
 
                             // Submit form after 1.5 seconds
                             setTimeout(() => {
-                                clearInterval(faceChangeInterval);
+                                if (faceChangeInterval) clearInterval(faceChangeInterval);
                                 rollForm.submit();
                             }, 1500);
                         });
@@ -546,7 +432,12 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
                 document.addEventListener('astro:page-load', () => {
                     stopPolling();
                     setupRollAnimation();
-                    
+
+                    // Si el banner de Lomito ya está al cargar, se festeja
+                    if (document.querySelector('#lomito-container section')) {
+                        triggerConfetti();
+                    }
+
                     document.addEventListener("visibilitychange", handleVisibilityChange);
                     if (!document.hidden) {
                         startPolling();
@@ -559,30 +450,29 @@ const savedPlayers = sortedRolls.filter(r => rollChoreMap.get(r.id)?.code === 'N
                 });
             })();
         </script>
-        
+
         {showScheduleNotice && <ScheduleNotice start={schedule.start} end={schedule.end} dateStr={dateStr} />}
 
-        <!-- Fullscreen Dice Rolling Overlay -->
-        <div id="roll-overlay" class="fixed inset-0 z-[100] bg-background/80 backdrop-blur-md hidden flex-col items-center justify-center animate-in fade-in duration-300">
-            <div class="bg-white/80 border border-white/20 p-8 sm:p-12 rounded-3xl shadow-2xl flex flex-col items-center gap-8 max-w-md w-[90%] text-center animate-in zoom-in-95 duration-300">
-                <p class="text-secondary font-black tracking-widest uppercase text-sm animate-pulse">Invocando al destino</p>
-                
-                <!-- Giant Rolling Dice Container -->
-                <div class="flex items-center justify-center gap-6 text-5xl sm:text-6xl md:text-7xl py-4">
-                    <i class="fa-solid fa-dice-one text-primary animate-shake-roll" style="animation-delay: 0s;"></i>
-                    <i class="fa-solid fa-dice-two text-secondary animate-shake-roll" style="animation-delay: 0.1s;"></i>
-                    <i class="fa-solid fa-dice-three text-accent animate-shake-roll" style="animation-delay: 0.2s;"></i>
-                    <i class="fa-solid fa-dice-four text-foreground/40 animate-shake-roll" style="animation-delay: 0.3s;"></i>
+        <!-- Pantalla de la tirada: fondo lleno en gris y la tarjeta blanca encima -->
+        <div id="roll-overlay" class="fixed inset-0 z-[100] bg-lutvia-gris hidden flex-col items-center justify-center animate-in fade-in" role="status" aria-live="polite">
+            <div class="bg-lutvia-blanco p-8 sm:p-12 rounded-3xl shadow-xl flex flex-col items-center gap-8 max-w-md w-[90%] text-center animate-in zoom-in-95">
+                <p class="rotulo animate-pulse">Invocando al destino</p>
+
+                <div class="flex items-center justify-center gap-6 text-5xl sm:text-6xl md:text-7xl py-4" aria-hidden="true">
+                    <i data-overlay-die class="fa-solid fa-dice-one text-lutvia-rosa animate-shake-roll"></i>
+                    <i data-overlay-die class="fa-solid fa-dice-two text-lutvia-violeta animate-shake-roll [animation-delay:0.1s]"></i>
+                    <i data-overlay-die class="fa-solid fa-dice-three text-lutvia-oscuro animate-shake-roll [animation-delay:0.2s]"></i>
+                    <i data-overlay-die class="fa-solid fa-dice-four text-lutvia-texto-suave animate-shake-roll [animation-delay:0.3s]"></i>
                 </div>
-                
+
                 <div class="space-y-2">
-                    <h3 class="text-2xl font-black text-foreground tracking-tight" id="overlay-status-text">Lanzando los dados...</h3>
-                    <p class="text-xs text-foreground/50 font-medium">¿Zafás o lavás? El destino se está decidiendo ahora mismo.</p>
+                    <h3 class="text-2xl font-black text-lutvia-oscuro tracking-tight" id="overlay-status-text">Lanzando los dados...</h3>
+                    <p class="text-xs text-lutvia-texto-suave font-medium">¿Zafás o lavás? El destino se está decidiendo ahora mismo.</p>
                 </div>
-                
-                <!-- Glowing loading bar -->
-                <div class="w-full bg-foreground/5 h-2 rounded-full overflow-hidden">
-                    <div class="bg-gradient-to-r from-primary via-secondary to-accent h-full w-full rounded-full animate-pulse"></div>
+
+                <!-- Barra con el degradé de los cuatro colores vivos -->
+                <div class="w-full bg-lutvia-gris h-2 rounded-lutvia-pildora overflow-hidden">
+                    <div class="degrade-lutvia h-full w-full rounded-lutvia-pildora animate-pulse"></div>
                 </div>
             </div>
         </div>

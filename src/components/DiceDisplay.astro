@@ -22,12 +22,14 @@ const sizeClasses = {
     xl: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl gap-3 sm:gap-4 lg:gap-6"
 };
 
-const safeClass = color || (isSafe === undefined ? "text-secondary" : (isSafe ? "text-secondary" : "text-primary"));
+// El dado que decide va en color: cyan si te salvás, rosa si te toca tarea, o el color que pase quien lo usa.
+// Sin estado, va en gris oscuro. El color nunca es la única señal: la fila siempre dice el estado en texto.
+const decisiveClass = color || (isSafe === undefined ? "text-lutvia-oscuro" : (isSafe ? "text-lutvia-cyan" : "text-lutvia-rosa"));
+const dice = [die1, die2, die3, die4];
 ---
 
-<div class={`flex items-center justify-center ${sizeClasses[size]}`}>
-    <i class={`${getDieClass(die1)} ${safeClass} drop-shadow-sm animate-in fade-in zoom-in-95 duration-300 hover:scale-110 hover:rotate-6 transition-all duration-300 cursor-default`}></i>
-    <i class={`${getDieClass(die2)} text-foreground/30 animate-in fade-in zoom-in-95 duration-300 delay-75 hover:scale-110 hover:-rotate-6 transition-all duration-300 cursor-default`}></i>
-    <i class={`${getDieClass(die3)} text-foreground/30 animate-in fade-in zoom-in-95 duration-300 delay-150 hover:scale-110 hover:rotate-6 transition-all duration-300 cursor-default`}></i>
-    <i class={`${getDieClass(die4)} text-foreground/30 animate-in fade-in zoom-in-95 duration-300 delay-200 hover:scale-110 hover:-rotate-6 transition-all duration-300 cursor-default`}></i>
+<div class={`flex items-center justify-center ${sizeClasses[size]}`} role="img" aria-label={`Dados: ${dice.join(", ")}`}>
+    {dice.map((die, i) => (
+        <i class={`${getDieClass(die)} ${i === 0 ? decisiveClass : "text-lutvia-texto-suave"} animate-in fade-in zoom-in-95`} aria-hidden="true"></i>
+    ))}
 </div>
